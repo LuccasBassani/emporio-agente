@@ -1,3 +1,4 @@
 httpx>=0.28.1,<0.29
 python-dotenv>=1.1,<2
 pypdf>=6,<7
+streamlit>=1.50,<2

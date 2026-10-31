@@ -108,6 +108,30 @@ As evidências cobrem dois cenários de um turno, não todas as reformulações 
 
 As verificações de referência e o teste de valores sem fonte não comprovam automaticamente a fidelidade de todas as afirmações. A geração segue dependendo da escolha correta de ferramentas e da interpretação pelo modelo. Não há consulta de pedidos, persistência de sessão nem interface gráfica nesta etapa.
 
+## 31/10/2026 — Pedidos e interface de configuração/chat
+
+### Realizado
+
+- Implementadas consulta e listagem de pedidos vinculadas ao cliente escolhido pela aplicação, sem permitir que o modelo forneça outra identidade.
+- Preservados total histórico, rastreamento ausente e ausência de data real de recebimento. Nome, contato, e-mail, notas e datas de pedidos não fazem parte do retorno para o modelo.
+- Implementadas configuração de nome/tom/instruções/modelos, importação e exportação JSON, chat com fontes, nova conversa e downloads Markdown/TXT com evidências opcionais.
+- Troca de cliente, aplicação e importação de configuração limpam a conversa anterior. Pergunta com erro pode ser repetida explicitamente e não entra no histórico até concluir.
+- Instalado Streamlit 1.66.1 no ambiente Python 3.14.4; revisado requisito mínimo de Python para 3.12 por causa das versões fixadas das dependências.
+
+### Verificação
+
+- Quarenta e um testes passaram na primeira rodada, incluindo pedidos, configuração e Streamlit AppTest com API simulada. Adicionado teste para conferir aplicação do perfil no prompt e exportação sem evidências; a suíte passou a conter 42 testes.
+- Após autorização explícita, a consulta real do pedido fictício 8 foi executada pela interface via AppTest com cliente #2. Status, item, total e rastreamento corresponderam aos CSVs. Evidência salva em examples/pedido-rastreamento.md.
+- Interface iniciada em 127.0.0.1:8501 e inspecionada no navegador. Uma pergunta sobre acessórios foi respondida conforme o escopo fixo e exportada em examples/fora-do-escopo.md.
+- Downloads Markdown, TXT e JSON realizados pelo navegador e conteúdo dos arquivos conferido. Configuração importada mudou o nome para Bia e limpou o chat; ao final, a configuração inicial Lia foi restaurada.
+- Captura da interface salva em docs/interface.png. O servidor local foi deixado em execução para revisão do candidato.
+- Dependências de requirements.lock.txt instaladas em um segundo ambiente virtual limpo com Python 3.14.4. Os 42 testes e o comando de ajuda passaram nesse ambiente; pip check não identificou incompatibilidades.
+- Código, testes, documentação e verificações desta etapa realizados com assistência do Codex.
+
+### Limitações
+
+Os testes da interface não demonstram todas as combinações de perguntas. Ollama não foi validado com modelo local em execução. Identificação é simulada; não há autenticação de produção, atendimento humano real ou operações de escrita em pedidos. A revisão para publicação e entrega continua pendente.
+
 ## Como registrar as próximas etapas
 
 Para cada etapa, anotar: problema, solução escolhida e motivo, alternativa considerada, teste executado, resultado e limitação restante.

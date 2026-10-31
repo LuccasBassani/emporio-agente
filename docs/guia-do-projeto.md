@@ -14,15 +14,26 @@ Este guia acompanha a construção do agente de atendimento da Empório da Músi
 - [x] Validar conexão e ferramentas com Groq em chamadas reais.
 - [ ] Validar o conector Ollama com modelo local.
 - [x] Implementar e validar consultas de catálogo, disponibilidade, promoções e PIX.
-- [ ] Implementar consultas de pedidos por cliente de teste.
+- [x] Implementar consultas de pedidos por cliente de teste.
 - [x] Recuperar as políticas por pergunta e verificar o conjunto inicial de perguntas.
 - [x] Validar dois cenários reais de políticas com Groq e registrar evidências.
 - [x] Integrar o modelo às ferramentas de catálogo e recuperação de políticas.
-- [ ] Montar configuração, chat e exportações.
-- [ ] Testar o conjunto e salvar exemplos reais.
+- [x] Montar configuração, chat e exportações.
+- [x] Executar verificação inicial do conjunto e salvar cinco exemplos reais.
 - [ ] Revisar a entrega e tornar o repositório público.
 
-O projeto já tem agente por terminal com catálogo, preços, recuperação de políticas e histórico de sessão. A Groq passou nos diagnósticos reais, nos dois cenários de políticas e em uma conversa de catálogo com continuação sobre PIX. Consultas de catálogo e o ciclo de ferramentas têm testes automatizados. A cota gratuita limitou uma primeira tentativa; a nova sessão foi concluída com intervalo entre turnos. Pedidos, interface de configuração/chat e avaliação mais ampla continuam pendentes.
+O protótipo tem interface e terminal com catálogo, preços, RAG, pedidos por cliente de teste, configuração e exportações. A Groq passou nos cenários reais registrados, incluindo consulta de pedido pela interface. O navegador foi usado para conferir o envio de mensagem, importação de configuração e downloads. Ollama está preparado, mas ainda sem validação real local. A revisão final de entrega continua pendente.
+
+## Como acompanhar a versão atual
+
+1. Na pasta do projeto, execute `.\.venv\Scripts\python.exe -m streamlit run app.py` e abra http://127.0.0.1:8501.
+2. Ajuste nome, tom, instruções e provedor. Clique em **Aplicar e iniciar nova conversa**.
+3. Pergunte por dois violões até R$ 1.000 e depois pergunte pelo preço do primeiro no PIX. Confira as consultas no expansor da resposta.
+4. Baixe a conversa antes de mudar o contexto. Selecione **Cliente #2** e consulte o **pedido 8**. Uma consulta a pedido de outro cliente não deve expor seus dados.
+5. Teste uma dúvida de política e confira os trechos recuperados do PDF. Os testes já exportados estão em examples/.
+6. Baixe a configuração JSON, altere uma preferência e importe o arquivo anterior para reproduzir a configuração. Não é necessário informar chave no JSON.
+
+Trocar cliente ou aplicar/importar configuração limpa a conversa. A sessão não é salva automaticamente; use o download. A API gratuita pode exigir intervalo entre mensagens ou uma nova tentativa depois de renovar a cota.
 
 ## Prazo e prioridade
 
@@ -186,4 +197,4 @@ Não precisa escrever um diário longo. Para cada decisão relevante, responder:
 
 ## Próxima ação
 
-Implementar pedidos restritos ao cliente de teste e a interface de configuração/chat. Ollama ainda precisa de validação com modelo local. Manter a revisão de respostas reais e respeitar a cota de uso do provedor.
+Fazer a revisão do protótipo com o candidato, priorizar eventuais ajustes e preparar a entrega. Ollama ainda precisa de validação com modelo local. Manter o repositório privado até a revisão para publicação exigida pelo desafio.

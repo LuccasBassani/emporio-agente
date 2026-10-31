@@ -4,10 +4,10 @@ Protótipo do desafio técnico de AI Engineer da Artefact.
 
 ## Situação atual
 
-Desenvolvimento iniciado em 31/10/2026. Agente por terminal com consultas de catálogo, preços, promoções, RAG sobre políticas e histórico de sessão implementados. As consultas de pedidos e a interface de configuração/chat ainda estão pendentes.
+Desenvolvimento iniciado em 31/10/2026. Protótipo local com interface de configuração e chat, RAG sobre políticas, catálogo/preços, pedidos por cliente de teste, fontes e exportações implementados. A revisão final de entrega e a validação do modelo local Ollama continuam pendentes.
 Entrega informada pelo candidato: terça-feira, 03/11/2026 às 23h59. Planejamento em America/Sao_Paulo, sujeito ao fuso indicado no e-mail.
 
-## Escopo proposto para a primeira versão
+## Funcionalidades da primeira versão
 
 - Aplicação local em Python com interface Streamlit.
 - Configuração de nome, tom e instruções adicionais do agente.
@@ -16,14 +16,26 @@ Entrega informada pelo candidato: terça-feira, 03/11/2026 às 23h59. Planejamen
 - Busca de trechos relevantes no PDF de políticas, com indicação da seção/página.
 - Exportação da conversa em Markdown ou texto e da configuração em JSON.
 - Visualização opcional das consultas e fontes usadas, sem expor raciocínio interno do modelo.
+- Pedidos restritos ao cliente fictício selecionado, sem enviar nomes ou contatos ao modelo.
 
 O agente é inspirado na experiência de configuração e simulação de atendimento de um projeto já desenvolvido. A implementação será independente, em Python, sem copiar código ou depender da infraestrutura do projeto de referência.
 
-## Arquitetura proposta
+## Arquitetura
 
 Interface Streamlit -> agente Python -> ferramentas de consulta -> CSVs e políticas.
 O agente usa uma API de modelo para escolher ferramentas e redigir respostas.
 Filtros, cálculos de preço e validação dos parâmetros ficam no código Python.
+
+```mermaid
+flowchart LR
+    UI[Interface ou terminal] --> AG[Agente Python]
+    AG <--> LLM[Groq ou Ollama]
+    AG --> CAT[Consultas estruturadas nos CSVs]
+    AG --> RAG[Recuperação BM25 no PDF]
+    CAT --> AG
+    RAG --> AG
+    AG --> OUT[Resposta com fontes e exportação]
+```
 
 Groq e Ollama são os provedores escolhidos. A seleção é explícita em `LLM_PROVIDER`, sem troca automática entre processamento local e externo.
 Groq depende de chave e das cotas disponíveis na conta. Ollama depende do servidor local e do modelo baixado.
@@ -31,7 +43,7 @@ A chave fica em variável de ambiente ou `.env` local, fora do Git. Os modelos s
 
 ## Preparar e executar
 
-Requer Python 3.11 ou superior. Ambiente verificado nesta etapa: Python 3.14.4 no Windows.
+Requer Python 3.12 ou superior para as versões fixadas das dependências. Ambiente verificado: Python 3.14.4 no Windows.
 No PowerShell, a partir da pasta do projeto:
 
 ```powershell
@@ -42,6 +54,25 @@ Copy-Item .env.example .env
 
 Copie o exemplo apenas na primeira configuração; preserve o `.env` se ele já contiver sua chave. Não é necessário ativar o ambiente virtual para usar os comandos abaixo.
 `requirements.txt` declara as dependências diretas; `requirements.lock.txt` registra as versões instaladas nesta etapa, incluindo dependências transitivas.
+
+### Abrir a interface
+
+```powershell
+.\.venv\Scripts\python.exe -m streamlit run app.py
+```
+
+Abra http://127.0.0.1:8501 no navegador. O servidor usa somente a interface local do computador. Para encerrar, pressione Ctrl+C no terminal.
+
+1. Escolha nome, tom e instruções adicionais; selecione Groq ou Ollama e confira o modelo.
+2. Clique em **Aplicar e iniciar nova conversa**. Alterações em rascunho não mudam uma conversa em andamento.
+3. Para testar pedidos, selecione o cliente fictício. **Cliente #2** tem o **pedido 8**; o **Cliente #6** tem o **pedido 9**, sem código de rastreamento.
+4. Envie mensagens. Em **Ver consultas e fontes**, confira os argumentos, resultados e trechos usados.
+5. Baixe a conversa em Markdown ou TXT. A caixa de seleção permite incluir ou omitir consultas e fontes.
+6. Baixe a configuração em JSON e recarregue-a por **Importar configuração** quando quiser reproduzir o estilo e a seleção de modelo.
+
+Aplicar ou importar configuração, trocar o cliente ou clicar em **Nova conversa** limpa o histórico atual. Exporte antes de trocar, se quiser guardá-lo. A configuração JSON não inclui chave, histórico ou identidade do cliente. Credenciais são lidas do `.env`; reinicie o servidor após alterá-las.
+
+![Interface local de configuração e chat](docs/interface.png)
 
 ### Usar Groq
 
@@ -99,6 +130,9 @@ Os testes usam respostas HTTP simuladas para verificar os dois protocolos, retor
 - `emporio/catalog.py`: consultas e cálculos de preço em Python.
 - `emporio/tools.py`: ferramentas permitidas e validação de argumentos.
 - `emporio/agent.py`: escolha de ferramentas pelo modelo, histórico e exportação.
+- `emporio/orders.py`: pedidos vinculados ao cliente de teste definido pela aplicação.
+- `emporio/profile.py`: configuração validada e exportável, sem credenciais.
+- `emporio/ui.py` e `app.py`: interface Streamlit de configuração e chat.
 - `emporio/__main__.py`: diagnósticos, consultas e chat por terminal.
 - `emporio/policies.py`: extração por seção/página e busca lexical BM25.
 - `emporio/rag.py`: recuperação, geração e validação dos identificadores de fonte.
@@ -128,7 +162,7 @@ Converse com o agente usando o provedor configurado:
 
 No chat, use `/sair` para encerrar e salvar a conversa. `--show-sources` mostra consultas e resultados. A exportação contém as mensagens, parâmetros e resultados completos das ferramentas, além das fontes citadas, sem credencial.
 
-O modelo pode escolher buscar_produtos, consultar_produto ou buscar_politicas. A ferramenta de políticas executa a recuperação do PDF antes de devolver contexto ao modelo; consultas operacionais ficam nas funções de catálogo. Os nomes de funções são uma lista fechada, sem execução de código sugerido pelo modelo.
+O modelo pode escolher buscar_produtos, consultar_produto, buscar_politicas, consultar_pedido ou listar_meus_pedidos. A ferramenta de políticas executa a recuperação do PDF antes de devolver contexto ao modelo; consultas operacionais ficam nas funções de catálogo/pedidos. Os nomes de funções são uma lista fechada, sem execução de código sugerido pelo modelo.
 
 Cada turno é limitado a quatro rodadas de geração e quatro chamadas de ferramenta por rodada. Somente turnos concluídos entram no histórico; o contexto inclui os dois últimos turnos completos. Não há persistência ou carregamento automático de sessões anteriores. As consultas usam a fotografia dos CSVs carregada ao iniciar a sessão, sem integração com estoque ao vivo.
 
@@ -139,6 +173,31 @@ No plano gratuito da Groq, uma pergunta pode exigir várias chamadas ao modelo e
 A conversa real de [catálogo e PIX](examples/catalogo-e-pix.md) foi concluída com intervalo entre os turnos: o agente recuperou duas opções, interpretou a referência ao primeiro produto e consultou o preço no PIX. Essa execução foi revisada contra os CSVs e o cálculo Python; não demonstra acerto para todas as reformulações.
 
 Buscas por marca/modelo usam nome e categoria. As descrições livres não entram na busca porque há divergências no material fornecido. Filtros de cordas e captação usam os valores de specs; campo ausente não é tratado como falso. Ainda é necessário revisar divergências nas especificações antes de afirmar características não comprovadas.
+
+## Pedidos e cliente de teste
+
+A aplicação fixa o cliente fora dos argumentos do modelo. Uma consulta verifica essa associação antes de devolver informações; pedido inexistente e pedido de outro cliente recebem a mesma resposta. A interface começa uma conversa nova ao mudar a seleção para impedir mistura de históricos. Essa seleção é uma simulação local, não autenticação de produção.
+
+As ferramentas devolvem somente número, status, itens, total histórico e rastreamento, com metadados das fontes. Não incluem nome, telefone, e-mail, endereço, notas ou identidade do cliente. O total do pedido não é recalculado com os preços atuais. Código ausente permanece ausente, e não existe consulta ao site da transportadora nem data efetiva de recebimento.
+
+No terminal, o mesmo contexto pode ser selecionado explicitamente:
+
+```powershell
+.\.venv\Scripts\python.exe -m emporio --customer-id 2 --message "Qual o status do pedido 8?"
+```
+
+## Validação e limitações conhecidas
+
+- 42 testes automatizados de preços, disponibilidade, acesso a pedidos, recuperação, protocolos de IA e fluxo da interface via Streamlit AppTest. As chamadas nesses testes são simuladas e não consomem API. As dependências fixadas foram instaladas em um segundo ambiente virtual limpo e os mesmos testes passaram, com pip check sem incompatibilidades.
+- Exemplos reais em [examples/](examples/README.md), com catálogo/continuação, políticas, pedido e atendimento fora do escopo. A consulta real de pedido foi executada pela interface via AppTest com Groq. Envio de mensagem, importação da configuração e downloads Markdown/TXT/JSON também foram conferidos no navegador.
+- RAG lexical pode falhar em reformulações ou recuperar trechos incompletos; citações válidas não garantem fidelidade de todas as afirmações. O comportamento de triagem de devolução ainda depende do modelo.
+- Instruções de estilo são subordinadas às regras fixas no prompt e às validações do código. Isso não é uma garantia absoluta contra prompt injection.
+- Histórico em memória da sessão, com dois turnos anteriores no contexto. Sem gravação automática de conversas nem credenciais exportadas. Recarregar ou encerrar a sessão pode perder o histórico; use o download.
+- A cota gratuita pode interromper o fluxo. A tela mantém a pergunta com falha e oferece nova tentativa explícita; não há retry ou fallback automático.
+- Ollama tem suporte de protocolo testado com respostas simuladas, mas ainda não foi validado com um modelo local instalado.
+- Os dados e políticas são uma fotografia fornecida pelo desafio. Não há integração com WhatsApp real, estoque ao vivo, transportadora ou operações de compra/devolução.
+
+Com mais tempo: ampliar a avaliação com reformulações e ataques ao prompt, comparar recuperação semântica com BM25, validar modelos locais, adicionar autenticação real e persistência com retenção definida. Essas melhorias não são apresentadas como funcionalidades existentes.
 
 ## RAG sobre políticas
 
@@ -178,7 +237,7 @@ Dois cenários reais de geração, sobre promoção/PIX e devolução, estão re
 
 ## Uso de IA até o momento
 
-Codex foi usado para ler o enunciado, examinar os dados, consultar documentação oficial, analisar a referência de interface, preparar a documentação e implementar a camada inicial de configuração, conectores e testes. As escolhas de suporte a Groq e Ollama foram confirmadas durante o desenvolvimento. Os testes executados e as limitações estão registrados no diário.
+Codex foi usado para ler o enunciado, examinar os dados, consultar documentação oficial, analisar a referência de interface, implementar o protótipo e seus testes e preparar a documentação. As escolhas de escopo e provedores foram discutidas durante o desenvolvimento. O fluxo de trabalho foi incremental: implementar, executar testes locais e reais, revisar falhas, registrar decisões e salvar commits. Um exemplo foi a correção da triagem de devolução após uma resposta que confirmou elegibilidade antes de perguntar a data de recebimento. Evidências e limitações estão registradas no diário.
 
 ## Documentação
 

@@ -1,6 +1,6 @@
 # Decisões e questões em aberto
 
-As opções abaixo são propostas iniciais, não resultados de implementação ou testes.
+Este documento registra escolhas implementadas, motivos e limitações. Pendências estão indicadas explicitamente.
 
 ## 1. Python e Streamlit
 
@@ -8,6 +8,12 @@ Motivo: atender à exigência de Python e concentrar interface e agente na mesma
 Streamlit oferece elementos de chat e download de arquivos.
 Alternativa considerada: interface React com API Python. Adicionaria duas aplicações e mais configuração sem necessidade para o protótipo.
 Limitação: menor liberdade de interface que uma aplicação web personalizada.
+
+Implementada tela com configuração e chat lado a lado, importação/exportação JSON e download de conversa em Markdown/TXT, com evidências opcionais. Aplicar ou importar configuração e trocar de cliente iniciam conversa nova. Dados de catálogo/políticas são compartilhados em cache de leitura, enquanto cliente HTTP, contexto de cliente e histórico ficam na sessão do usuário.
+
+A chave não é um campo de configuração exportável. JSON importado aceita somente os campos conhecidos; campos extras, credenciais e identidade são rejeitados. A escolha de cliente fica fora do JSON de estilo/modelo.
+
+Requisitos fixados: Python 3.12 ou superior, devido ao NumPy instalado como dependência do Streamlit. Ambiente testado: Python 3.14.4 no Windows.
 
 ## 2. Consultas estruturadas para dados operacionais
 
@@ -19,7 +25,9 @@ Disponibilidade: status active e estoque positivo. Preservar motivos distintos p
 
 Busca: normalizar acentos e consultar nome/categoria, sem usar descrições livres divergentes para identificar marcas ou modelos. Filtros de cordas e captação usam specs; valores ausentes não são inferidos. Ordenar pelo preço final e informar quando existem mais resultados do que os exibidos.
 
-Agente: lista fechada de três ferramentas, limite de quatro rodadas por turno e histórico dos dois últimos turnos completos. Chamadas e respostas de ferramenta permanecem juntas; turnos com falha não entram no histórico. A exportação registra consultas completas, enquanto o contexto enviado ao modelo omite metadados repetidos para economizar tokens.
+Agente: lista fechada de cinco ferramentas, limite de quatro rodadas por turno e histórico dos dois últimos turnos completos. Chamadas e respostas de ferramenta permanecem juntas; turnos com falha não entram no histórico. A exportação registra consultas completas, enquanto o contexto enviado ao modelo omite metadados repetidos para economizar tokens.
+
+Pedidos: identidade vinculada pela aplicação e ausente do schema das ferramentas. Pedido de terceiro e pedido inexistente geram resposta equivalente. A seleção local simula identificação, sem pretender autenticação real. As ferramentas enviam somente número/status/itens/total/rastreamento e referências; não enviam nome, contato, notas ou data estimada de entrega. Preservar o total histórico e a ausência de rastreamento/data real de recebimento.
 
 Limitação observada: uma conversa rápida na Groq atingiu a cota gratuita durante uma pergunta de continuação. Não fazer fallback ou retry automático; orientar nova tentativa após renovar a cota.
 
@@ -81,6 +89,6 @@ Além das conversas, testar funções críticas de preço, filtros e acesso a pe
 ## Pendências
 
 - Prazo informado pelo candidato: 03/11/2026 às 23h59. Conferir eventual fuso específico no e-mail. Priorizar uma primeira versão completa em 31/10.
-- Configurar uma chave pessoal Groq ou iniciar Ollama com o modelo instalado; realizar o diagnóstico real e verificar as condições de uso/cotas.
-- Validar com o candidato o escopo e a estratégia de recuperação.
-- Implementar e testar antes de declarar qualquer funcionalidade como concluída.
+- Groq configurada e testada; validar Ollama com modelo instalado e respeitar as cotas disponíveis.
+- Revisar as cinco conversas e ampliar testes com variações, ambiguidades e tentativa de induzir respostas sem fontes.
+- Revisão final da entrega e mudança do repositório para público permanecem pendentes; não publicar a aplicação nem enviar e-mail automaticamente.
