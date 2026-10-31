@@ -11,9 +11,17 @@ Limitação: menor liberdade de interface que uma aplicação web personalizada.
 
 ## 2. Consultas estruturadas para dados operacionais
 
-Ler os CSVs e expor funções Python com parâmetros definidos. O modelo solicita a consulta; o código valida e executa.
-Preços, estoque, status e descontos não devem depender de similaridade de texto.
-Começar com leitura direta dos arquivos; avaliar SQLite apenas se as consultas justificarem a camada adicional.
+Implementada leitura direta dos CSVs por funções Python com parâmetros definidos. O modelo solicita a consulta; o código valida e executa. Preços, estoque, status e descontos não dependem de similaridade textual. SQLite não foi necessário para o tamanho e as consultas atuais.
+
+Orçamento: filtrar pelo preço final arredondado para o pagamento escolhido, sem frete. Decimal com ROUND_HALF_UP evita aritmética binária de ponto flutuante. Promoção ativa prevalece; não aplicar PIX adicional. Sem promoção, PIX aplica 5% sobre a tabela. Múltiplas promoções ativas para um produto são consideradas ambíguas, sem selecionar uma arbitrariamente.
+
+Disponibilidade: status active e estoque positivo. Preservar motivos distintos para esgotado, descontinuado e coming_soon. Estoque positivo não reativa um produto. Os dados são uma fotografia carregada no início da sessão.
+
+Busca: normalizar acentos e consultar nome/categoria, sem usar descrições livres divergentes para identificar marcas ou modelos. Filtros de cordas e captação usam specs; valores ausentes não são inferidos. Ordenar pelo preço final e informar quando existem mais resultados do que os exibidos.
+
+Agente: lista fechada de três ferramentas, limite de quatro rodadas por turno e histórico dos dois últimos turnos completos. Chamadas e respostas de ferramenta permanecem juntas; turnos com falha não entram no histórico. A exportação registra consultas completas, enquanto o contexto enviado ao modelo omite metadados repetidos para economizar tokens.
+
+Limitação observada: uma conversa rápida na Groq atingiu a cota gratuita durante uma pergunta de continuação. Não fazer fallback ou retry automático; orientar nova tentativa após renovar a cota.
 
 ## 3. Recuperação de políticas
 

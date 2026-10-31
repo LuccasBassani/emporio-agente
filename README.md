@@ -4,7 +4,7 @@ Protótipo do desafio técnico de AI Engineer da Artefact.
 
 ## Situação atual
 
-Desenvolvimento iniciado em 31/10/2026. Ambiente Python, conectores Groq/Ollama e RAG sobre políticas implementados, com comandos por terminal. As consultas de catálogo/pedidos, o histórico de conversa e a interface ainda estão pendentes.
+Desenvolvimento iniciado em 31/10/2026. Agente por terminal com consultas de catálogo, preços, promoções, RAG sobre políticas e histórico de sessão implementados. As consultas de pedidos e a interface de configuração/chat ainda estão pendentes.
 Entrega informada pelo candidato: terça-feira, 03/11/2026 às 23h59. Planejamento em America/Sao_Paulo, sujeito ao fuso indicado no e-mail.
 
 ## Escopo proposto para a primeira versão
@@ -96,12 +96,49 @@ Os testes usam respostas HTTP simuladas para verificar os dois protocolos, retor
 
 - `emporio/config.py`: leitura e validação das configurações.
 - `emporio/llm.py`: requisições Groq/Ollama e normalização de texto e ferramentas.
-- `emporio/__main__.py`: comandos de diagnóstico.
+- `emporio/catalog.py`: consultas e cálculos de preço em Python.
+- `emporio/tools.py`: ferramentas permitidas e validação de argumentos.
+- `emporio/agent.py`: escolha de ferramentas pelo modelo, histórico e exportação.
+- `emporio/__main__.py`: diagnósticos, consultas e chat por terminal.
 - `emporio/policies.py`: extração por seção/página e busca lexical BM25.
 - `emporio/rag.py`: recuperação, geração e validação dos identificadores de fonte.
 - `data/`: cópias dos seis CSVs e do manual fornecido, sem alterar os originais.
 - `tests/`: testes de integração simulada dos conectores.
 - `docs/`: decisões, guia e diário.
+
+## Catálogo e agente por terminal
+
+Consulte os CSVs sem chamar o modelo:
+
+```powershell
+.\.venv\Scripts\python.exe -m emporio --catalog --category-id 5 --max-price 1000 --limit 3
+.\.venv\Scripts\python.exe -m emporio --catalog --query "Yamaha C40" --payment pix
+```
+
+O orçamento considera o preço final para o pagamento escolhido, sem frete. Uma promoção ativa tem prioridade sobre o desconto PIX, sem acumulação. As promoções são determinadas pelo campo is_active, sem inferir vigência pela descrição ou pelo mês atual. Se houver mais de uma promoção ativa para o mesmo produto, o catálogo recusa a cotação até a regra ser esclarecida.
+
+Valores monetários são calculados com Decimal e arredondamento ROUND_HALF_UP em centavos. Disponibilidade exige status active e estoque positivo. Itens discontinued ou coming_soon não são oferecidos para compra, mesmo com estoque cadastrado. O preço de um item indisponível pode ser informado como valor cadastrado, acompanhado do motivo da indisponibilidade.
+
+Converse com o agente usando o provedor configurado:
+
+```powershell
+.\.venv\Scripts\python.exe -m emporio --message "Quais violões disponíveis custam até R$ 1.000?"
+.\.venv\Scripts\python.exe -m emporio --chat --export local/conversa.md
+```
+
+No chat, use `/sair` para encerrar e salvar a conversa. `--show-sources` mostra consultas e resultados. A exportação contém as mensagens, parâmetros e resultados completos das ferramentas, além das fontes citadas, sem credencial.
+
+O modelo pode escolher buscar_produtos, consultar_produto ou buscar_politicas. A ferramenta de políticas executa a recuperação do PDF antes de devolver contexto ao modelo; consultas operacionais ficam nas funções de catálogo. Os nomes de funções são uma lista fechada, sem execução de código sugerido pelo modelo.
+
+Cada turno é limitado a quatro rodadas de geração e quatro chamadas de ferramenta por rodada. Somente turnos concluídos entram no histórico; o contexto inclui os dois últimos turnos completos. Não há persistência ou carregamento automático de sessões anteriores. As consultas usam a fotografia dos CSVs carregada ao iniciar a sessão, sem integração com estoque ao vivo.
+
+Os resultados enviados ao modelo omitem metadados repetidos de origem para reduzir o uso de tokens; a exportação preserva a consulta completa. Referências D83 identificam o produto 83 e referências P6.2-p6-1 identificam trechos das políticas. A validação de referências não verifica automaticamente a fidelidade de todas as afirmações ou valores da resposta.
+
+No plano gratuito da Groq, uma pergunta pode exigir várias chamadas ao modelo e exceder a cota de tokens por minuto. O programa informa o erro sem trocar de provedor ou repetir automaticamente. Aguarde a renovação da cota antes de tentar novamente. Uma conversa rápida de teste atingiu esse limite durante a validação inicial.
+
+A conversa real de [catálogo e PIX](examples/catalogo-e-pix.md) foi concluída com intervalo entre os turnos: o agente recuperou duas opções, interpretou a referência ao primeiro produto e consultou o preço no PIX. Essa execução foi revisada contra os CSVs e o cálculo Python; não demonstra acerto para todas as reformulações.
+
+Buscas por marca/modelo usam nome e categoria. As descrições livres não entram na busca porque há divergências no material fornecido. Filtros de cordas e captação usam os valores de specs; campo ausente não é tratado como falso. Ainda é necessário revisar divergências nas especificações antes de afirmar características não comprovadas.
 
 ## RAG sobre políticas
 

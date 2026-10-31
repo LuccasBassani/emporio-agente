@@ -85,6 +85,29 @@ Não houve geração real: não foi configurada chave Groq e não foi encontrado
 
 As evidências cobrem dois cenários de um turno, não todas as reformulações nem o conjunto completo do desafio. O ajuste depende de cumprimento da instrução pelo modelo. Não houve envio de dados de clientes. Ollama, continuidade de conversa, catálogo e pedidos continuam pendentes.
 
+## 31/10/2026 — Catálogo, preços e agente com ferramentas
+
+### Realizado
+
+- Implementadas consultas diretas aos CSVs de produtos, categorias e promoções, com filtros de orçamento final, nome/categoria, cordas, captação e disponibilidade.
+- Implementados cálculos Decimal, PIX não cumulativo e rejeição de múltiplas promoções ativas ambíguas. Produtos ativos esgotados, descontinuados e coming_soon preservam motivos distintos.
+- Implementado agente com ferramentas permitidas, recuperação de políticas, histórico dos dois últimos turnos completos e exportação de mensagens, consultas e fontes.
+- Adicionados comandos de consulta local, mensagem única e chat interativo no terminal.
+- Desenvolvidos código, testes e documentação com assistência do Codex.
+
+### Verificação inicial
+
+- Vinte e oito testes automatizados passaram, incluindo orçamento e arredondamento, promoções, status/estoque, chamada/retorno de ferramentas, fontes, histórico após erro e limites de execução.
+- Consulta local à categoria de violões até R$ 1.000 encontrou 12 produtos disponíveis; os resultados foram comparados aos CSVs.
+- Primeira busca real pela Groq apresentou corretamente as duas opções mais baratas. A pergunta de continuação atingiu a cota gratuita; não foi apresentada como um teste completo aprovado.
+- Removidos metadados repetidos dos resultados enviados ao modelo, preservando os dados completos nas evidências. Iniciada nova sessão para verificar o fluxo com intervalo entre turnos.
+- Nova sessão concluída e revisada: duas opções retornadas pelo catálogo e pergunta "o primeiro no PIX" corretamente relacionada ao produto 83. A ferramenta calculou R$ 408,41, valor que foi apresentado pelo modelo. Evidência real salva em examples/catalogo-e-pix.md, sem edição das respostas.
+- Acrescentado teste para o limite de contexto, verificando que mantém dois turnos completos e não separa chamadas dos resultados de ferramentas. A suíte final desta etapa contém 29 testes.
+
+### Limitações
+
+As verificações de referência e o teste de valores sem fonte não comprovam automaticamente a fidelidade de todas as afirmações. A geração segue dependendo da escolha correta de ferramentas e da interpretação pelo modelo. Não há consulta de pedidos, persistência de sessão nem interface gráfica nesta etapa.
+
 ## Como registrar as próximas etapas
 
 Para cada etapa, anotar: problema, solução escolhida e motivo, alternativa considerada, teste executado, resultado e limitação restante.

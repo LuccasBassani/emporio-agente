@@ -13,15 +13,16 @@ Este guia acompanha a construção do agente de atendimento da Empório da Músi
 - [x] Implementar conectores Groq/Ollama e testar contratos HTTP simulados.
 - [x] Validar conexão e ferramentas com Groq em chamadas reais.
 - [ ] Validar o conector Ollama com modelo local.
-- [ ] Implementar e validar as consultas.
+- [x] Implementar e validar consultas de catálogo, disponibilidade, promoções e PIX.
+- [ ] Implementar consultas de pedidos por cliente de teste.
 - [x] Recuperar as políticas por pergunta e verificar o conjunto inicial de perguntas.
 - [x] Validar dois cenários reais de políticas com Groq e registrar evidências.
-- [ ] Integrar o modelo às ferramentas.
+- [x] Integrar o modelo às ferramentas de catálogo e recuperação de políticas.
 - [ ] Montar configuração, chat e exportações.
 - [ ] Testar o conjunto e salvar exemplos reais.
 - [ ] Revisar a entrega e tornar o repositório público.
 
-O projeto executa diagnósticos e RAG de políticas por terminal. A Groq passou nos diagnósticos reais de conexão e ferramentas. O RAG foi verificado com recuperação real do PDF, geração simulada e dois cenários de geração real revisados, salvos em examples/. O teste de devolução identificou a necessidade de reforçar a triagem no prompt; a nova resposta pediu a data de recebimento. O agente completo de atendimento e a interface ainda não estão implementados.
+O projeto já tem agente por terminal com catálogo, preços, recuperação de políticas e histórico de sessão. A Groq passou nos diagnósticos reais, nos dois cenários de políticas e em uma conversa de catálogo com continuação sobre PIX. Consultas de catálogo e o ciclo de ferramentas têm testes automatizados. A cota gratuita limitou uma primeira tentativa; a nova sessão foi concluída com intervalo entre turnos. Pedidos, interface de configuração/chat e avaliação mais ampla continuam pendentes.
 
 ## Prazo e prioridade
 
@@ -185,4 +186,4 @@ Não precisa escrever um diário longo. Para cada decisão relevante, responder:
 
 ## Próxima ação
 
-Implementar a primeira consulta de catálogo da etapa 2. Em paralelo, configurar Groq ou Ollama e executar os diagnósticos descritos no README. A implementação das consultas pode avançar sem acesso ao modelo.
+Implementar pedidos restritos ao cliente de teste e a interface de configuração/chat. Ollama ainda precisa de validação com modelo local. Manter a revisão de respostas reais e respeitar a cota de uso do provedor.
