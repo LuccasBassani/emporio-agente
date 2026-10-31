@@ -27,7 +27,7 @@ Filtros, cálculos de preço e validação dos parâmetros ficam no código Pyth
 
 Groq e Ollama são os provedores escolhidos. A seleção é explícita em `LLM_PROVIDER`, sem troca automática entre processamento local e externo.
 Groq depende de chave e das cotas disponíveis na conta. Ollama depende do servidor local e do modelo baixado.
-A chave fica em variável de ambiente ou `.env` local, fora do Git. Os modelos são configuráveis. A Groq passou no diagnóstico real de saudação e chamada/retorno de ferramenta; a geração de políticas com conteúdo do manual precisa de validação real autorizada. Ollama ainda não foi validado com modelo em execução.
+A chave fica em variável de ambiente ou `.env` local, fora do Git. Os modelos são configuráveis. A Groq passou nos diagnósticos reais de saudação e chamada/retorno de ferramenta e em dois cenários de RAG sobre o manual, revisados manualmente. Ollama ainda não foi validado com modelo em execução.
 
 ## Preparar e executar
 
@@ -128,6 +128,8 @@ A exportação inclui pergunta, resposta, modelo/provedor e os trechos recuperad
 Se não houver correspondência lexical, o programa informa a ausência e não chama o modelo. Um score positivo não é uma probabilidade de relevância. Perguntas reformuladas fora do vocabulário podem falhar, e perguntas com muitos assuntos podem exigir mais contexto. O comando atual trata uma pergunta por execução, sem memória de conversa.
 
 `tests/policy_questions.json` contém 14 perguntas revisadas para verificar a presença das seções esperadas entre os quatro primeiros resultados. O conjunto é pequeno e não representa uma avaliação ampla de qualidade.
+
+Dois cenários reais de geração, sobre promoção/PIX e devolução, estão registrados em [examples/](examples/README.md), com as respostas exportadas e os trechos recuperados. O teste de devolução levou a um ajuste da instrução para pedir a data de recebimento antes de concluir elegibilidade. O cenário foi repetido e a nova resposta revisada; o ajuste de prompt não garante esse comportamento em todas as reformulações.
 
 ## Entrega planejada
 

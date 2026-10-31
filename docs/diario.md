@@ -70,6 +70,21 @@ Não houve geração real: não foi configurada chave Groq e não foi encontrado
 - A verificação lexical e de IDs não demonstra fidelidade de todas as afirmações do modelo. A geração real, perguntas adicionais e comportamento com histórico ainda precisam ser avaliados.
 - Código, testes e documentação desta etapa desenvolvidos com assistência do Codex.
 
+## 31/10/2026 — Validação real do RAG
+
+### Realizado
+
+- Recebida autorização explícita para enviar os trechos pertinentes das políticas da loja fictícia à Groq e salvar os resultados dos dois cenários no repositório privado.
+- Executado o cenário promoção + PIX; a resposta correspondeu à regra recuperada e citou a seção pertinente.
+- Executado o cenário de devolução online sem data de recebimento. A resposta inicial explicou o manual, mas começou com uma confirmação e não perguntou a data, contrariando o comportamento esperado.
+- Ajustada a instrução de triagem: em pedido de devolução específico com dados ausentes, apresentar condições sem confirmar elegibilidade e perguntar explicitamente quando o produto foi recebido.
+- Repetido o cenário de devolução; a nova resposta explicou as condições e perguntou a data de recebimento. Resposta revisada em relação aos trechos enviados.
+- Salvas as duas respostas finais reais em examples/, com pergunta, provedor/modelo e trechos recuperados. As respostas exportadas não foram editadas manualmente.
+
+### Limitações
+
+As evidências cobrem dois cenários de um turno, não todas as reformulações nem o conjunto completo do desafio. O ajuste depende de cumprimento da instrução pelo modelo. Não houve envio de dados de clientes. Ollama, continuidade de conversa, catálogo e pedidos continuam pendentes.
+
 ## Como registrar as próximas etapas
 
 Para cada etapa, anotar: problema, solução escolhida e motivo, alternativa considerada, teste executado, resultado e limitação restante.

@@ -25,6 +25,8 @@ Verificação inicial: as seções esperadas foram recuperadas entre os quatro p
 
 O modelo precisa citar IDs dos trechos fornecidos. IDs inexistentes e ausência de citações são rejeitados. Essa validação não verifica automaticamente se o conteúdo da resposta é fiel à fonte; é necessário revisar os exemplos gerados.
 
+Validação real inicial: executados e revisados dois cenários na Groq, com autorização para envio dos trechos do manual. O cenário de devolução mostrou uma confirmação antecipada sem data de recebimento. A instrução foi reforçada para explicar condições sem confirmar elegibilidade e perguntar explicitamente a data ausente; a repetição passou nessa revisão. Essa correção de prompt não garante acerto em todas as perguntas e deve continuar sendo avaliada com variações.
+
 Dados sem correspondência não provocam geração. Não há memória de conversa nessa primeira versão do RAG por terminal. O envio do conteúdo do manual a um provedor externo depende de autorização.
 
 ## 4. Provedores do modelo: Groq e Ollama

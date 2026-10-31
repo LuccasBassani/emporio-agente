@@ -15,13 +15,13 @@ Este guia acompanha a construção do agente de atendimento da Empório da Músi
 - [ ] Validar o conector Ollama com modelo local.
 - [ ] Implementar e validar as consultas.
 - [x] Recuperar as políticas por pergunta e verificar o conjunto inicial de perguntas.
-- [ ] Validar respostas reais de políticas com o provedor escolhido.
+- [x] Validar dois cenários reais de políticas com Groq e registrar evidências.
 - [ ] Integrar o modelo às ferramentas.
 - [ ] Montar configuração, chat e exportações.
 - [ ] Testar o conjunto e salvar exemplos reais.
 - [ ] Revisar a entrega e tornar o repositório público.
 
-O projeto executa diagnósticos e recuperação de políticas por terminal. A Groq passou nos diagnósticos reais de conexão e ferramentas. O RAG foi verificado localmente com extração e recuperação reais do PDF e geração simulada. A validação da geração real sobre o manual está pendente de autorização para envio dos trechos ou disponibilidade de modelo local. O agente completo de atendimento e a interface ainda não estão implementados.
+O projeto executa diagnósticos e RAG de políticas por terminal. A Groq passou nos diagnósticos reais de conexão e ferramentas. O RAG foi verificado com recuperação real do PDF, geração simulada e dois cenários de geração real revisados, salvos em examples/. O teste de devolução identificou a necessidade de reforçar a triagem no prompt; a nova resposta pediu a data de recebimento. O agente completo de atendimento e a interface ainda não estão implementados.
 
 ## Prazo e prioridade
 
