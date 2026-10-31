@@ -1,0 +1,27 @@
+# Credenciais e configuracoes privadas
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# Ambiente Python e arquivos gerados
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Estado local: exemplos revisados para entrega ficam em examples/
+local/
+exports/
+*.log
+
+# Editor e sistema operacional
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
