@@ -4,7 +4,7 @@ Protótipo do desafio técnico de AI Engineer da Artefact.
 
 ## Situação atual
 
-Desenvolvimento iniciado em 31/10/2026. Ambiente Python, dados e conectores Groq/Ollama implementados, com diagnóstico por terminal. O agente de atendimento, as consultas de negócio e a interface ainda estão pendentes.
+Desenvolvimento iniciado em 31/10/2026. Ambiente Python, conectores Groq/Ollama e RAG sobre políticas implementados, com comandos por terminal. As consultas de catálogo/pedidos, o histórico de conversa e a interface ainda estão pendentes.
 Entrega informada pelo candidato: terça-feira, 03/11/2026 às 23h59. Planejamento em America/Sao_Paulo, sujeito ao fuso indicado no e-mail.
 
 ## Escopo proposto para a primeira versão
@@ -27,7 +27,7 @@ Filtros, cálculos de preço e validação dos parâmetros ficam no código Pyth
 
 Groq e Ollama são os provedores escolhidos. A seleção é explícita em `LLM_PROVIDER`, sem troca automática entre processamento local e externo.
 Groq depende de chave e das cotas disponíveis na conta. Ollama depende do servidor local e do modelo baixado.
-A chave fica em variável de ambiente ou `.env` local, fora do Git. Os modelos são configuráveis; a qualidade com modelos reais ainda não foi avaliada.
+A chave fica em variável de ambiente ou `.env` local, fora do Git. Os modelos são configuráveis. A Groq passou no diagnóstico real de saudação e chamada/retorno de ferramenta; a geração de políticas com conteúdo do manual precisa de validação real autorizada. Ollama ainda não foi validado com modelo em execução.
 
 ## Preparar e executar
 
@@ -97,9 +97,37 @@ Os testes usam respostas HTTP simuladas para verificar os dois protocolos, retor
 - `emporio/config.py`: leitura e validação das configurações.
 - `emporio/llm.py`: requisições Groq/Ollama e normalização de texto e ferramentas.
 - `emporio/__main__.py`: comandos de diagnóstico.
+- `emporio/policies.py`: extração por seção/página e busca lexical BM25.
+- `emporio/rag.py`: recuperação, geração e validação dos identificadores de fonte.
 - `data/`: cópias dos seis CSVs e do manual fornecido, sem alterar os originais.
 - `tests/`: testes de integração simulada dos conectores.
 - `docs/`: decisões, guia e diário.
+
+## RAG sobre políticas
+
+O fluxo implementado é: pergunta -> busca no índice do PDF -> seleção de até quatro trechos -> geração pelo modelo -> resposta com citações e registro das fontes. O modelo recebe os trechos selecionados, não o manual inteiro.
+
+A extração preserva seção, página e um identificador para cada trecho. Uma seção que continua na página seguinte mantém seu número e recebe a página correta. A busca usa BM25 com normalização de acentos e um vocabulário explícito de equivalências em português. Não usa embeddings nem banco vetorial.
+
+Para verificar somente a recuperação, sem enviar dados à API:
+
+```powershell
+.\.venv\Scripts\python.exe -m emporio --retrieve "Posso acumular promoção com PIX?" --show-sources
+```
+
+Para gerar uma resposta real e exportar a evidência:
+
+```powershell
+.\.venv\Scripts\python.exe -m emporio --ask "Comprei online e quero devolver. Como funciona?" --show-sources --export local/teste-rag.md
+```
+
+`--ask` envia os trechos recuperados ao provedor selecionado. Com Groq, isso transmite conteúdo do manual ao serviço externo; use apenas com autorização sobre esse conteúdo. Com o endereço local padrão do Ollama e modelo local, a geração é feita no computador.
+
+A exportação inclui pergunta, resposta, modelo/provedor e os trechos recuperados com seção e página. Citações `[P1]`, `[P2]`, etc., identificam esses trechos. O programa rejeita uma resposta sem citação ou com ID inexistente; isso verifica a referência, mas não prova que cada afirmação foi corretamente interpretada. A revisão de fidelidade continua sendo parte dos testes.
+
+Se não houver correspondência lexical, o programa informa a ausência e não chama o modelo. Um score positivo não é uma probabilidade de relevância. Perguntas reformuladas fora do vocabulário podem falhar, e perguntas com muitos assuntos podem exigir mais contexto. O comando atual trata uma pergunta por execução, sem memória de conversa.
+
+`tests/policy_questions.json` contém 14 perguntas revisadas para verificar a presença das seções esperadas entre os quatro primeiros resultados. O conjunto é pequeno e não representa uma avaliação ampla de qualidade.
 
 ## Entrega planejada
 

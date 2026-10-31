@@ -11,15 +11,17 @@ Este guia acompanha a construção do agente de atendimento da Empório da Músi
 - [x] Registrar este plano de trabalho.
 - [x] Configurar o ambiente Python.
 - [x] Implementar conectores Groq/Ollama e testar contratos HTTP simulados.
-- [ ] Validar conexão e ferramentas com um modelo real.
+- [x] Validar conexão e ferramentas com Groq em chamadas reais.
+- [ ] Validar o conector Ollama com modelo local.
 - [ ] Implementar e validar as consultas.
-- [ ] Recuperar as políticas por pergunta.
+- [x] Recuperar as políticas por pergunta e verificar o conjunto inicial de perguntas.
+- [ ] Validar respostas reais de políticas com o provedor escolhido.
 - [ ] Integrar o modelo às ferramentas.
 - [ ] Montar configuração, chat e exportações.
 - [ ] Testar o conjunto e salvar exemplos reais.
 - [ ] Revisar a entrega e tornar o repositório público.
 
-O projeto já executa diagnósticos de conexão por terminal e testes simulados dos conectores. O agente de atendimento e a interface ainda não estão implementados.
+O projeto executa diagnósticos e recuperação de políticas por terminal. A Groq passou nos diagnósticos reais de conexão e ferramentas. O RAG foi verificado localmente com extração e recuperação reais do PDF e geração simulada. A validação da geração real sobre o manual está pendente de autorização para envio dos trechos ou disponibilidade de modelo local. O agente completo de atendimento e a interface ainda não estão implementados.
 
 ## Prazo e prioridade
 
@@ -47,7 +49,7 @@ Prioridade do candidato: adiantar a maior parte em 31/10. A meta para hoje é um
 | API | Decisão confirmada | Groq no plano gratuito ou Ollama local; nenhum gasto pago autorizado |
 | Interface | Proposta recomendada | Streamlit para configuração, chat e exportações |
 | Dados | Proposta recomendada | Funções Python sobre os CSVs; cálculos e validações no código |
-| Políticas | Proposta recomendada | Extrair por seção/página e avaliar busca textual antes de adicionar embeddings |
+| Políticas | Implementado e verificado localmente | RAG lexical BM25, com seção/página e 14 perguntas de recuperação |
 | Identificação | Proposta para demonstração | Selecionar um cliente fictício e restringir pedidos a esse cliente |
 | Publicação da aplicação | Fora da primeira versão | Rodar localmente com instruções reproduzíveis |
 

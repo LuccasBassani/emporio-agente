@@ -53,6 +53,23 @@ Ainda não há testes do agente nem chamadas à API. A verificação dos arquivo
 
 Não houve geração real: não foi configurada chave Groq e não foi encontrado Ollama em execução. Testes simulados validam o protocolo implementado, não disponibilidade de modelo, desempenho, qualidade em português ou qualidade do futuro atendimento. O agente de negócio e a interface continuam pendentes.
 
+## 31/10/2026 — Diagnóstico real Groq e RAG de políticas
+
+### Realizado
+
+- Configuração local selecionada como Groq, preservando a chave fora do Git.
+- Diagnósticos reais de saudação em português e chamada/retorno da ferramenta de teste concluídos com sucesso no modelo qwen/qwen3.8-27b.
+- Extraído o manual em 27 trechos com seção, página e ID. Implementada recuperação lexical BM25 com equivalências explícitas de vocabulário.
+- Implementado o fluxo de recuperação e geração, validação de IDs de citação e exportação de pergunta/resposta/trechos por terminal.
+- Adicionado conjunto de 14 perguntas revisadas e testes de recuperação, continuação de seções entre páginas e geração simulada.
+
+### Verificação e limitações
+
+- Treze testes automatizados passaram, incluindo os conectores e o RAG. Todas as 14 perguntas de recuperação encontraram as seções esperadas no top 4.
+- O teste de envio de políticas à Groq foi bloqueado antes da execução pela revisão automática porque o manual está marcado como interno. Solicitada autorização específica; nenhuma resposta real de políticas foi gerada até este registro.
+- A verificação lexical e de IDs não demonstra fidelidade de todas as afirmações do modelo. A geração real, perguntas adicionais e comportamento com histórico ainda precisam ser avaliados.
+- Código, testes e documentação desta etapa desenvolvidos com assistência do Codex.
+
 ## Como registrar as próximas etapas
 
 Para cada etapa, anotar: problema, solução escolhida e motivo, alternativa considerada, teste executado, resultado e limitação restante.

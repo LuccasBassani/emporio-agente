@@ -17,16 +17,21 @@ Começar com leitura direta dos arquivos; avaliar SQLite apenas se as consultas 
 
 ## 3. Recuperação de políticas
 
-Extrair o PDF preservando página e seção. Recuperar trechos por pergunta antes da geração da resposta.
-Começar avaliando busca textual com normalização e sinônimos sobre esse manual pequeno.
-Se houver falhas de recuperação nos cenários, comparar outra estratégia e registrar a evidência.
-Ainda não foi escolhido nem avaliado um algoritmo de ranking. Não afirmar que existe busca semântica ou embeddings sem implementá-los.
+Implementado RAG lexical: extrair o PDF com pypdf em modo layout, separar por título de seção e página, limitar o tamanho dos trechos e preservar as continuações entre páginas. O manual atual gerou 27 trechos.
+
+Ranking escolhido: BM25 com normalização de acentos e equivalências explícitas de vocabulário. Os títulos recebem peso adicional; até quatro trechos são fornecidos ao modelo por pergunta. Motivo: o manual é pequeno e a estratégia é local, inspecionável e não exige outro serviço de IA.
+
+Verificação inicial: as seções esperadas foram recuperadas entre os quatro primeiros resultados nas 14 perguntas revisadas. Isso é cobertura desse conjunto, não garantia de relevância geral. Não há embeddings nem busca semântica. Se surgirem falhas em reformulações ou perguntas com vários assuntos, registrar o caso e comparar alternativas.
+
+O modelo precisa citar IDs dos trechos fornecidos. IDs inexistentes e ausência de citações são rejeitados. Essa validação não verifica automaticamente se o conteúdo da resposta é fiel à fonte; é necessário revisar os exemplos gerados.
+
+Dados sem correspondência não provocam geração. Não há memória de conversa nessa primeira versão do RAG por terminal. O envio do conteúdo do manual a um provedor externo depende de autorização.
 
 ## 4. Provedores do modelo: Groq e Ollama
 
 Decisão confirmada em 31/10/2026: suportar Groq e Ollama, com escolha explícita por configuração. A alternativa inicial DeepSeek foi substituída por esta combinação para permitir uso do plano gratuito da Groq ou execução local.
 
-Modelos iniciais configuráveis: `qwen/qwen3.8-27b` na Groq e `qwen3:8b` no Ollama. Ainda não foram avaliados com chamadas reais. Nenhuma contratação ou gasto pago foi autorizado; confirmar cotas da conta antes de usar a Groq.
+Modelos iniciais configuráveis: `qwen/qwen3.8-27b` na Groq e `qwen3:8b` no Ollama. Groq validada em chamadas reais de saudação e chamada/retorno de ferramenta. Ollama ainda não validado com modelo local. Nenhuma contratação ou gasto pago foi autorizado; conferir cotas antes de novas chamadas.
 
 Implementação: HTTP com httpx, sem framework de agentes nesta etapa. Groq usa o endpoint de chat compatível com o formato OpenAI; Ollama usa sua API nativa, permitindo desabilitar thinking e configurar contexto local. As diferenças de argumentos e respostas de ferramentas são normalizadas no conector.
 
