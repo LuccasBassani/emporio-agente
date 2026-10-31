@@ -26,6 +26,7 @@ Ainda não foi escolhido nem avaliado um algoritmo de ranking. Não afirmar que 
 
 DeepSeek foi sugerido pelo candidato. A documentação oficial consultada em 31/10/2026 informa cobrança por tokens e suporte a ferramentas.
 Não foi verificado saldo, crédito promocional ou acesso a qualquer conta de provedor.
+O candidato confirmou preferência por tentar créditos gratuitos primeiro. Nenhuma contratação ou gasto pago foi autorizado. Verificar o provedor, o modelo e os limites disponíveis antes de fechar a integração.
 Manter modelo, endereço da API e chave configuráveis. Não incluir chave nas exportações.
 
 ## 5. Inspiração e implementação independente
@@ -57,7 +58,7 @@ Além das conversas, testar funções críticas de preço, filtros e acesso a pe
 
 ## Pendências
 
-- Confirmar o horário exato de entrega no e-mail.
+- Prazo informado pelo candidato: 03/11/2026 às 23h59. Conferir eventual fuso específico no e-mail. Priorizar uma primeira versão completa em 31/10.
 - Configurar uma chave pessoal de provedor e verificar as condições de uso/custo.
 - Validar com o candidato o escopo e a estratégia de recuperação.
 - Implementar e testar antes de declarar qualquer funcionalidade como concluída.

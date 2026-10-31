@@ -16,6 +16,10 @@ Registrar apenas ações realmente realizadas. Separar observação, decisão e 
 - Registrado o prazo de entrega em 03/11/2026.
 - Candidato solicitou iniciar o repositorio no GitHub como privado, com commits por etapas reais. A publicacao final devera atender a exigencia de repositorio publico do desafio.
 - Preparado .gitignore para evitar versionar credenciais, ambiente Python e exportacoes locais. Exemplos de entrega deverao ser revisados e incluidos explicitamente.
+- Criado o repositório privado LuccasBassani/emporio-agente, vinculado à pasta local. Primeiro envio com a documentação inicial e .gitignore.
+- Configurada autoria local com o perfil pessoal e endereço noreply do GitHub, sem alterar a configuração global do computador.
+- Criado guia com etapas, critérios de conclusão, conceitos técnicos e preparação da entrega.
+- Candidato confirmou entrega em 03/11 às 23h59, preferência por créditos gratuitos e intenção de adiantar a maior parte em 31/10.
 
 ### Propostas ainda não implementadas
 

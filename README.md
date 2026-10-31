@@ -5,7 +5,7 @@ Protótipo do desafio técnico de AI Engineer da Artefact.
 ## Situação atual
 
 Planejamento iniciado em 31/10/2026. Ainda não existe agente executável.
-Entrega informada pelo candidato: terça-feira, 03/11/2026; horário a confirmar no e-mail.
+Entrega informada pelo candidato: terça-feira, 03/11/2026 às 23h59. Planejamento em America/Sao_Paulo, sujeito ao fuso indicado no e-mail.
 
 ## Escopo proposto para a primeira versão
 
@@ -43,6 +43,7 @@ Codex foi usado para ler o enunciado, examinar os dados, consultar documentaçã
 
 ## Documentação
 
+- [Guia para acompanhar as etapas](docs/guia-do-projeto.md)
 - [Decisões e questões em aberto](docs/decisoes.md)
 - [Diário do desenvolvimento](docs/diario.md)
 
