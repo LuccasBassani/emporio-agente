@@ -13,6 +13,7 @@ from emporio.rag import PolicyRAG
 from emporio.catalog import Catalog
 from emporio.tools import StoreTools
 from emporio.agent import StoreAgent
+from emporio.orders import Orders
 
 
 def main() -> int:
@@ -30,6 +31,7 @@ def main() -> int:
     parser.add_argument("--max-price", help="Orçamento máximo em reais para a consulta local.")
     parser.add_argument("--payment", choices=["padrao", "pix"], default="padrao")
     parser.add_argument("--limit", type=int, default=5, help="Limite de resultados na consulta local.")
+    parser.add_argument("--customer-id", type=int, help="Cliente fictício para consultas de pedidos nesta sessão.")
     parser.add_argument("--show-sources", action="store_true", help="Exibe o texto completo dos trechos recuperados.")
     parser.add_argument("--export", type=Path, metavar="ARQUIVO.md", help="Exporta pergunta, resposta e trechos do teste de RAG.")
     args = parser.parse_args()
@@ -58,7 +60,8 @@ def main() -> int:
         print(f"Provedor: {settings.provider} | Modelo: {settings.model}")
         if args.message or args.chat:
             with LLMClient(settings) as client:
-                agent = StoreAgent(client, StoreTools(Catalog(), PolicyIndex.from_pdf()))
+                catalog = Catalog()
+                agent = StoreAgent(client, StoreTools(catalog, PolicyIndex.from_pdf(), Orders(catalog), args.customer_id))
 
                 def respond(text):
                     turn = agent.respond(text)

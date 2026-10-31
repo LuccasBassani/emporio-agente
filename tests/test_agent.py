@@ -9,6 +9,7 @@ from emporio.config import Settings
 from emporio.llm import LLMClient, ProviderError
 from emporio.policies import PolicyIndex
 from emporio.tools import StoreTools
+from emporio.profile import DemoConfig
 
 
 def call(name, arguments):
@@ -124,6 +125,19 @@ class AgentTests(unittest.TestCase):
         self.assertEqual(questions, ["Pergunta 1", "Pergunta 2", "Pergunta 3"])
         self.assertEqual(sum(bool(m.get("tool_calls")) for m in fourth_turn), 2)
         self.assertEqual(sum(m["role"] == "tool" for m in fourth_turn), 2)
+
+    def test_profile_reaches_model_while_fixed_rules_remain(self):
+        requests = []
+        profile = DemoConfig(name="Bia", instructions="Prefira respostas curtas.")
+        with self.client([{"content": "Olá, sou a Bia!"}], requests) as client:
+            agent = StoreAgent(client, self.tools, profile)
+            agent.respond("Oi!")
+            self.assertIn('"nome": "Bia"', requests[0]["messages"][0]["content"])
+            self.assertIn("Prefira respostas curtas.", requests[0]["messages"][0]["content"])
+            self.assertIn("Não calcule descontos mentalmente", requests[0]["messages"][0]["content"])
+            self.assertNotIn("Consultas executadas", agent.to_markdown(False))
+            self.assertNotIn("Fontes citadas", agent.to_markdown(False))
+            self.assertNotIn("Consultas e fontes", agent.to_text(False))
 
 
 if __name__ == "__main__":

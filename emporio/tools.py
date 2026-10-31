@@ -4,9 +4,19 @@ from dataclasses import dataclass
 
 from emporio.catalog import Catalog
 from emporio.policies import PolicyIndex
+from emporio.orders import Orders
 
 
 TOOLS = [
+    {"type": "function", "function": {
+        "name": "consultar_pedido", "description": "Consulta status, itens, total histórico e rastreamento cadastrado de um pedido do cliente selecionado pela aplicação. O cliente não pode ser escolhido por argumento.",
+        "parameters": {"type": "object", "properties": {"pedido_id": {"type": "integer", "minimum": 1}},
+                       "required": ["pedido_id"], "additionalProperties": False},
+    }},
+    {"type": "function", "function": {
+        "name": "listar_meus_pedidos", "description": "Lista números, status e totais dos pedidos do cliente de teste selecionado, para esclarecer qual pedido consultar.",
+        "parameters": {"type": "object", "properties": {}, "required": [], "additionalProperties": False},
+    }},
     {"type": "function", "function": {
         "name": "buscar_produtos",
         "description": "Busca catálogo por orçamento final sem frete. Só disponíveis por padrão. Ordena do menor preço. Categorias: 1 guitarras, 2 baixos, 3 baterias, 4 teclados/pianos, 5 violões, 6 sopro madeiras, 7 sopro metais, 8 cordas orquestrais, 9 ukuleles. Para tipos, prefira categoria_id; termo serve para marca/modelo.",
@@ -62,13 +72,30 @@ class ToolResult:
 
 
 class StoreTools:
-    def __init__(self, catalog: Catalog, policies: PolicyIndex):
+    def __init__(self, catalog: Catalog, policies: PolicyIndex, orders: Orders | None = None,
+                 customer_id: int | None = None):
         self.catalog = catalog
         self.policies = policies
+        self.orders = orders
+        if orders:
+            orders.validate_customer(customer_id)
+        self.customer_id = customer_id
 
     def execute(self, name: str, arguments: dict) -> ToolResult:
         """O nome vindo do modelo nunca é avaliado como código ou importação."""
         try:
+            if name in {"consultar_pedido", "listar_meus_pedidos"}:
+                if self.orders is None:
+                    return ToolResult({"erro": "Consulta de pedidos não configurada nesta sessão."})
+                if name == "consultar_pedido":
+                    if set(arguments) != {"pedido_id"}:
+                        raise ValueError("Informe somente pedido_id; a identidade é definida pela aplicação.")
+                    data = self.orders.lookup(self.customer_id, arguments["pedido_id"])
+                else:
+                    if arguments:
+                        raise ValueError("listar_meus_pedidos não aceita argumentos.")
+                    data = self.orders.list_for_customer(self.customer_id)
+                return ToolResult(data, tuple(data["fontes"]))
             if name == "buscar_produtos":
                 fields = {"termo": "query", "categoria_id": "category_id", "preco_maximo": "max_price",
                           "pagamento": "payment", "somente_disponiveis": "only_available",
