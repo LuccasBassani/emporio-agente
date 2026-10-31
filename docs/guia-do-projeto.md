@@ -9,7 +9,9 @@ Este guia acompanha a construção do agente de atendimento da Empório da Músi
 - [x] Criar documentação inicial e .gitignore.
 - [x] Criar repositório privado no GitHub e enviar o primeiro commit.
 - [x] Registrar este plano de trabalho.
-- [ ] Configurar o ambiente Python.
+- [x] Configurar o ambiente Python.
+- [x] Implementar conectores Groq/Ollama e testar contratos HTTP simulados.
+- [ ] Validar conexão e ferramentas com um modelo real.
 - [ ] Implementar e validar as consultas.
 - [ ] Recuperar as políticas por pergunta.
 - [ ] Integrar o modelo às ferramentas.
@@ -17,7 +19,7 @@ Este guia acompanha a construção do agente de atendimento da Empório da Músi
 - [ ] Testar o conjunto e salvar exemplos reais.
 - [ ] Revisar a entrega e tornar o repositório público.
 
-Ainda não existe agente executável. A documentação e o repositório são o ponto de partida.
+O projeto já executa diagnósticos de conexão por terminal e testes simulados dos conectores. O agente de atendimento e a interface ainda não estão implementados.
 
 ## Prazo e prioridade
 
@@ -42,14 +44,14 @@ Prioridade do candidato: adiantar a maior parte em 31/10. A meta para hoje é um
 | Infraestrutura | Combinado | Aplicação independente, inspirada na interação de um projeto já desenvolvido |
 | GitHub | Concluído | Repositório privado durante o desenvolvimento; público para entregar |
 | Uso de IA | Exigência de transparência | Registrar a assistência efetivamente utilizada |
-| API | Preferência confirmada | Tentar créditos gratuitos primeiro; nenhum gasto pago autorizado |
+| API | Decisão confirmada | Groq no plano gratuito ou Ollama local; nenhum gasto pago autorizado |
 | Interface | Proposta recomendada | Streamlit para configuração, chat e exportações |
 | Dados | Proposta recomendada | Funções Python sobre os CSVs; cálculos e validações no código |
 | Políticas | Proposta recomendada | Extrair por seção/página e avaliar busca textual antes de adicionar embeddings |
 | Identificação | Proposta para demonstração | Selecionar um cliente fictício e restringir pedidos a esse cliente |
 | Publicação da aplicação | Fora da primeira versão | Rodar localmente com instruções reproduzíveis |
 
-Antes de integrar o modelo, confirmar provedor, modelo disponível, limites dos créditos e suporte às chamadas de ferramentas. Se não conseguirmos acesso gratuito adequado, apresentar as opções ao candidato antes de qualquer contratação ou gasto.
+Antes de testar o modelo, configurar a chave Groq e confirmar as cotas ou instalar/iniciar Ollama com o modelo escolhido. Os conectores suportam ferramentas, mas o comportamento real de cada modelo ainda precisa ser validado.
 
 ## Como o agente vai funcionar
 
@@ -181,4 +183,4 @@ Não precisa escrever um diário longo. Para cada decisão relevante, responder:
 
 ## Próxima ação
 
-Executar a etapa 1 e, na sequência, implementar a primeira consulta de catálogo da etapa 2. O trabalho independente de modelo pode avançar enquanto verificamos os créditos gratuitos.
+Implementar a primeira consulta de catálogo da etapa 2. Em paralelo, configurar Groq ou Ollama e executar os diagnósticos descritos no README. A implementação das consultas pode avançar sem acesso ao modelo.

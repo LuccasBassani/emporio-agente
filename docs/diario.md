@@ -31,6 +31,28 @@ Registrar apenas ações realmente realizadas. Separar observação, decisão e 
 
 Ainda não há testes do agente nem chamadas à API. A verificação dos arquivos não demonstra qualidade de atendimento.
 
+## 31/10/2026 — Ambiente e conectores de modelo
+
+### Realizado
+
+- Confirmado suporte a Groq e Ollama, com seleção explícita de provedor e modelo.
+- Criado ambiente virtual com Python 3.14.4; instalados httpx e python-dotenv e registradas versões em requirements.lock.txt.
+- Copiados os seis CSVs e o manual para data/, preservando o conteúdo dos arquivos fornecidos. Os nomes dos CSVs foram reduzidos ao nome da tabela e o PDF foi nomeado politicas_da_loja.pdf.
+- Implementadas validação da configuração, camada comum de resposta e adaptação dos protocolos de ferramentas da Groq e Ollama.
+- Adicionados diagnósticos por terminal para saudação e chamada/retorno de uma ferramenta de teste.
+- Preparado .env local sem chave e confirmado que ele e o ambiente virtual são ignorados pelo Git.
+- Implementação e documentação realizadas com assistência do Codex.
+
+### Verificação
+
+- Sete testes automatizados passaram, com subcasos para os dois provedores, retorno de ferramenta, isolamento de credencial, parâmetros inválidos, erros HTTP, timeout e resposta inválida/interrompida.
+- pip check não identificou incompatibilidades e o comando de ajuda executou corretamente.
+- Não foi encontrado serviço respondendo na porta local padrão do Ollama durante o levantamento inicial.
+
+### Limitações
+
+Não houve geração real: não foi configurada chave Groq e não foi encontrado Ollama em execução. Testes simulados validam o protocolo implementado, não disponibilidade de modelo, desempenho, qualidade em português ou qualidade do futuro atendimento. O agente de negócio e a interface continuam pendentes.
+
 ## Como registrar as próximas etapas
 
 Para cada etapa, anotar: problema, solução escolhida e motivo, alternativa considerada, teste executado, resultado e limitação restante.

@@ -22,12 +22,19 @@ Começar avaliando busca textual com normalização e sinônimos sobre esse manu
 Se houver falhas de recuperação nos cenários, comparar outra estratégia e registrar a evidência.
 Ainda não foi escolhido nem avaliado um algoritmo de ranking. Não afirmar que existe busca semântica ou embeddings sem implementá-los.
 
-## 4. API do modelo
+## 4. Provedores do modelo: Groq e Ollama
 
-DeepSeek foi sugerido pelo candidato. A documentação oficial consultada em 31/10/2026 informa cobrança por tokens e suporte a ferramentas.
-Não foi verificado saldo, crédito promocional ou acesso a qualquer conta de provedor.
-O candidato confirmou preferência por tentar créditos gratuitos primeiro. Nenhuma contratação ou gasto pago foi autorizado. Verificar o provedor, o modelo e os limites disponíveis antes de fechar a integração.
-Manter modelo, endereço da API e chave configuráveis. Não incluir chave nas exportações.
+Decisão confirmada em 31/10/2026: suportar Groq e Ollama, com escolha explícita por configuração. A alternativa inicial DeepSeek foi substituída por esta combinação para permitir uso do plano gratuito da Groq ou execução local.
+
+Modelos iniciais configuráveis: `qwen/qwen3.8-27b` na Groq e `qwen3:8b` no Ollama. Ainda não foram avaliados com chamadas reais. Nenhuma contratação ou gasto pago foi autorizado; confirmar cotas da conta antes de usar a Groq.
+
+Implementação: HTTP com httpx, sem framework de agentes nesta etapa. Groq usa o endpoint de chat compatível com o formato OpenAI; Ollama usa sua API nativa, permitindo desabilitar thinking e configurar contexto local. As diferenças de argumentos e respostas de ferramentas são normalizadas no conector.
+
+Motivo: separar o atendimento do provedor e tornar explícita a requisição enviada, sem exigir dois SDKs. Alternativa: usar um único SDK de compatibilidade para ambos. A API nativa do Ollama facilita controlar suas opções específicas; a camada comum mantém o restante do código independente.
+
+Não há fallback automático, retries automáticos ou execução de ferramentas dentro do conector. O programa chamador deve validar a ferramenta solicitada e executar apenas as funções permitidas. A chave Groq não é retida na configuração Ollama nem enviada ao servidor local. Corpos de erros HTTP não são mostrados ao usuário.
+
+Um intermediário adicional de modelos não é necessário nesta versão. A integração direta reduz dependências de instalação e configuração para reproduzir o projeto.
 
 ## 5. Inspiração e implementação independente
 
@@ -59,6 +66,6 @@ Além das conversas, testar funções críticas de preço, filtros e acesso a pe
 ## Pendências
 
 - Prazo informado pelo candidato: 03/11/2026 às 23h59. Conferir eventual fuso específico no e-mail. Priorizar uma primeira versão completa em 31/10.
-- Configurar uma chave pessoal de provedor e verificar as condições de uso/custo.
+- Configurar uma chave pessoal Groq ou iniciar Ollama com o modelo instalado; realizar o diagnóstico real e verificar as condições de uso/cotas.
 - Validar com o candidato o escopo e a estratégia de recuperação.
 - Implementar e testar antes de declarar qualquer funcionalidade como concluída.
