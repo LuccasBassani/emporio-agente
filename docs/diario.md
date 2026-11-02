@@ -148,6 +148,25 @@ Os testes da interface não demonstram todas as combinações de perguntas. Olla
 - Esta etapa não fez chamadas reais à Groq nem ao Ollama. O roteiro é uma proposta de avaliação, não um registro de 32 conversas aprovadas. Os cinco exemplos anteriores continuam sendo evidências da configuração anterior à nova persona.
 - As instruções de estilo não garantem cumprimento em todas as respostas. Avaliar as conversas reais e registrar falhas antes de afirmar melhora de qualidade.
 
+## 02/11/2026 — Rodada real dos 32 cenários pela interface
+
+### Realizado
+
+- Com autorização do candidato, tentados todos os 32 casos do roteiro no navegador, pela interface Streamlit, com Groq e a persona padrão do commit 06a2fcd. Não houve alteração do código ou das instruções durante a rodada.
+- Exportadas 29 conversas completas em Markdown com consultas/fontes, cópias intermediárias dos casos de vários turnos e a configuração JSON usada. Casos sem resposta final receberam registro da mensagem de erro e captura da tela quando disponível.
+- Guardados arquivos completos em local/avaliacao/2026-11-02-persona/, fora do Git, com relatório navegável, resultados JSON e horários dos envios. Preparado pacote ZIP das evidências sem credenciais. O resumo foi registrado em docs/avaliacao-persona-2026-11-02.md, preservando os cinco exemplos de entrega anteriores.
+- O controle de cadência da automação inicialmente não aplicou os intervalos previstos. Após o primeiro bloqueio de C07, foi corrigido; os envios seguintes tiveram pelo menos 70 segundos entre si. Isso não eliminou bloqueios de perguntas que fazem várias chamadas internas.
+- Registradas novas tentativas em casos de cota, sem troca de provedor ou repetição automática pelo aplicativo. C13 permaneceu bloqueado após três tentativas; C27 e C31 concluíram após nova tentativa.
+- Operação do navegador, revisão de resultados e documentação realizadas com assistência do Codex.
+
+### Resultados e limites
+
+- 9 aprovados, 10 aprovados com ressalvas, 12 falhas e 1 bloqueado por cota. Os 32 foram tentados; isso não significa que os 32 geraram resposta final.
+- C09 e C28 não entregaram resposta por bloqueio de valor sem referência; o conteúdo recusado não foi exibido pela interface, então a causa completa ainda precisa de investigação. C13 não permite concluir sobre conteúdo por não ter resposta final.
+- Encontradas confirmação prematura de devolução/cobertura, interpretação indevida do frete de exatamente R$ 500, busca que omite modelos indisponíveis, excesso de opções, consultas omitidas e redirecionamento fora do escopo da loja. As citações válidas não impediram erros de interpretação.
+- A primeira falha de C06 teve somente registro incremental incompleto; sua causa não foi diagnosticada. A execução posterior concluída foi exportada e avaliada.
+- Os resultados não são apresentados como corrigidos. O código do agente permaneceu inalterado; os próximos passos são corrigir os casos reproduzidos, adicionar verificações úteis e repetir as conversas afetadas. Não foram repetidos os testes automatizados, pois esta etapa alterou apenas documentação e gerou evidências.
+
 ## Como registrar as próximas etapas
 
 Para cada etapa, anotar: problema, solução escolhida e motivo, alternativa considerada, teste executado, resultado e limitação restante.

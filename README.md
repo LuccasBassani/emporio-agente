@@ -196,6 +196,8 @@ No terminal, o mesmo contexto pode ser selecionado explicitamente:
 
 ## Validação e limitações conhecidas
 
+A [avaliação real da persona em 02/11](docs/avaliacao-persona-2026-11-02.md) tentou os 32 cenários pela interface: 9 aprovados, 10 aprovados com ressalvas, 12 falhas e 1 bloqueado por cota. Foram exportadas 29 conversas completas; dois casos falharam antes de entregar resposta e um permaneceu bloqueado. A rodada revelou problemas de triagem, interpretação de ambiguidade, busca de modelos indisponíveis, escopo e validação de valores que ainda precisam de correção. Os testes automatizados abaixo não devem ser interpretados como aprovação geral do atendimento. Evidências adicionais foram guardadas localmente, fora do Git, conforme descrito no relatório.
+
 - 42 testes automatizados de preços, disponibilidade, acesso a pedidos, recuperação, protocolos de IA e fluxo da interface via Streamlit AppTest. As chamadas nesses testes são simuladas e não consomem API. As dependências fixadas foram instaladas em um segundo ambiente virtual limpo e os mesmos testes passaram, com pip check sem incompatibilidades.
 - Exemplos reais em [examples/](examples/README.md), com catálogo/continuação, políticas, pedido e atendimento fora do escopo. A consulta real de pedido foi executada pela interface via AppTest com Groq. Envio de mensagem, importação da configuração e downloads Markdown/TXT/JSON também foram conferidos no navegador.
 - RAG lexical pode falhar em reformulações ou recuperar trechos incompletos; citações válidas não garantem fidelidade de todas as afirmações. O comportamento de triagem de devolução ainda depende do modelo.

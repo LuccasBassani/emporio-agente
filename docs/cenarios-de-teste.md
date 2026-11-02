@@ -74,6 +74,8 @@ Em todos os casos: observar parágrafos curtos, listas nas comparações, até t
 
 ## Registro das execuções
 
+Primeira rodada tentada pela interface em 02/11/2026, com configuração padrão: consulte o [relatório de avaliação](avaliacao-persona-2026-11-02.md). Resultado: 9 aprovados, 10 aprovados com ressalvas, 12 falhas e 1 bloqueado por cota. A lista acima permanece como roteiro e a tabela abaixo como modelo de registro; os resultados efetivos e as evidências estão no relatório.
+
 Copie uma linha por caso executado; não marque automaticamente os 32 casos como aprovados por a suíte de código passar. Testes de estilo e interpretação exigem leitura da conversa real. Esta planilha em texto começa sem execuções.
 
 | Caso | Data | Provedor/modelo | Cliente | Resultado | Arquivo da conversa | Observação |
