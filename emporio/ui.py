@@ -53,7 +53,7 @@ def render_app():
         clear_conversation()
     config = st.session_state.active_config
     st.title("Empório da Música")
-    st.caption("Configure o assistente, experimente o atendimento e salve as conversas.")
+    st.caption("A Lia já vem configurada para atender. Experimente o chat ou personalize o atendimento.")
     try:
         data = load_data()
     except (OSError, ValueError):

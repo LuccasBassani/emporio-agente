@@ -9,7 +9,7 @@ from emporio.config import Settings
 from emporio.llm import LLMClient, ProviderError
 from emporio.policies import PolicyIndex
 from emporio.tools import StoreTools
-from emporio.profile import DemoConfig
+from emporio.profile import DemoConfig, DEFAULT_INSTRUCTIONS
 
 
 def call(name, arguments):
@@ -106,10 +106,13 @@ class AgentTests(unittest.TestCase):
             self.assertFalse(agent.turns)
 
     def test_greeting_does_not_require_a_fabricated_source(self):
-        with self.client([{"content": "Olá! O que procura hoje?"}]) as client:
+        requests = []
+        with self.client([{"content": "Olá! O que procura hoje?"}], requests) as client:
             turn = StoreAgent(client, self.tools).respond("Oi!")
             self.assertFalse(turn.sources)
             self.assertFalse(turn.queries)
+        prompt = requests[0]["messages"][0]["content"]
+        self.assertIn(json.dumps(DEFAULT_INSTRUCTIONS, ensure_ascii=False), prompt)
 
     def test_context_limit_preserves_complete_tool_pairs(self):
         requests, responses = [], []

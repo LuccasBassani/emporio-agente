@@ -18,6 +18,14 @@ Entrega informada pelo candidato: terça-feira, 03/11/2026 às 23h59. Planejamen
 - Visualização opcional das consultas e fontes usadas, sem expor raciocínio interno do modelo.
 - Pedidos restritos ao cliente fictício selecionado, sem enviar nomes ou contatos ao modelo.
 
+### Persona e estratégia de conversa
+
+A Lia já inicia configurada como assistente virtual acolhedora, objetiva e consultiva, sem pressionar a compra. A configuração padrão orienta português brasileiro natural, ausência de emojis por padrão, parágrafos curtos, até três opções de produto e uma pergunta principal por turno somente quando necessária. Em reclamações e devoluções, deve manter empatia e explicar condições sem antecipar elegibilidade. O texto completo fica em `DEFAULT_INSTRUCTIONS`, em `emporio/profile.py`, e aparece preenchido na interface.
+
+Nome, tom e instruções continuam editáveis; a personalização é opcional. O estilo é enviado ao modelo junto das regras fixas de consulta e acesso, que têm prioridade. São orientações de geração, não garantias automáticas de comportamento. Configurações importadas preservam o conteúdo salvo, inclusive instruções vazias; sessões já abertas precisam ser reiniciadas para carregar o novo padrão.
+
+O [roteiro de cenários](docs/cenarios-de-teste.md) permite avaliar tom, continuidade, consultas e situações difíceis com critérios de aprovação explícitos. Ele distingue cenários propostos de evidências já executadas.
+
 O agente é inspirado na experiência de configuração e simulação de atendimento de um projeto já desenvolvido. A implementação será independente, em Python, sem copiar código ou depender da infraestrutura do projeto de referência.
 
 ## Arquitetura

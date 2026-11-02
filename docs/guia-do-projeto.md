@@ -26,6 +26,8 @@ O protótipo tem interface e terminal com catálogo, preços, RAG, pedidos por c
 
 ## Como acompanhar a versão atual
 
+A Lia já inicia com a persona definida; alterar nome, tom ou instruções é opcional. Para a rodada de avaliação, siga o [roteiro de 32 cenários](cenarios-de-teste.md), com perguntas, resultados esperados e espaço para registrar execuções. Uma nova sessão carrega o padrão atualizado; importar configuração antiga mantém as preferências daquele arquivo.
+
 1. Na pasta do projeto, execute `.\.venv\Scripts\python.exe -m streamlit run app.py` e abra http://127.0.0.1:8501.
 2. Ajuste nome, tom, instruções e provedor. Clique em **Aplicar e iniciar nova conversa**.
 3. Pergunte por dois violões até R$ 1.000 e depois pergunte pelo preço do primeiro no PIX. Confira as consultas no expansor da resposta.

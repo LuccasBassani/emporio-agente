@@ -132,6 +132,22 @@ As verificações de referência e o teste de valores sem fonte não comprovam a
 
 Os testes da interface não demonstram todas as combinações de perguntas. Ollama não foi validado com modelo local em execução. Identificação é simulada; não há autenticação de produção, atendimento humano real ou operações de escrita em pedidos. A revisão para publicação e entrega continua pendente.
 
+## 02/11/2026 — Persona padrão e roteiro de avaliação
+
+### Realizado
+
+- Incorporado como padrão o texto de persona definido pelo candidato para Lia, preservando a possibilidade de personalização. O mesmo `DemoConfig` alimenta a interface e o agente por terminal; configurações importadas e sessões existentes não são sobrescritas.
+- Atualizada a apresentação da interface para indicar que a assistente já vem configurada; documentadas a estratégia de conversa e a precedência das regras fixas.
+- Preparados 32 cenários manuais com mensagens, cliente de teste quando necessário, critérios de aprovação e orientação de registro. Preços, status de itens, pedidos e políticas usados como resultados esperados foram conferidos nas fontes locais. Selecionados dez casos iniciais para uma rodada menor.
+- Atualizados testes existentes para verificar que as instruções padrão chegam ao prompt e aparecem preenchidas na interface.
+- Código, roteiro e verificação realizados com assistência do Codex.
+
+### Verificação e limites
+
+- Os 42 testes automatizados passaram; `git diff --check` não encontrou problemas de whitespace.
+- Esta etapa não fez chamadas reais à Groq nem ao Ollama. O roteiro é uma proposta de avaliação, não um registro de 32 conversas aprovadas. Os cinco exemplos anteriores continuam sendo evidências da configuração anterior à nova persona.
+- As instruções de estilo não garantem cumprimento em todas as respostas. Avaliar as conversas reais e registrar falhas antes de afirmar melhora de qualidade.
+
 ## Como registrar as próximas etapas
 
 Para cada etapa, anotar: problema, solução escolhida e motivo, alternativa considerada, teste executado, resultado e limitação restante.

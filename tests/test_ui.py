@@ -8,6 +8,7 @@ import httpx
 from streamlit.testing.v1 import AppTest
 
 from emporio.llm import LLMClient
+from emporio.profile import DEFAULT_INSTRUCTIONS
 
 
 APP = Path(__file__).resolve().parents[1] / "app.py"
@@ -32,6 +33,8 @@ class InterfaceTests(unittest.TestCase):
         self.assertEqual(app.title[0].value, "Empório da Música")
         self.assertEqual(len(app.chat_input), 1)
         self.assertIsNone(app.session_state["agent"])
+        self.assertEqual(app.text_area(key="instructions_0").value, DEFAULT_INSTRUCTIONS)
+        self.assertEqual(app.session_state["active_config"].instructions, DEFAULT_INSTRUCTIONS)
         self.assertNotIn("chave-ficticia", app.session_state["active_config"].to_json())
 
     def test_chat_and_changing_customer_clear_history(self):

@@ -78,6 +78,10 @@ Usar como inspiração o padrão de configuração e simulação de atendimento 
 
 ## 7. Critérios propostos para testar o agente
 
+Em 02/11/2026, a configuração inicial passou a incluir a persona completa definida para Lia: acolhedora, objetiva e consultiva; linguagem natural, sem emojis por padrão; até três opções; uma pergunta principal necessária por turno e encerramento sem insistência. O padrão é compartilhado entre terminal e interface por `DemoConfig`, mantendo personalização opcional e prioridade das regras fixas. As sessões e configurações anteriormente salvas não são sobrescritas.
+
+O roteiro `cenarios-de-teste.md` amplia a avaliação proposta para 32 casos, incluindo tom, continuidade, políticas ambíguas, disponibilidade, descontos, pedidos e tentativas de indução. Ter um resultado esperado não equivale a já ter executado a conversa com o modelo.
+
 1. Encontrar violões disponíveis dentro de um orçamento e manter o contexto no turno seguinte.
 2. Aplicar promoção ativa e explicar por que não acumula com PIX.
 3. Explicar uma devolução pedindo as informações ausentes.
