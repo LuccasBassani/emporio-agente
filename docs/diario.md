@@ -207,6 +207,23 @@ Os testes da interface não demonstram todas as combinações de perguntas. Olla
 - Retomada a avaliação em local/revalidacao-v2-2026-11-02/, com chamadas reais, espaçamento de 65 segundos e metadados sem credenciais. O código ficou fixo nesta retomada; versões e evidências anteriores permaneceram separadas.
 - Reiniciado somente o servidor Streamlit identificado na porta local 8501 para carregar os módulos atuais e evitar recursos antigos em cache. Não há exposição pública da aplicação.
 
+## 02/11/2026 — Limite diário confirmado e qualificação do preço indisponível
+
+- Concluída a retomada de 13 cenários com intervalo de 65 segundos. Nove geraram resposta final; C14, D137 e C03 foram interrompidos por HTTP 429 e C10 por HTTP 400, sem diagnosticar retroativamente a causa deste último.
+- Feitas tentativas isoladas com 120 segundos entre chamadas e diagnóstico restrito, sem registrar corpo HTTP, credenciais ou identificadores da conta. C14 e D137 concluíram; C03 concluiu apenas o primeiro turno antes de novo bloqueio.
+- O diagnóstico do último HTTP 429 confirmou tokens por dia: limite 200.000, uso informado 198.275 e requisição estimada em 2.961. Interrompidas novas chamadas; espaçamento adicional não resolve limite diário. C10 não foi repetido nessa rodada isolada e seu HTTP 400 permanece sem causa confirmada.
+- C14 identificou corretamente o status em breve, mas prometeu preço na futura liberação. Ajustada a observação do catálogo para qualificar valor cadastrado atual e não garantir preço/data futura. A compactação passou a preservar esse campo para o modelo. A suíte passou a 54 testes, todos aprovados; a geração real após esse último ajuste permanece pendente por cota.
+- As rodadas e respostas anteriores foram preservadas. Não houve contratação de plano, troca automática de provedor, instalação de Ollama ou mudança nos CSVs/manual originais. Consulta local não encontrou o executável Ollama nos caminhos verificados.
+- A rodada integral dos 32 após todas as correções não foi concluída; não declarar aprovação geral. O plano de evolução com mais tempo está documentado independentemente das restrições do plano gratuito.
+
+## 02/11/2026 — Consolidação e encerramento da rodada por cota
+
+- Consolidados 18 cenários priorizados: 16 dos 32 originais e dois conflitos adicionais de cadastro. Quinze atenderam ao objetivo principal, quatro com ressalvas; C14 após qualificação de preço, continuação de C03 e repetição de C10 continuam pendentes.
+- Separados objetivo funcional, estilo e execução. C05 não afirma uma regra antes de consultar; sua pergunta de esclarecimento não foi tratada como falha factual, mantendo a ressalva por juntar duas informações. As classificações da rodada inicial não foram alteradas nem usadas como comparação percentual entre conjuntos diferentes.
+- Relatório versionado em docs/revalidacao-correcoes-2026-11-02.md e evidências consolidadas em local/revalidacao-consolidada-2026-11-02/, com pacote ZIP local. As conversas dessa revalidação são por código, não novos testes manuais no navegador.
+- Servidor Streamlit recarregado após o ajuste final; interface inspecionada sem mensagens adicionais à API. A conferência visual da moeda em resposta real permanece pendente junto das chamadas bloqueadas.
+- Documentadas as melhorias com mais tempo e mantida a distinção entre limitações do protótipo e condições de capacidade do provedor/plano. Repositório permanece privado; publicação e envio final não foram realizados.
+
 ## Como registrar as próximas etapas
 
 Para cada etapa, anotar: problema, solução escolhida e motivo, alternativa considerada, teste executado, resultado e limitação restante.

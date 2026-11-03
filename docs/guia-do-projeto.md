@@ -22,7 +22,8 @@ Este guia acompanha a construção do agente de atendimento da Empório da Músi
 - [x] Executar verificação inicial do conjunto e salvar cinco exemplos reais.
 - [x] Tentar os 32 cenários da persona pela interface e salvar resultados/evidências locais em 02/11.
 - [x] Implementar correções de consulta, notas de auditoria, validação e instruções de triagem.
-- [ ] Concluir a revalidação real dos casos afetados e registrar os resultados; triagem em avaliação.
+- [x] Registrar a revalidação priorizada com respostas, ressalvas e interrupções do provedor separadas.
+- [ ] Concluir C14 após a qualificação de preço, continuação de C03 e repetição de C10 quando houver cota; depois repetir os 32 com código final.
 - [ ] Revisar a entrega e tornar o repositório público.
 
 O protótipo tem interface e terminal com catálogo, preços, RAG, pedidos por cliente de teste, configuração e exportações. A Groq passou nos cenários reais registrados, incluindo consulta de pedido pela interface. O navegador foi usado para conferir o envio de mensagem, importação de configuração e downloads. Ollama está preparado, mas ainda sem validação real local. A revisão final de entrega continua pendente.
@@ -31,7 +32,7 @@ O protótipo tem interface e terminal com catálogo, preços, RAG, pedidos por c
 
 A Lia já inicia com a persona definida; alterar nome, tom ou instruções é opcional. Para a rodada de avaliação, siga o [roteiro de 32 cenários](cenarios-de-teste.md), com perguntas, resultados esperados e espaço para registrar execuções. Uma nova sessão carrega o padrão atualizado; importar configuração antiga mantém as preferências daquele arquivo.
 
-A primeira rodada real está no [relatório de 02/11](avaliacao-persona-2026-11-02.md): 9 aprovados, 10 com ressalvas, 12 falhas e 1 bloqueado. As correções foram implementadas e a revalidação real está em andamento, preservando a rodada original. O caso C13 já concluiu após a alteração de consulta; ainda não é uma aprovação geral do protótipo.
+A primeira rodada real está no [relatório de 02/11](avaliacao-persona-2026-11-02.md). As correções e a [revalidação priorizada](revalidacao-correcoes-2026-11-02.md) foram registradas: 15 de 18 cenários atenderam ao objetivo principal, quatro com ressalvas, e três estão pendentes. A cota diária do provedor encerrou a rodada. O caso C13 já concluiu após a alteração de consulta; ainda não é aprovação geral do protótipo.
 
 1. Na pasta do projeto, execute `.\.venv\Scripts\python.exe -m streamlit run app.py` e abra http://127.0.0.1:8501.
 2. Ajuste nome, tom, instruções e provedor. Clique em **Aplicar e iniciar nova conversa**.

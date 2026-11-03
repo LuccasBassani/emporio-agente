@@ -37,6 +37,14 @@ class ObservationTests(unittest.TestCase):
         self.assertEqual(result.data["produto_id"], 142)
         self.assertTrue(result.for_model()["divergencias_cadastrais"])
 
+    def test_unavailable_price_qualification_reaches_model_without_changing_price(self):
+        result = self.tools.execute("consultar_produto", {"termo": "Kala KA-ABP-CTG"})
+        model = result.for_model()
+        self.assertFalse(model["disponivel"])
+        self.assertEqual(model["preco_final_brl"], "1749.00")
+        self.assertIn("cadastrado atual", model["observacao"])
+        self.assertIn("não garante preço futuro", model["observacao"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -61,7 +61,7 @@ class ToolResult:
             keep = {"encontrado", "produto_id", "nome", "categoria", "estoque", "disponivel",
                     "disponibilidade", "preco_tabela_brl", "preco_final_brl", "pagamento",
                     "desconto_percentual", "tipo_desconto", "promocao", "pix_acumulado",
-                    "especificacoes_cadastradas", "divergencias_cadastrais", "classificacao_eletrica"}
+                    "especificacoes_cadastradas", "divergencias_cadastrais", "classificacao_eletrica", "observacao"}
             result = {key: value for key, value in product.items() if key in keep}
             result["fontes"] = [source["id"] for source in product.get("fontes", [])]
             return result

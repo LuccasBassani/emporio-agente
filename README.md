@@ -26,7 +26,7 @@ Nome, tom e instruções continuam editáveis; a personalização é opcional. O
 
 O [roteiro de cenários](docs/cenarios-de-teste.md) permite avaliar tom, continuidade, consultas e situações difíceis com critérios de aprovação explícitos. Ele distingue cenários propostos de evidências já executadas.
 
-O agente é inspirado na experiência de configuração e simulação de atendimento de um projeto já desenvolvido. A implementação será independente, em Python, sem copiar código ou depender da infraestrutura do projeto de referência.
+O agente é inspirado na experiência de configuração e simulação de atendimento de um projeto já desenvolvido. A implementação é independente, em Python, sem copiar código ou depender da infraestrutura do projeto de referência.
 
 ## Arquitetura
 
@@ -48,6 +48,8 @@ flowchart LR
 Groq e Ollama são os provedores escolhidos. A seleção é explícita em `LLM_PROVIDER`, sem troca automática entre processamento local e externo.
 Groq depende de chave e das cotas disponíveis na conta. Ollama depende do servidor local e do modelo baixado.
 A chave fica em variável de ambiente ou `.env` local, fora do Git. Os modelos são configuráveis. A Groq passou nos diagnósticos reais de saudação e chamada/retorno de ferramenta e em dois cenários de RAG sobre o manual, revisados manualmente. Ollama ainda não foi validado com modelo em execução.
+
+O modelo Groq foi mantido como configuração inicial disponível na conta e validada nos cenários registrados; não foi escolhido por um benchmark comparativo de modelos. O nome do modelo é configurável para permitir essa comparação. A configuração Ollama é uma alternativa local preparada, cuja qualidade de atendimento ainda precisa de validação real.
 
 ## Preparar e executar
 
@@ -190,6 +192,8 @@ Uma busca vazia pode repetir o orçamento consultado sem inventar uma fonte de p
 
 Uma checagem conservadora também pede revisão de algumas aberturas afirmativas em casos pessoais de devolução/garantia. Ela não decide elegibilidade, não cobre todas as paráfrases e pode ser insuficiente; o protótipo orienta a análise pela equipe. Uma triagem estruturada é uma evolução proposta, descrita no plano do produto.
 
+Qualificações comerciais como preço cadastrado atual e ausência de garantia de preço futuro são preservadas também no contexto compacto enviado ao modelo. Esse ajuste adicional foi coberto por teste automatizado; sua nova geração real ainda aguarda disponibilidade de cota.
+
 ## Pedidos e cliente de teste
 
 A aplicação fixa o cliente fora dos argumentos do modelo. Uma consulta verifica essa associação antes de devolver informações; pedido inexistente e pedido de outro cliente recebem a mesma resposta. A interface começa uma conversa nova ao mudar a seleção para impedir mistura de históricos. Essa seleção é uma simulação local, não autenticação de produção.
@@ -204,9 +208,11 @@ No terminal, o mesmo contexto pode ser selecionado explicitamente:
 
 ## Validação e limitações conhecidas
 
-A [avaliação real da persona em 02/11](docs/avaliacao-persona-2026-11-02.md) tentou os 32 cenários pela interface: 9 aprovados, 10 aprovados com ressalvas, 12 falhas e 1 bloqueado por cota. Foram exportadas 29 conversas completas; dois casos falharam antes de entregar resposta e um permaneceu bloqueado. A rodada revelou problemas de triagem, interpretação de ambiguidade, busca de modelos indisponíveis, escopo e validação de valores que ainda precisam de correção. Os testes automatizados abaixo não devem ser interpretados como aprovação geral do atendimento. Evidências adicionais foram guardadas localmente, fora do Git, conforme descrito no relatório.
+A [avaliação inicial da persona em 02/11](docs/avaliacao-persona-2026-11-02.md) tentou os 32 cenários pela interface: 9 aprovados, 10 aprovados com ressalvas, 12 falhas e 1 bloqueado por cota. Foram exportadas 29 conversas completas. Essa rodada orientou as correções, mantendo as evidências originais.
 
-- 53 testes automatizados de preços, disponibilidade, acesso a pedidos, recuperação, observações de auditoria, correção de referências e aberturas de triagem, protocolos de IA, espaçamento opcional e fluxo da interface via Streamlit AppTest. As chamadas nesses testes são simuladas e não consomem API. A instalação em um segundo ambiente limpo foi conferida anteriormente com a suíte de 42 testes; as dependências não mudaram nesta correção.
+A [revalidação das correções](docs/revalidacao-correcoes-2026-11-02.md), por código com chamadas reais à Groq, tentou 18 cenários priorizados: 15 atenderam ao objetivo principal, quatro deles com ressalvas; três permanecem pendentes (C14 após ajuste de preço futuro, continuação de C03 e repetição de C10). O diagnóstico do último HTTP 429 confirmou limite diário do provedor; novas chamadas foram encerradas. O HTTP 400 anterior de C10 tem causa não confirmada. A rodada integral dos 32 com o código final e uma nova conferência de moeda no navegador não foram concluídas. Testes locais não devem ser interpretados como aprovação geral do atendimento; evidências completas estão guardadas localmente, fora do Git.
+
+- 54 testes automatizados de preços, disponibilidade, acesso a pedidos, recuperação, observações de auditoria, qualificações comerciais, correção de referências e aberturas de triagem, protocolos de IA, espaçamento opcional e fluxo da interface via Streamlit AppTest. As chamadas nesses testes são simuladas e não consomem API. A instalação em um segundo ambiente limpo foi conferida anteriormente com a suíte de 42 testes; as dependências não mudaram nesta correção.
 - Exemplos reais em [examples/](examples/README.md), com catálogo/continuação, políticas, pedido e atendimento fora do escopo. A consulta real de pedido foi executada pela interface via AppTest com Groq. Envio de mensagem, importação da configuração e downloads Markdown/TXT/JSON também foram conferidos no navegador.
 - RAG lexical pode falhar em reformulações ou recuperar trechos incompletos; citações válidas não garantem fidelidade de todas as afirmações. O comportamento de triagem de devolução ainda depende do modelo.
 - Instruções de estilo são subordinadas às regras fixas no prompt e às validações do código. Isso não é uma garantia absoluta contra prompt injection.

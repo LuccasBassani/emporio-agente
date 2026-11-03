@@ -151,7 +151,9 @@ class Catalog:
                 "arquivo_promocoes": "promotions.csv",
                 "regras_preco": "politicas_da_loja.pdf, seções 3 e 6.2",
             }],
-            "observacao": "Preço sem frete. Indisponibilidade impede oferta de compra mesmo com preço cadastrado.",
+            "observacao": "Valor cadastrado atual, sem frete." + (
+                " Compra indisponível; esse valor não garante preço futuro nem data de reposição ou lançamento."
+                if not product.available else ""),
         }
 
     def lookup(self, query: str, payment: str = "padrao") -> dict:
