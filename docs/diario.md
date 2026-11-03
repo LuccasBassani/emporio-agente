@@ -167,6 +167,17 @@ Os testes da interface não demonstram todas as combinações de perguntas. Olla
 - A primeira falha de C06 teve somente registro incremental incompleto; sua causa não foi diagnosticada. A execução posterior concluída foi exportada e avaliada.
 - Os resultados não são apresentados como corrigidos. O código do agente permaneceu inalterado; os próximos passos são corrigir os casos reproduzidos, adicionar verificações úteis e repetir as conversas afetadas. Não foram repetidos os testes automatizados, pois esta etapa alterou apenas documentação e gerou evidências.
 
+## 02/11/2026 — Auditoria dos materiais antes das correções
+
+- Reexaminados os seis CSVs, o manual e as orientações do desafio, sem chamadas a modelos e sem modificar os dados. Confirmada igualdade byte a byte das cópias em data/ com os originais recebidos.
+- Conferidos IDs duplicados, referências entre tabelas, itens por pedido, JSONs de especificações, campos ausentes, promoções ativas e cálculos de reconciliação com preços atuais.
+- Confirmadas divergências entre marca/modelo, descrição e specs; combinações de status/estoque; totais históricos; parcelamentos inferiores aos limites do manual; catálogo parcial e campos de specs com sentidos diferentes conforme a categoria.
+- Identificado e-mail idêntico nos clientes 11 e 43, documentando somente os IDs. Não usar contato como chave única de identidade.
+- Revisitadas ambiguidades de frete, parcelamento e contatos do manual, distinguindo regras de troca/garantia, informações ausentes e procedimentos que o protótipo não executa.
+- Nenhuma referência órfã ou chave primária duplicada foi encontrada; todos os pedidos têm itens. A busca textual de padrões comuns de instrução maliciosa não encontrou ocorrências, sem prometer inspeção exaustiva de conteúdo oculto.
+- Evidências e orientações registradas em docs/auditoria-dados-2026-11-02.md. As divergências não foram atribuídas à intenção da empresa e não justificam alterar silenciosamente registros ou descartar as falhas da avaliação.
+- Análise e documentação com assistência do Codex. Nenhuma correção do programa foi implementada nesta etapa.
+
 ## Como registrar as próximas etapas
 
 Para cada etapa, anotar: problema, solução escolhida e motivo, alternativa considerada, teste executado, resultado e limitação restante.

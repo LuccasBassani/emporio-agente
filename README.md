@@ -251,6 +251,7 @@ Codex foi usado para ler o enunciado, examinar os dados, consultar documentaçã
 
 ## Documentação
 
+- [Auditoria dos dados e ambiguidades do material fornecido](docs/auditoria-dados-2026-11-02.md)
 - [Guia para acompanhar as etapas](docs/guia-do-projeto.md)
 - [Decisões e questões em aberto](docs/decisoes.md)
 - [Diário do desenvolvimento](docs/diario.md)
