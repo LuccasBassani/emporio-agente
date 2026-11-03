@@ -224,6 +224,15 @@ Os testes da interface não demonstram todas as combinações de perguntas. Olla
 - Servidor Streamlit recarregado após o ajuste final; interface inspecionada sem mensagens adicionais à API. A conferência visual da moeda em resposta real permanece pendente junto das chamadas bloqueadas.
 - Documentadas as melhorias com mais tempo e mantida a distinção entre limitações do protótipo e condições de capacidade do provedor/plano. Repositório permanece privado; publicação e envio final não foram realizados.
 
+## 03/11/2026 — Tentativa da rodada integral após meia-noite
+
+- Conferidas as cotas na documentação oficial da Groq e feita chamada mínima, que retornou 200. Registrada a distinção: isso não confirma renovação integral do saldo diário de tokens.
+- Preparado lançador de 32 cenários via Streamlit AppTest com API real, sem simular respostas, com cliente de teste por cenário, metadados seguros, consumo reportado e cadência global de 120 segundos. O código do agente permaneceu fixo em ea85546.
+- C14 passou com a qualificação de preço indisponível corrigida. C03 concluiu o primeiro turno; a continuação foi bloqueada por limite diário de tokens. Os outros 30 cenários não foram iniciados.
+- O último HTTP 429 informou limite 200.000, uso 197.575 e requisição estimada em 3.466. Interrompida a rodada, preservando os arquivos completos e o resultado parcial; não registrar aprovação dos 32.
+- Consultada a lista de modelos pela API, sem inferência adicional ou envio do desafio. Preparada configuração alternativa GPT-OSS 20B com mesma persona/provedor, sem aplicá-la. Solicitada escolha explícita entre avaliar outro modelo gratuito e aguardar o Qwen, mantendo a seleção de destino transparente.
+- Documentação e registros em docs/validacao-32-2026-11-03.md e local/validacao-32-2026-11-03/. Nenhum plano contratado, chave exposta ou dado original alterado.
+
 ## Como registrar as próximas etapas
 
 Para cada etapa, anotar: problema, solução escolhida e motivo, alternativa considerada, teste executado, resultado e limitação restante.
