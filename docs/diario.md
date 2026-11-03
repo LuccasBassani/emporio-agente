@@ -198,6 +198,15 @@ Os testes da interface não demonstram todas as combinações de perguntas. Olla
 - C19 e C09 já concluídos com resposta adequada: frete de exatamente R$ 500 reconhecido como indefinido e orçamento de busca vazia repetido sem bloqueio. Demais casos em andamento, a consolidar em registro posterior.
 - Implementação, testes, revalidação e documentação com assistência do Codex.
 
+## 02/11/2026 — Ajuste adicional após a primeira revalidação
+
+- A primeira rodada de correções concluiu C19, C09, C12, C13 e C28 com objetivo principal atendido. C06 ainda confirmou enquadramento sem todas as condições; o primeiro turno de C16 também teve abertura afirmativa. Preservados C06 completo e C16 parcial, sem reescrever as respostas.
+- Interrompida somente a rotina de avaliação iniciada nesta etapa, para não continuar validando a versão anterior da triagem. O servidor da aplicação permaneceu independente.
+- Adicionada checagem conservadora de algumas aberturas de confirmação em casos pessoais de devolução/garantia e revisão da resposta pelo modelo dentro do limite existente. Essa heurística não decide elegibilidade nem cobre toda formulação possível; manter a análise pela equipe.
+- Suíte de 53 testes passou, incluindo a revisão de uma confirmação de devolução e a preservação de resposta afirmativa normal sobre PIX.
+- Retomada a avaliação em local/revalidacao-v2-2026-11-02/, com chamadas reais, espaçamento de 65 segundos e metadados sem credenciais. O código ficou fixo nesta retomada; versões e evidências anteriores permaneceram separadas.
+- Reiniciado somente o servidor Streamlit identificado na porta local 8501 para carregar os módulos atuais e evitar recursos antigos em cache. Não há exposição pública da aplicação.
+
 ## Como registrar as próximas etapas
 
 Para cada etapa, anotar: problema, solução escolhida e motivo, alternativa considerada, teste executado, resultado e limitação restante.

@@ -40,6 +40,23 @@ def recommendation_limit(question: str) -> int:
     return {"uma": 1, "duas": 2, "dois": 2, "tres": 3, "quatro": 4, "cinco": 5}.get(match[1], int(match[1]) if match[1].isdigit() else 3)
 
 
+def confirms_triage(question: str, previous_questions: list[str], text: str) -> bool:
+    """Guarda conservadora de aberturas afirmativas; não decide elegibilidade nem substitui triagem."""
+    topic = r"\b(?:devol\w*|arrepend\w*|garantia|defeito|cobertura)\b"
+    current = normalize(question)
+    personal = bool(re.search(r"\b(?:comprei|recebi|meu|minha|posso|tenho)\b", current))
+    followup = bool(re.match(r"(?:recebi|chegou|esta sem uso|sem uso|com embalagem|sim\b|nao\b)", current))
+    relevant = (bool(re.search(topic, current)) and personal) or (
+        followup and any(re.search(topic, normalize(q)) for q in previous_questions[-2:]))
+    if not relevant:
+        return False
+    opening = normalize(text.split("\n", 1)[0])
+    if opening.startswith(("nao ", "para ", "se ", "o manual ", "conforme ", "pela politica ")):
+        return False
+    return bool(re.match(r"sim\b|ha cobertura\b", opening) or re.search(
+        r"\b(?:o produto|seu produto|seu caso|sua compra|voce) (?:se enquadra|esta elegivel|esta cobert[oa]|pode devolver)\b", opening))
+
+
 SYSTEM = """Você atende somente a Empório da Música, em português. O nome e estilo vêm do perfil.
 
 CONSULTAS
@@ -62,6 +79,7 @@ enquanto faltarem dados. Explique condicionalmente a regra consultada. Faça SOM
 sobre canal, recebimento efetivo ou condições, usando o que já foi informado; pare e aguarde após a pergunta.
 Troca em 30 dias da compra não é toda a garantia: distinga 90 dias do recebimento e certificado do fabricante.
 Não diagnostique defeito, aprove exceção nem conclua cobertura sem condições suficientes.
+Neste protótipo, oriente a solicitação de análise pela equipe; não abra a resposta confirmando elegibilidade.
 Responda primeiro ao pedido, sem ofertas genéricas de ajuda ou perguntas extras se a dúvida estiver resolvida.
 'o primeiro' é a primeira opção apresentada na conversa. Ao agradecer/encerrar, encerre cordialmente sem insistência.
 
@@ -124,6 +142,8 @@ class StoreAgent:
                     error = "O agente não referenciou corretamente as fontes consultadas."
                 elif not cited and currency_values(reply.content) and not budget_echo_only(reply.content, queries):
                     error = "O agente tentou informar valor sem referência de consulta."
+                elif confirms_triage(question, [t.question for t in self.turns], reply.content):
+                    error = "A resposta confirmou devolução ou cobertura antes da análise da equipe."
                 if error:
                     # Uma correção de conteúdo dentro do mesmo limite de rodadas; não repete erros HTTP.
                     if validation_feedback:
@@ -131,7 +151,9 @@ class StoreAgent:
                     validation_feedback = True
                     messages.extend([reply.as_message(), {"role": "user", "content":
                         "Validação da aplicação: " + error + " Consulte a ferramenta adequada e corrija as fontes. "
-                        "Para pedido, consulte o total registrado; não recalcule. Não invente IDs."}])
+                        "Para pedido, consulte o total registrado; não recalcule. Não invente IDs. "
+                        "Em devolução/garantia, descreva a regra condicionalmente, sem confirmar enquadramento/cobertura; "
+                        "pergunte somente a próxima condição ausente e aguarde a resposta."}])
                     continue
                 messages.append(reply.as_message())
                 turn = Turn(question, reply.content, tuple(messages[start:]), tuple(queries),

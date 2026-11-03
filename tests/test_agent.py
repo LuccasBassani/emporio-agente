@@ -166,6 +166,23 @@ class AgentTests(unittest.TestCase):
             self.assertEqual(len(agent.turns), 1)
             self.assertEqual(turn.sources[0]["id"], "D81")
 
+    def test_return_confirmation_is_revised_without_claiming_eligibility(self):
+        with self.client([
+            call("buscar_politicas", {"pergunta": "devolução arrependimento online"}),
+            {"content": "Pelo que você descreveu, o produto se enquadra nas condições [P4.1-p4-1]."},
+            {"content": "Para compras online, o manual prevê até sete dias [P4.1-p4-1]. O item está com todos os acessórios e manuais?"},
+        ]) as client:
+            turn = StoreAgent(client, self.tools).respond("Comprei online, recebi ontem, sem uso e na embalagem original. Como devolvo?")
+            self.assertNotIn("se enquadra", turn.text)
+            self.assertIn("acessórios e manuais?", turn.text)
+
+    def test_general_payment_confirmation_is_not_treated_as_warranty_approval(self):
+        with self.client([
+            call("buscar_politicas", {"pergunta": "formas de pagamento PIX"}),
+            {"content": "Sim, aceitamos PIX [P3-p3-1]."},
+        ]) as client:
+            self.assertTrue(StoreAgent(client, self.tools).respond("Aceitam PIX?").text.startswith("Sim"))
+
     def test_recommendations_default_to_three_but_explicit_five_is_allowed(self):
         for question, count in [("Quais violões até mil?", 3), ("Quero cinco opções de violões até mil.", 5)]:
             with self.subTest(question=question), self.client([

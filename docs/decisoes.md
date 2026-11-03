@@ -100,7 +100,7 @@ Além das conversas, testar funções críticas de preço, filtros e acesso a pe
 - Reorganizado o prompt com consulta, triagem, limites e fontes. Reforçadas respostas condicionais, aproveitamento do contexto, uma pergunta principal seguida de espera e escopo comercial. Essas instruções ainda dependem de cumprimento pelo modelo; não há alegação de máquina de estados ou aprovação automática de devoluções.
 - Adicionado intervalo opcional entre requisições na mesma sessão, padrão 0. Cotas pertencem ao provedor/plano e ficam separadas das limitações do protótipo. A opção não coordena sessões concorrentes nem garante evitar todo tipo de cota.
 - Escapados símbolos de moeda apenas na apresentação do chat para evitar interpretação LaTeX; o texto exportado permanece original.
-- Suíte ampliada de 42 para 51 testes, com regressões úteis para os casos observados. Revalidação real dos casos afetados em andamento, registrada separadamente da primeira rodada no navegador. Não alterar as evidências antigas para aparentar acerto.
+- Suíte ampliada de 42 para 53 testes, com regressões úteis para os casos observados. Após nova falha real de triagem, incluída guarda conservadora para algumas aberturas de confirmação em casos pessoais, com correção de conteúdo dentro do limite existente. Não é classificador completo nem validação de elegibilidade. Revalidação real em andamento, separada da primeira rodada no navegador; evidências antigas preservadas.
 - Evolução proposta para um produto real documentada em `evolucao-produto.md`, com prioridades e critérios, sem tratar propostas como capacidades implementadas.
 
 ## Pendências atualizadas

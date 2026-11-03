@@ -21,7 +21,8 @@ Este guia acompanha a construção do agente de atendimento da Empório da Músi
 - [x] Montar configuração, chat e exportações.
 - [x] Executar verificação inicial do conjunto e salvar cinco exemplos reais.
 - [x] Tentar os 32 cenários da persona pela interface e salvar resultados/evidências locais em 02/11.
-- [ ] Corrigir as falhas encontradas na avaliação de 02/11 e repetir os casos afetados; C13 continua bloqueado por cota.
+- [x] Implementar correções de consulta, notas de auditoria, validação e instruções de triagem.
+- [ ] Concluir a revalidação real dos casos afetados e registrar os resultados; triagem em avaliação.
 - [ ] Revisar a entrega e tornar o repositório público.
 
 O protótipo tem interface e terminal com catálogo, preços, RAG, pedidos por cliente de teste, configuração e exportações. A Groq passou nos cenários reais registrados, incluindo consulta de pedido pela interface. O navegador foi usado para conferir o envio de mensagem, importação de configuração e downloads. Ollama está preparado, mas ainda sem validação real local. A revisão final de entrega continua pendente.
@@ -30,7 +31,7 @@ O protótipo tem interface e terminal com catálogo, preços, RAG, pedidos por c
 
 A Lia já inicia com a persona definida; alterar nome, tom ou instruções é opcional. Para a rodada de avaliação, siga o [roteiro de 32 cenários](cenarios-de-teste.md), com perguntas, resultados esperados e espaço para registrar execuções. Uma nova sessão carrega o padrão atualizado; importar configuração antiga mantém as preferências daquele arquivo.
 
-A primeira rodada real está no [relatório de 02/11](avaliacao-persona-2026-11-02.md): 9 aprovados, 10 com ressalvas, 12 falhas e 1 bloqueado. O protótipo precisa de correções antes da revisão final de entrega.
+A primeira rodada real está no [relatório de 02/11](avaliacao-persona-2026-11-02.md): 9 aprovados, 10 com ressalvas, 12 falhas e 1 bloqueado. As correções foram implementadas e a revalidação real está em andamento, preservando a rodada original. O caso C13 já concluiu após a alteração de consulta; ainda não é uma aprovação geral do protótipo.
 
 1. Na pasta do projeto, execute `.\.venv\Scripts\python.exe -m streamlit run app.py` e abra http://127.0.0.1:8501.
 2. Ajuste nome, tom, instruções e provedor. Clique em **Aplicar e iniciar nova conversa**.
@@ -45,7 +46,7 @@ Trocar cliente ou aplicar/importar configuração limpa a conversa. A sessão n�
 
 Entrega informada: 03/11/2026 às 23h59. Horário de referência deste planejamento: America/Sao_Paulo; conferir eventual fuso diferente no e-mail.
 
-Prioridade do candidato: adiantar a maior parte em 31/10. A meta para hoje é uma primeira versão que percorra o caminho completo: perguntar, consultar uma fonte, responder e exportar. Essa meta depende de obter acesso a uma API de modelo. Não é uma afirmação de que a integração já está disponível.
+O planejamento inicial priorizou uma primeira versão completa em 31/10. Em 02/11, a prioridade passou a ser corrigir casos reproduzidos, concluir a revalidação e preparar os exemplos e a publicação final. A tabela abaixo registra o plano inicial; o checklist e o diário registram o andamento efetivo.
 
 | Período | Prioridade | Resultado a conferir |
 | --- | --- | --- |
@@ -65,10 +66,10 @@ Prioridade do candidato: adiantar a maior parte em 31/10. A meta para hoje é um
 | GitHub | Concluído | Repositório privado durante o desenvolvimento; público para entregar |
 | Uso de IA | Exigência de transparência | Registrar a assistência efetivamente utilizada |
 | API | Decisão confirmada | Groq no plano gratuito ou Ollama local; nenhum gasto pago autorizado |
-| Interface | Proposta recomendada | Streamlit para configuração, chat e exportações |
-| Dados | Proposta recomendada | Funções Python sobre os CSVs; cálculos e validações no código |
+| Interface | Implementado | Streamlit para configuração, chat e exportações |
+| Dados | Implementado | Funções Python sobre os CSVs; cálculos e validações no código |
 | Políticas | Implementado e verificado localmente | RAG lexical BM25, com seção/página e 14 perguntas de recuperação |
-| Identificação | Proposta para demonstração | Selecionar um cliente fictício e restringir pedidos a esse cliente |
+| Identificação | Implementado para demonstração | Selecionar um cliente fictício e restringir pedidos a esse cliente |
 | Publicação da aplicação | Fora da primeira versão | Rodar localmente com instruções reproduzíveis |
 
 Antes de testar o modelo, configurar a chave Groq e confirmar as cotas ou instalar/iniciar Ollama com o modelo escolhido. Os conectores suportam ferramentas, mas o comportamento real de cada modelo ainda precisa ser validado.
