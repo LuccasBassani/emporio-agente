@@ -34,6 +34,16 @@ class SettingsTests(unittest.TestCase):
             with self.subTest(values=values), self.assertRaises(ValueError):
                 Settings.from_env(values)
 
+    def test_gemini_requires_its_own_key_and_ignores_other_credentials(self):
+        with self.assertRaisesRegex(ValueError, "GEMINI_API_KEY"):
+            Settings.from_env({"LLM_PROVIDER": "gemini", "GROQ_API_KEY": "outra-chave",
+                               "GOOGLE_API_KEY": "chave-ambiente-nao-selecionada"})
+        settings = Settings.from_env({"LLM_PROVIDER": "gemini", "GEMINI_API_KEY": "chave-gemini",
+                                      "GROQ_API_KEY": "outra-chave"})
+        self.assertEqual(settings.api_key, "chave-gemini")
+        self.assertEqual(settings.model, "gemini-3.6-flash")
+        self.assertNotIn("chave-gemini", repr(settings))
+
 
 class ProviderTests(unittest.TestCase):
     def test_optional_pacing_spaces_requests_without_retrying(self):
@@ -52,14 +62,15 @@ class ProviderTests(unittest.TestCase):
         self.assertEqual(sent, [0.0, 65.0])
 
     def settings(self, provider):
-        return Settings.from_env({"LLM_PROVIDER": provider, "GROQ_API_KEY": "segredo-de-teste"})
+        return Settings.from_env({"LLM_PROVIDER": provider, "GROQ_API_KEY": "segredo-de-teste",
+                                  "GEMINI_API_KEY": "segredo-de-teste"})
 
     def test_tool_roundtrip_for_both_providers(self):
         """Simula decisão -> execução externa -> resposta, conferindo os dois protocolos."""
         tools = [{"type": "function", "function": {
             "name": "buscar_produtos", "parameters": {"type": "object", "properties": {}},
         }}]
-        for provider in ["groq", "ollama"]:
+        for provider in ["groq", "gemini", "ollama"]:
             with self.subTest(provider=provider):
                 requests = []
 
@@ -68,10 +79,12 @@ class ProviderTests(unittest.TestCase):
                     requests.append(body)
                     if len(requests) == 1:
                         self.assertEqual(body["tools"], tools)
-                    if provider == "groq":
-                        self.assertEqual(request.url.host, "api.groq.com")
+                    if provider in {"groq", "gemini"}:
+                        self.assertEqual(request.url.host, "api.groq.com" if provider == "groq" else "generativelanguage.googleapis.com")
                         self.assertEqual(request.headers["authorization"], "Bearer segredo-de-teste")
-                        self.assertEqual(request.url.path, "/openai/v1/chat/completions")
+                        self.assertEqual(request.url.path, "/openai/v1/chat/completions" if provider == "groq" else "/v1beta/openai/chat/completions")
+                        if provider == "gemini":
+                            self.assertEqual(body["reasoning_effort"], "low")
                     else:
                         self.assertEqual(request.url.host, "127.0.0.1")
                         self.assertNotIn("authorization", request.headers)
@@ -80,9 +93,11 @@ class ProviderTests(unittest.TestCase):
                     if len(requests) == 1:
                         args = {"orcamento": 1000}
                         call = {"function": {"name": "buscar_produtos", "arguments": args}}
-                        if provider == "groq":
+                        if provider in {"groq", "gemini"}:
                             call.update(id="call_1", type="function")
                             call["function"]["arguments"] = json.dumps(args)
+                            if provider == "gemini":
+                                call["extra_content"] = {"google": {"thought_signature": "assinatura-opaca"}}
                         message = {"role": "assistant", "content": "", "tool_calls": [call]}
                     else:
                         history = body["messages"]
@@ -92,9 +107,12 @@ class ProviderTests(unittest.TestCase):
                             self.assertEqual(history[-2]["tool_calls"][0]["function"]["arguments"], {"orcamento": 1000})
                         else:
                             self.assertEqual(history[-1]["tool_call_id"], "call_1")
+                            if provider == "gemini":
+                                self.assertEqual(history[-2]["tool_calls"][0]["extra_content"],
+                                                 {"google": {"thought_signature": "assinatura-opaca"}})
                         message = {"role": "assistant", "content": "Violão de teste por R$ 900."}
                     result = ({"choices": [{"message": message, "finish_reason": "stop"}]}
-                              if provider == "groq" else {"message": message, "done": True})
+                              if provider in {"groq", "gemini"} else {"message": message, "done": True})
                     return httpx.Response(200, json=result)
 
                 with LLMClient(self.settings(provider), transport=httpx.MockTransport(handle)) as client:
@@ -111,7 +129,7 @@ class ProviderTests(unittest.TestCase):
                     self.assertFalse(final.tool_calls)
 
     def test_errors_do_not_leak_provider_body_or_retry(self):
-        for provider in ["groq", "ollama"]:
+        for provider in ["groq", "gemini", "ollama"]:
             for status in [401, 403, 404, 429, 500, 302]:
                 calls = []
 

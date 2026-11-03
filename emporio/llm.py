@@ -1,4 +1,4 @@
-"""Conectores Groq e Ollama com uma resposta comum para o agente."""
+"""Conectores Groq, Gemini e Ollama com uma resposta comum para o agente."""
 
 from dataclasses import dataclass
 import json
@@ -19,6 +19,7 @@ class ToolCall:
     id: str
     name: str
     arguments: dict[str, Any]
+    extra_content: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -33,7 +34,8 @@ class Reply:
                 {"id": call.id, "type": "function", "function": {
                     "name": call.name,
                     "arguments": json.dumps(call.arguments, ensure_ascii=False),
-                }} for call in self.tool_calls
+                }, **({"extra_content": call.extra_content} if call.extra_content else {})}
+                for call in self.tool_calls
             ]
         return message
 
@@ -63,10 +65,12 @@ class LLMClient:
         headers = {}
         if tools:
             payload["tools"] = tools
-        if cfg.provider == "groq":
+        if cfg.provider in {"groq", "gemini"}:
             endpoint = cfg.base_url + "/chat/completions"
             headers["Authorization"] = f"Bearer {cfg.api_key}"
             payload.update(temperature=0.2, max_tokens=1024)
+            if cfg.provider == "gemini":
+                payload["reasoning_effort"] = "low"
         else:
             endpoint = cfg.base_url + "/api/chat"
             payload["messages"] = [self._ollama_message(m) for m in messages]
@@ -96,7 +100,7 @@ class LLMClient:
             raise ProviderError(reason)
         try:
             data = response.json()
-            if cfg.provider == "groq":
+            if cfg.provider in {"groq", "gemini"}:
                 choice = data["choices"][0]
                 if choice.get("finish_reason") in {"length", "content_filter"}:
                     raise ProviderError("A resposta do modelo foi interrompida; não será usada como resposta completa.")
@@ -117,9 +121,13 @@ class LLMClient:
                 if not isinstance(arguments, dict) or not isinstance(function["name"], str):
                     raise ValueError()
                 call_id = call.get("id") or f"ollama_{index}"
-                if cfg.provider == "groq" and not call.get("id"):
+                if cfg.provider in {"groq", "gemini"} and not call.get("id"):
                     raise ValueError()
-                calls.append(ToolCall(call_id, function["name"], arguments))
+                extra = call.get("extra_content") if cfg.provider == "gemini" else None
+                if extra is not None and not isinstance(extra, dict):
+                    raise ValueError()
+                # Assinatura opaca retornada pelo Gemini: devolver intacta na chamada seguinte.
+                calls.append(ToolCall(call_id, function["name"], arguments, extra))
             if not content.strip() and not calls:
                 raise ValueError()
             return Reply(content, tuple(calls))

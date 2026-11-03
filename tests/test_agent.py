@@ -183,6 +183,15 @@ class AgentTests(unittest.TestCase):
         ]) as client:
             self.assertTrue(StoreAgent(client, self.tools).respond("Aceitam PIX?").text.startswith("Sim"))
 
+    def test_campaign_description_does_not_imply_active_discount(self):
+        with self.client([
+            call("buscar_politicas", {"pergunta": "Black Friday campanhas novembro"}),
+            {"content": "A Black Friday prevê de 15% a 30% em todo catálogo [P6.1-p6-1]."},
+            {"content": "O mês não ativa promoções automaticamente. A campanha descrita no manual depende das promoções ativas no cadastro [P6.1-p6-1]."},
+        ]) as client:
+            turn = StoreAgent(client, self.tools).respond("Em novembro todos têm 30%?")
+            self.assertIn("não ativa", turn.text)
+
     def test_recommendations_default_to_three_but_explicit_five_is_allowed(self):
         for question, count in [("Quais violões até mil?", 3), ("Quero cinco opções de violões até mil.", 5)]:
             with self.subTest(question=question), self.client([

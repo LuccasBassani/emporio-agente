@@ -39,7 +39,8 @@ def clear_conversation():
 
 def make_agent(config, customer_id, data):
     environment = {**os.environ, "LLM_PROVIDER": config.provider,
-                   "GROQ_MODEL": config.groq_model, "OLLAMA_MODEL": config.ollama_model}
+                   "GROQ_MODEL": config.groq_model, "GEMINI_MODEL": config.gemini_model,
+                   "OLLAMA_MODEL": config.ollama_model}
     settings = Settings.from_env(environment)
     catalog, policies, orders = data
     return StoreAgent(LLMClient(settings), StoreTools(catalog, policies, orders, customer_id), config)
@@ -53,6 +54,7 @@ def render_app():
             provider=os.getenv("LLM_PROVIDER", "ollama"),
             groq_model=os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b"),
             ollama_model=os.getenv("OLLAMA_MODEL", "qwen3:8b"),
+            gemini_model=os.getenv("GEMINI_MODEL", "gemini-3.6-flash"),
         )
         st.session_state.form_revision = 0
         clear_conversation()
@@ -74,17 +76,18 @@ def render_app():
             tone = st.selectbox("Tom de voz", TONES, index=TONES.index(config.tone), key=f"tone_{revision}")
             instructions = st.text_area("Instruções adicionais", config.instructions, max_chars=1200,
                                         placeholder="Ex.: prefira respostas curtas e evite emojis.", key=f"instructions_{revision}")
-            provider = st.selectbox("Onde executar a IA", ["groq", "ollama"],
-                                    index=["groq", "ollama"].index(config.provider),
-                                    format_func=lambda p: "Groq · API" if p == "groq" else "Ollama · local",
+            provider = st.selectbox("Onde executar a IA", ["groq", "gemini", "ollama"],
+                                    index=["groq", "gemini", "ollama"].index(config.provider),
+                                    format_func=lambda p: {"groq": "Groq · API", "gemini": "Gemini · API", "ollama": "Ollama · local"}[p],
                                     key=f"provider_{revision}")
             groq_model = st.text_input("Modelo da Groq", config.groq_model, key=f"groq_model_{revision}")
+            gemini_model = st.text_input("Modelo do Gemini", config.gemini_model, key=f"gemini_model_{revision}")
             ollama_model = st.text_input("Modelo do Ollama", config.ollama_model, key=f"ollama_model_{revision}")
             apply = st.form_submit_button("Aplicar e iniciar nova conversa", type="primary")
         if apply:
             try:
                 new_config = DemoConfig(provider, groq_model.strip(), ollama_model.strip(),
-                                        name.strip(), tone, instructions.strip())
+                                        name.strip(), tone, instructions.strip(), gemini_model.strip())
             except ValueError as error:
                 st.error(str(error))
             else:
@@ -106,7 +109,7 @@ def render_app():
                     st.session_state.form_revision += 1
                     clear_conversation()
                     st.rerun()
-        st.caption("A chave da Groq é lida do .env local e não faz parte da configuração exportada.")
+        st.caption("As chaves das APIs são lidas do .env local e não fazem parte da configuração exportada.")
 
     with chat_column:
         st.subheader("Teste de atendimento")
@@ -121,7 +124,7 @@ def render_app():
         if st.button("Nova conversa", key="new_conversation"):
             clear_conversation()
             st.rerun()
-        model = config.groq_model if config.provider == "groq" else config.ollama_model
+        model = {"groq": config.groq_model, "gemini": config.gemini_model, "ollama": config.ollama_model}[config.provider]
         st.caption(f"{config.name} · {config.provider} · {model}")
 
         agent = st.session_state.agent

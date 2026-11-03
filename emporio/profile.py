@@ -35,11 +35,12 @@ class DemoConfig:
     name: str = "Lia"
     tone: str = TONES[0]
     instructions: str = DEFAULT_INSTRUCTIONS
+    gemini_model: str = "gemini-3.6-flash"
 
     def __post_init__(self):
-        if self.provider not in {"groq", "ollama"} or self.tone not in TONES:
+        if self.provider not in {"groq", "gemini", "ollama"} or self.tone not in TONES:
             raise ValueError("Provedor ou tom inválido.")
-        for key, limit in [("name", 40), ("groq_model", 120), ("ollama_model", 120), ("instructions", 1200)]:
+        for key, limit in [("name", 40), ("groq_model", 120), ("gemini_model", 120), ("ollama_model", 120), ("instructions", 1200)]:
             value = getattr(self, key)
             if not isinstance(value, str) or len(value) > limit or (key != "instructions" and not value.strip()):
                 raise ValueError(f"Configuração inválida no campo {key}.")
@@ -53,6 +54,9 @@ class DemoConfig:
             raise ValueError("A configuração deve ter até 20 KB.")
         try:
             data = json.loads(content)
+            # Compatibilidade com configurações exportadas antes do conector Gemini.
+            if isinstance(data, dict) and set(data) == set(cls.__dataclass_fields__) - {"gemini_model"}:
+                data["gemini_model"] = cls.__dataclass_fields__["gemini_model"].default
             if not isinstance(data, dict) or set(data) != set(cls.__dataclass_fields__):
                 raise ValueError()
             return cls(**data)

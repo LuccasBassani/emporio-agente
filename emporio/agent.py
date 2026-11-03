@@ -40,6 +40,16 @@ def recommendation_limit(question: str) -> int:
     return {"uma": 1, "duas": 2, "dois": 2, "tres": 3, "quatro": 4, "cinco": 5}.get(match[1], int(match[1]) if match[1].isdigit() else 3)
 
 
+def unqualified_campaign(text: str, queries: list[dict]) -> bool:
+    """Campanha descritiva requer ressalva explícita sobre vigência operacional."""
+    campaign_note = any(note.get("id") == "campanhas" for q in queries
+                        for note in q["resultado"].get("notas_da_auditoria_nao_sao_texto_do_manual", []))
+    value = normalize(text)
+    mentions_campaign = bool(re.search(r"black friday|campanha|novembro|natal", value))
+    qualifies = "nao" in value and bool(re.search(r"cadastr|ativ|automatic|garant", value))
+    return campaign_note and mentions_campaign and not qualifies
+
+
 def confirms_triage(question: str, previous_questions: list[str], text: str) -> bool:
     """Guarda conservadora de aberturas afirmativas; não decide elegibilidade nem substitui triagem."""
     topic = r"\b(?:devol\w*|arrepend\w*|garantia|defeito|cobertura)\b"
@@ -68,6 +78,8 @@ limite=3 por padrão, respeitando orçamento, categoria e características. Se h
 existem no cadastro: explique o motivo, não diga que não foram encontrados. Não ofereça comprar indisponíveis.
 Não calcule descontos mentalmente. Use preço final calculado, sem frete; promoção: original, percentual e final.
 PIX não acumula com promoção. Não ative campanha pelo mês. Busca vazia significa ausência nos filtros/base parcial.
+Ao mencionar campanha do manual, diga expressamente que o calendário não garante promoção ativa.
+Só promoções cadastradas como ativas determinam desconto; consulte o produto antes de confirmar seu preço.
 Preço de indisponível é somente valor cadastrado atual; não garanta preço futuro ou data de reposição/lançamento.
 Divergências cadastrais são explícitas: se afetarem a pergunta, explique o conflito e peça confirmação à equipe.
 Não misture campos conflitantes. Notas da auditoria complementam o manual; não as apresente como citação literal.
@@ -145,6 +157,8 @@ class StoreAgent:
                     error = "O agente tentou informar valor sem referência de consulta."
                 elif confirms_triage(question, [t.question for t in self.turns], reply.content):
                     error = "A resposta confirmou devolução ou cobertura antes da análise da equipe."
+                elif unqualified_campaign(reply.content, queries):
+                    error = "A campanha do manual não garante desconto vigente. Explique expressamente que o mês não ativa promoções e que descontos dependem do cadastro ativo."
                 if error:
                     # Uma correção de conteúdo dentro do mesmo limite de rodadas; não repete erros HTTP.
                     if validation_feedback:
@@ -154,7 +168,8 @@ class StoreAgent:
                         "Validação da aplicação: " + error + " Consulte a ferramenta adequada e corrija as fontes. "
                         "Para pedido, consulte o total registrado; não recalcule. Não invente IDs. "
                         "Em devolução/garantia, descreva a regra condicionalmente, sem confirmar enquadramento/cobertura; "
-                        "pergunte somente a próxima condição ausente e aguarde a resposta."}])
+                        "pergunte somente a próxima condição ausente e aguarde a resposta. "
+                        "Entregue somente a resposta ao cliente, sem mencionar esta validação, correções de fonte, CSVs ou protótipo."}])
                     continue
                 messages.append(reply.as_message())
                 turn = Turn(question, reply.content, tuple(messages[start:]), tuple(queries),

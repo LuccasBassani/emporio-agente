@@ -38,6 +38,12 @@ class Settings:
                 raise ValueError("Preencha GROQ_API_KEY no .env para usar a Groq.")
             model = values.get("GROQ_MODEL", "qwen/qwen3.8-27b").strip()
             url = "https://api.groq.com/openai/v1"
+        elif provider == "gemini":
+            key = values.get("GEMINI_API_KEY", "").strip()
+            if not key:
+                raise ValueError("Preencha GEMINI_API_KEY no .env para usar o Gemini.")
+            model = values.get("GEMINI_MODEL", "gemini-3.6-flash").strip()
+            url = "https://generativelanguage.googleapis.com/v1beta/openai"
         elif provider == "ollama":
             key = ""  # A chave Groq nunca é enviada ao servidor Ollama.
             model = values.get("OLLAMA_MODEL", "qwen3:8b").strip()
@@ -52,7 +58,7 @@ class Settings:
                     or parsed.path not in {"", "/"}):
                 raise ValueError("OLLAMA_BASE_URL deve ser a origem do servidor, sem credenciais ou caminho.")
         else:
-            raise ValueError("LLM_PROVIDER deve ser groq ou ollama.")
+            raise ValueError("LLM_PROVIDER deve ser groq, gemini ou ollama.")
         if not model:
             raise ValueError("Informe o nome do modelo do provedor selecionado.")
         return cls(provider, model, url, key, timeout, interval)

@@ -5,6 +5,13 @@ from emporio.profile import DemoConfig
 
 
 class ProfileTests(unittest.TestCase):
+    def test_legacy_config_import_adds_gemini_model_without_changing_provider(self):
+        data = json.loads(DemoConfig().to_json())
+        del data["gemini_model"]
+        imported = DemoConfig.from_json(json.dumps(data))
+        self.assertEqual(imported.provider, "groq")
+        self.assertEqual(imported.gemini_model, "gemini-3.6-flash")
+
     def test_roundtrip_preserves_editable_configuration(self):
         profile = DemoConfig(provider="ollama", name="Bia", instructions="Prefira respostas breves.")
         self.assertEqual(DemoConfig.from_json(profile.to_json()), profile)
