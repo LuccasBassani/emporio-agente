@@ -182,6 +182,12 @@ A conversa real de [catálogo e PIX](examples/catalogo-e-pix.md) foi concluída 
 
 Buscas por marca/modelo usam nome e categoria. As descrições livres não entram na busca porque há divergências no material fornecido. Filtros de cordas e captação usam os valores de specs; campo ausente não é tratado como falso. Ainda é necessário revisar divergências nas especificações antes de afirmar características não comprovadas.
 
+A consulta de um modelo específico aceita nome ou ID e inclui itens indisponíveis, preservando esgotado, descontinuado e em breve. A busca de recomendações continua filtrando disponíveis; se uma busca por termo não encontrar opções disponíveis, também expõe os modelos indisponíveis correspondentes. O agente limita a três recomendações por padrão; quantidades explícitas de uma a cinco podem ser atendidas. A exportação distingue parâmetros solicitados e aplicados quando o limite é ajustado.
+
+`data/observacoes_dados.json` registra conflitos por produto e ambiguidades por seção, com origem e orientação. Essas notas não alteram as fontes fornecidas e são identificadas separadamente do texto do manual. A busca de políticas e o RAG isolado incluem as notas pertinentes e preservam os trechos originais. O material de cordas só é filtrado em violões/ukuleles; para tipo elétrico, usa-se electronics quando existe ou indicação explícita no nome/descrição da categoria, sem tratar campo ausente como falso.
+
+Uma busca vazia pode repetir o orçamento consultado sem inventar uma fonte de produto. Valores sem referência que não correspondem a esse orçamento e referências inválidas recebem uma oportunidade de correção pelo modelo, dentro das quatro rodadas existentes. Isso não é retry de erro HTTP e não garante fidelidade de todas as afirmações. O prompt reforça triagem condicional, uma pergunta principal por vez e redirecionamento ao atendimento da loja.
+
 ## Pedidos e cliente de teste
 
 A aplicação fixa o cliente fora dos argumentos do modelo. Uma consulta verifica essa associação antes de devolver informações; pedido inexistente e pedido de outro cliente recebem a mesma resposta. A interface começa uma conversa nova ao mudar a seleção para impedir mistura de históricos. Essa seleção é uma simulação local, não autenticação de produção.
@@ -198,16 +204,23 @@ No terminal, o mesmo contexto pode ser selecionado explicitamente:
 
 A [avaliação real da persona em 02/11](docs/avaliacao-persona-2026-11-02.md) tentou os 32 cenários pela interface: 9 aprovados, 10 aprovados com ressalvas, 12 falhas e 1 bloqueado por cota. Foram exportadas 29 conversas completas; dois casos falharam antes de entregar resposta e um permaneceu bloqueado. A rodada revelou problemas de triagem, interpretação de ambiguidade, busca de modelos indisponíveis, escopo e validação de valores que ainda precisam de correção. Os testes automatizados abaixo não devem ser interpretados como aprovação geral do atendimento. Evidências adicionais foram guardadas localmente, fora do Git, conforme descrito no relatório.
 
-- 42 testes automatizados de preços, disponibilidade, acesso a pedidos, recuperação, protocolos de IA e fluxo da interface via Streamlit AppTest. As chamadas nesses testes são simuladas e não consomem API. As dependências fixadas foram instaladas em um segundo ambiente virtual limpo e os mesmos testes passaram, com pip check sem incompatibilidades.
+- 51 testes automatizados de preços, disponibilidade, acesso a pedidos, recuperação, observações de auditoria, correção de referências, protocolos de IA, espaçamento opcional e fluxo da interface via Streamlit AppTest. As chamadas nesses testes são simuladas e não consomem API. A instalação em um segundo ambiente limpo foi conferida anteriormente com a suíte de 42 testes; as dependências não mudaram nesta correção.
 - Exemplos reais em [examples/](examples/README.md), com catálogo/continuação, políticas, pedido e atendimento fora do escopo. A consulta real de pedido foi executada pela interface via AppTest com Groq. Envio de mensagem, importação da configuração e downloads Markdown/TXT/JSON também foram conferidos no navegador.
 - RAG lexical pode falhar em reformulações ou recuperar trechos incompletos; citações válidas não garantem fidelidade de todas as afirmações. O comportamento de triagem de devolução ainda depende do modelo.
 - Instruções de estilo são subordinadas às regras fixas no prompt e às validações do código. Isso não é uma garantia absoluta contra prompt injection.
 - Histórico em memória da sessão, com dois turnos anteriores no contexto. Sem gravação automática de conversas nem credenciais exportadas. Recarregar ou encerrar a sessão pode perder o histórico; use o download.
-- A cota gratuita pode interromper o fluxo. A tela mantém a pergunta com falha e oferece nova tentativa explícita; não há retry ou fallback automático.
 - Ollama tem suporte de protocolo testado com respostas simuladas, mas ainda não foi validado com um modelo local instalado.
 - Os dados e políticas são uma fotografia fornecida pelo desafio. Não há integração com WhatsApp real, estoque ao vivo, transportadora ou operações de compra/devolução.
 
-Com mais tempo: ampliar a avaliação com reformulações e ataques ao prompt, comparar recuperação semântica com BM25, validar modelos locais, adicionar autenticação real e persistência com retenção definida. Essas melhorias não são apresentadas como funcionalidades existentes.
+### Condições de execução do provedor
+
+A demonstração foi validada com o plano gratuito da Groq, sujeito às cotas do provedor. Interrupções por cota são registradas separadamente da avaliação de conteúdo. Capacidade e disponibilidade dependem do modelo e do plano utilizados; alterar o provedor/modelo exige nova validação. A cota externa não é um defeito da lógica do agente. O programa informa o erro, mantém a pergunta e oferece nova tentativa explícita, sem retry HTTP ou fallback automático.
+
+`LLM_MIN_INTERVAL_SECONDS` permite espaçar chamadas na mesma sessão, inclusive chamadas internas de ferramentas. O padrão é 0 (desativado); por exemplo, 65 aplica 65 segundos entre os inícios das requisições. Reinicie a aplicação após alterar o `.env`. É uma opção de execução conforme a conta utilizada, sem garantia de evitar limites de tamanho, minuto ou dia, e não coordena cotas entre várias sessões.
+
+### Com mais tempo de desenvolvimento
+
+Priorizaríamos corrigir dados na origem e versionar políticas; implementar identificação/autorização reais; ampliar avaliação com paráfrases e conversas longas; estruturar a triagem de devoluções; integrar estoque, frete e atendimento humano; e persistir histórico com observabilidade e retenção definida. Compararíamos outros modelos e recuperação semântica somente mediante ganho medido sobre BM25. O [plano de evolução do produto](docs/evolucao-produto.md) explica prioridades e critérios de aceitação. Essas propostas não são apresentadas como funcionalidades existentes.
 
 ## RAG sobre políticas
 

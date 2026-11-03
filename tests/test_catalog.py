@@ -55,6 +55,20 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(self.catalog.search(query="Yamaha C40", max_price="569.91", payment="pix")["total_encontrado"], 1)
         self.assertEqual(self.catalog.search(query="Ohana CK-20", max_price="440")["total_encontrado"], 1)
 
+    def test_named_lookup_finds_unavailable_models_without_recommending_purchase(self):
+        for name, product_id in [("Giannini GF-3D", 96), ("Ibanez Bass 2X", 136), ("Kala KA-ABP-CTG", 130)]:
+            with self.subTest(name=name):
+                found = self.catalog.lookup(name)
+                self.assertEqual(found["produto_id"], product_id)
+                self.assertFalse(found["disponivel"])
+
+    def test_conflicting_specs_are_reported_and_category_filters_keep_their_meaning(self):
+        self.assertTrue(self.catalog.quote(142)["divergencias_cadastrais"])
+        self.assertFalse(self.catalog.quote(81)["divergencias_cadastrais"])
+        electric_guitars = self.catalog.search(category_id=1, electric=True)
+        self.assertEqual(electric_guitars["total_encontrado"], 5)
+        self.assertFalse(self.catalog.search(category_id=2, strings="nylon")["produtos"])
+
     def test_search_handles_accents_specs_and_missing_product(self):
         result = self.catalog.search(query="violão", category_id=5, strings="aco", electric=True)
         self.assertGreater(result["total_encontrado"], 0)

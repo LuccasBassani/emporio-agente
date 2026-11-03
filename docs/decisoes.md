@@ -90,7 +90,20 @@ O roteiro `cenarios-de-teste.md` amplia a avaliação proposta para 32 casos, in
 
 Além das conversas, testar funções críticas de preço, filtros e acesso a pedidos. Conferir manualmente as fontes recuperadas para as perguntas sobre políticas.
 
-## Pendências
+## Correções após a auditoria e a rodada real de 02/11
+
+- Mantida a arquitetura Python com cinco ferramentas. `consultar_produto` aceita exatamente ID ou termo e localiza indisponíveis. A busca de recomendação mantém o filtro e, quando fica vazia por termo, também retorna modelos correspondentes indisponíveis em campo separado.
+- Criado `data/observacoes_dados.json` com evidências de divergência e notas por seção do manual. As notas têm origem própria, são distintas do texto recuperado e não substituem os dados fornecidos. Não há mapeamento de perguntas dos testes para respostas prontas.
+- Material de cordas é tratado somente em violões/ukuleles. Tipo elétrico usa o campo existente ou indicação explícita no nome/descrição da categoria, com origem declarada; ausência permanece desconhecida. Não inferir captação ou material a partir de campo contraditório.
+- O programa aplica até três resultados de recomendação por padrão; quantidade explícita de uma a cinco pode ampliar/reduzir o limite. A exportação mostra argumentos solicitados e efetivamente aplicados quando diferentes.
+- A validação permite repetir orçamento de busca vazia, mas não libera qualquer valor recebido do usuário. Referência inválida/ausente ou valor não fundamentado recebem uma oportunidade de correção de conteúdo, dentro das quatro rodadas; turnos só entram no histórico quando concluem. Isso é distinto de retry HTTP, que continua desativado.
+- Reorganizado o prompt com consulta, triagem, limites e fontes. Reforçadas respostas condicionais, aproveitamento do contexto, uma pergunta principal seguida de espera e escopo comercial. Essas instruções ainda dependem de cumprimento pelo modelo; não há alegação de máquina de estados ou aprovação automática de devoluções.
+- Adicionado intervalo opcional entre requisições na mesma sessão, padrão 0. Cotas pertencem ao provedor/plano e ficam separadas das limitações do protótipo. A opção não coordena sessões concorrentes nem garante evitar todo tipo de cota.
+- Escapados símbolos de moeda apenas na apresentação do chat para evitar interpretação LaTeX; o texto exportado permanece original.
+- Suíte ampliada de 42 para 51 testes, com regressões úteis para os casos observados. Revalidação real dos casos afetados em andamento, registrada separadamente da primeira rodada no navegador. Não alterar as evidências antigas para aparentar acerto.
+- Evolução proposta para um produto real documentada em `evolucao-produto.md`, com prioridades e critérios, sem tratar propostas como capacidades implementadas.
+
+## Pendências atualizadas
 
 - Prazo informado pelo candidato: 03/11/2026 às 23h59. Conferir eventual fuso específico no e-mail. Priorizar uma primeira versão completa em 31/10.
 - Groq configurada e testada; validar Ollama com modelo instalado e respeitar as cotas disponíveis.

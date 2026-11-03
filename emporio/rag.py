@@ -5,6 +5,7 @@ import re
 
 from emporio.llm import LLMClient, ProviderError
 from emporio.policies import PolicyHit, PolicyIndex
+from emporio.observations import policy_observations
 
 
 SYSTEM = """Você atende a Empório da Música, em português, com tom acolhedor e profissional.
@@ -16,7 +17,8 @@ Quando a pessoa perguntar se pode devolver uma compra específica, verifique se 
 quando recebeu o produto, o canal da compra e as condições do item. Se faltar informação,
 não comece com 'sim', não diga que ela pode devolver e não conclua elegibilidade.
 Explique a regra de forma condicional ('Para compras online, o manual prevê...') e termine
-perguntando explicitamente os dados ausentes. A pergunta sobre a data ou o tempo desde o
+perguntando somente o próximo dado ausente, uma pergunta principal por turno. Pare depois da pergunta.
+A pergunta sobre a data ou o tempo desde o
 recebimento é obrigatória quando essa informação não foi dada. Não deduza datas.
 Se houver ambiguidade ou conflito entre trechos, explique a dúvida e recomende confirmar com a equipe.
 Não use conhecimento jurídico externo: descreva o que consta no manual, sem certificar conformidade legal.
@@ -44,6 +46,8 @@ class RAGAnswer:
             lines.extend(["", f"### [P{index}] {c.section} {c.title}",
                           f"Fonte: {c.source}, página {c.page}. ID: {c.id}. Score lexical: {hit.score}.",
                           "", c.text])
+            for note in policy_observations(c.section):
+                lines.extend(["", f"Nota da auditoria ({note['arquivo']}; não é texto do manual): {note['observacao']}"])
         return "\n".join(lines) + "\n"
 
 
@@ -62,9 +66,14 @@ class PolicyRAG:
                 "Não encontrei essa informação no manual. Pode reformular a dúvida sobre as políticas da loja?",
                 (), ())
         blocks = []
+        notes = {}
         for index, hit in enumerate(hits, 1):
             chunk = hit.chunk
             blocks.append(f"[P{index}] {chunk.section} {chunk.title} | página {chunk.page}\n{chunk.text}")
+            for note in policy_observations(chunk.section):
+                notes[note["id"]] = note
+        blocks.extend(f"NOTA DA AUDITORIA, não é texto do manual ({note['arquivo']}): {note['observacao']}"
+                      for note in notes.values())
         reply = self.client.complete([
             {"role": "system", "content": SYSTEM},
             {"role": "user", "content": "TRECHOS RECUPERADOS DO MANUAL:\n\n" + "\n\n".join(blocks)

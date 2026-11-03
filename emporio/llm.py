@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 import json
+import time
 from typing import Any
 
 import httpx
@@ -40,6 +41,7 @@ class Reply:
 class LLMClient:
     def __init__(self, settings: Settings, *, transport=None):
         self.settings = settings
+        self._last_request_at = None
         # Sem retries ou fallback automáticos: cada chamada fica explícita.
         self.http = httpx.Client(
             timeout=settings.timeout, transport=transport, trust_env=False,
@@ -72,6 +74,11 @@ class LLMClient:
                 "temperature": 0.2, "num_ctx": 8192, "num_predict": 1024,
             })
         try:
+            if self._last_request_at is not None and cfg.min_interval:
+                remaining = cfg.min_interval - (time.monotonic() - self._last_request_at)
+                if remaining > 0:
+                    time.sleep(remaining)
+            self._last_request_at = time.monotonic()
             response = self.http.post(endpoint, json=payload, headers=headers)
         except httpx.TimeoutException:
             raise ProviderError("Tempo limite excedido. Tente novamente ou revise o modelo selecionado.") from None
@@ -84,7 +91,7 @@ class LLMClient:
                 401: "Chave da API ausente ou inválida.",
                 403: "Acesso ao modelo ou provedor não autorizado.",
                 404: "Modelo ou endpoint não encontrado. Confira o nome e, no Ollama, o download do modelo.",
-                429: "Limite de uso atingido. Aguarde antes de tentar novamente.",
+                429: "Limite de uso do provedor atingido. Aguarde a renovação da cota antes de tentar novamente.",
             }.get(response.status_code, f"O provedor retornou erro HTTP {response.status_code}.")
             raise ProviderError(reason)
         try:

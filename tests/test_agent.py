@@ -87,7 +87,7 @@ class AgentTests(unittest.TestCase):
     def test_failed_turn_does_not_pollute_history(self):
         for final in ["Está disponível [D999].", "Está disponível."]:
             with self.subTest(final=final):
-                with self.client([call("consultar_produto", {"produto_id": 81}), {"content": final}]) as client:
+                with self.client([call("consultar_produto", {"produto_id": 81}), {"content": final}, {"content": final}]) as client:
                     agent = StoreAgent(client, self.tools)
                     with self.assertRaises(ProviderError):
                         agent.respond("Qual o preço do C40?")
@@ -95,7 +95,7 @@ class AgentTests(unittest.TestCase):
                     self.assertEqual(agent.sources, {})
 
     def test_values_without_source_and_endless_tool_loops_are_blocked(self):
-        with self.client([{"content": "Custa R$ 500."}]) as client:
+        with self.client([{"content": "Custa R$ 500."}, {"content": "Custa R$ 500."}]) as client:
             with self.assertRaises(ProviderError):
                 StoreAgent(client, self.tools).respond("Quanto custa?")
         responses = [call("consultar_produto", {"produto_id": 81})] * 4
@@ -141,6 +141,39 @@ class AgentTests(unittest.TestCase):
             self.assertNotIn("Consultas executadas", agent.to_markdown(False))
             self.assertNotIn("Fontes citadas", agent.to_markdown(False))
             self.assertNotIn("Consultas e fontes", agent.to_text(False))
+
+    def test_empty_catalog_can_echo_queried_budget_but_not_invent_a_price(self):
+        for answer, allowed in [("Não encontrei violão até R$ 100.", True),
+                                ("Não encontrei até R$ 100. Tenho um de R$ 90.", False)]:
+            replies = [call("buscar_produtos", {"categoria_id": 5, "preco_maximo": 100}),
+                       {"content": answer}, {"content": answer}]
+            with self.subTest(answer=answer), self.client(replies) as client:
+                agent = StoreAgent(client, self.tools)
+                if allowed:
+                    self.assertEqual(agent.respond("Violão até R$ 100?").text, answer)
+                else:
+                    with self.assertRaises(ProviderError):
+                        agent.respond("Violão até R$ 100?")
+
+    def test_missing_source_can_be_corrected_by_a_consultation(self):
+        with self.client([
+            {"content": "O C40 custa R$ 599,90."},
+            call("consultar_produto", {"termo": "Yamaha C40"}),
+            {"content": "O C40 custa R$ 599,90 [D81]."},
+        ]) as client:
+            agent = StoreAgent(client, self.tools)
+            turn = agent.respond("Quanto custa o Yamaha C40?")
+            self.assertEqual(len(agent.turns), 1)
+            self.assertEqual(turn.sources[0]["id"], "D81")
+
+    def test_recommendations_default_to_three_but_explicit_five_is_allowed(self):
+        for question, count in [("Quais violões até mil?", 3), ("Quero cinco opções de violões até mil.", 5)]:
+            with self.subTest(question=question), self.client([
+                call("buscar_produtos", {"categoria_id": 5, "preco_maximo": 1000, "limite": 5}),
+                {"content": "Opções consultadas [D83]."},
+            ]) as client:
+                turn = StoreAgent(client, self.tools).respond(question)
+                self.assertEqual(len(turn.queries[0]["resultado"]["produtos"]), count)
 
 
 if __name__ == "__main__":

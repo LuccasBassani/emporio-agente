@@ -14,6 +14,7 @@ class Settings:
     base_url: str
     api_key: str = field(default="", repr=False)
     timeout: float = 120.0
+    min_interval: float = 0.0
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] | None = None) -> "Settings":
@@ -25,6 +26,12 @@ class Settings:
             raise ValueError("LLM_TIMEOUT_SECONDS deve ser um número positivo.") from None
         if not math.isfinite(timeout) or timeout <= 0:
             raise ValueError("LLM_TIMEOUT_SECONDS deve ser um número positivo.")
+        try:
+            interval = float(values.get("LLM_MIN_INTERVAL_SECONDS", "0"))
+        except ValueError:
+            raise ValueError("LLM_MIN_INTERVAL_SECONDS deve estar entre 0 e 300.") from None
+        if not math.isfinite(interval) or not 0 <= interval <= 300:
+            raise ValueError("LLM_MIN_INTERVAL_SECONDS deve estar entre 0 e 300.")
         if provider == "groq":
             key = values.get("GROQ_API_KEY", "").strip()
             if not key:
@@ -48,4 +55,4 @@ class Settings:
             raise ValueError("LLM_PROVIDER deve ser groq ou ollama.")
         if not model:
             raise ValueError("Informe o nome do modelo do provedor selecionado.")
-        return cls(provider, model, url, key, timeout)
+        return cls(provider, model, url, key, timeout, interval)

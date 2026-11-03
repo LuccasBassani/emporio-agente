@@ -8,6 +8,8 @@ from pathlib import Path
 import re
 import unicodedata
 
+from emporio.observations import product_observations
+
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 CENT = Decimal("0.01")
@@ -71,11 +73,13 @@ class Catalog:
                 return list(csv.DictReader(stream))
 
         self.categories = {}
+        self.category_descriptions = {}
         for row in rows("categories.csv"):
             category_id = positive_id(int(row["category_id"]))
             if category_id in self.categories:
                 raise ValueError("Categoria duplicada no catálogo.")
             self.categories[category_id] = row["name"]
+            self.category_descriptions[category_id] = row["description"]
         self.products = {}
         for row in rows("products.csv"):
             product = Product(
@@ -103,6 +107,16 @@ class Catalog:
                     positive_id(int(row["promotion_id"])), product_id, percent, row["description"],
                 )
 
+    def electric_type(self, product: Product) -> dict:
+        value = product.specs.get("electronics")
+        if value in {"yes", "no"}:
+            return {"valor": value == "yes", "origem": "products.csv: specs.electronics"}
+        if product.category_id in {1, 2} and "electric" in normalize(product.name).split():
+            return {"valor": True, "origem": "products.csv: name contém Electric"}
+        if normalize(self.category_descriptions[product.category_id]).startswith("guitarras eletricas"):
+            return {"valor": True, "origem": "categories.csv: description informa guitarras elétricas"}
+        return {"valor": None, "origem": "Não informado; ausência não equivale a acústico."}
+
     def quote(self, product_id: int, payment: str = "padrao") -> dict:
         positive_id(product_id, "product_id")
         if payment not in {"padrao", "pix"}:
@@ -129,6 +143,8 @@ class Catalog:
             "promocao": ({"id": promotion.id, "descricao": promotion.description} if promotion else None),
             "pix_acumulado": False,
             "especificacoes_cadastradas": product.specs,
+            "classificacao_eletrica": self.electric_type(product),
+            "divergencias_cadastrais": product_observations(product.id),
             "fontes": [{
                 "id": f"D{product.id}", "arquivo": "products.csv", "produto_id": product.id,
                 "promocao_id": promotion.id if promotion else None,
@@ -137,6 +153,15 @@ class Catalog:
             }],
             "observacao": "Preço sem frete. Indisponibilidade impede oferta de compra mesmo com preço cadastrado.",
         }
+
+    def lookup(self, query: str, payment: str = "padrao") -> dict:
+        """Localiza modelo sem confundir indisponibilidade com ausência de cadastro."""
+        if not isinstance(query, str) or not query.strip():
+            raise ValueError("Informe o nome ou modelo do produto.")
+        result = self.search(query=query, payment=payment, only_available=False, limit=5)
+        if result["total_encontrado"] == 1:
+            return result["produtos"][0]
+        return {**result, "observacao": "Base parcial. Se houver vários modelos, peça qual deles; ausência nesta busca não significa que a loja não vende a categoria."}
 
     def search(self, *, query: str = "", category_id: int | None = None,
                max_price=None, payment: str = "padrao", only_available: bool = True,
@@ -163,9 +188,10 @@ class Catalog:
                 continue
             if only_available and not product.available:
                 continue
-            if strings is not None and product.specs.get("strings") != {"aco": "steel", "nylon": "nylon"}[strings]:
+            # Material das cordas existe em violões/ukuleles; 4/6 em baixos/guitarras é quantidade.
+            if strings is not None and (product.category_id not in {5, 9} or product.specs.get("strings") != {"aco": "steel", "nylon": "nylon"}[strings]):
                 continue
-            if electric is not None and product.specs.get("electronics") != ("yes" if electric else "no"):
+            if electric is not None and self.electric_type(product)["valor"] is not electric:
                 continue
             searchable = normalize(product.name + " " + self.categories[product.category_id])
             if not all(term in searchable for term in terms):

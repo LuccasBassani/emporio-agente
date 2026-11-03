@@ -2,6 +2,7 @@
 
 import json
 import unittest
+from unittest.mock import patch
 
 import httpx
 
@@ -28,12 +29,28 @@ class SettingsTests(unittest.TestCase):
             {"OLLAMA_BASE_URL": "http://usuario:senha@localhost:11434"},
             {"OLLAMA_BASE_URL": "http://localhost:11434/api/chat"},
             {"OLLAMA_BASE_URL": "http://localhost:porta"},
+            {"LLM_MIN_INTERVAL_SECONDS": "nan"}, {"LLM_MIN_INTERVAL_SECONDS": "-1"},
         ]:
             with self.subTest(values=values), self.assertRaises(ValueError):
                 Settings.from_env(values)
 
 
 class ProviderTests(unittest.TestCase):
+    def test_optional_pacing_spaces_requests_without_retrying(self):
+        clock = [0.0]
+        sent = []
+        def handle(request):
+            sent.append(clock[0])
+            return httpx.Response(200, json={"message": {"content": "Olá"}, "done": True})
+        settings = Settings.from_env({"LLM_MIN_INTERVAL_SECONDS": "65"})
+        with patch("emporio.llm.time.monotonic", side_effect=lambda: clock[0]), \
+             patch("emporio.llm.time.sleep", side_effect=lambda seconds: clock.__setitem__(0, clock[0] + seconds)), \
+             LLMClient(settings, transport=httpx.MockTransport(handle)) as client:
+            client.complete([{"role": "user", "content": "Oi"}])
+            clock[0] = 5.0
+            client.complete([{"role": "user", "content": "Oi"}])
+        self.assertEqual(sent, [0.0, 65.0])
+
     def settings(self, provider):
         return Settings.from_env({"LLM_PROVIDER": provider, "GROQ_API_KEY": "segredo-de-teste"})
 

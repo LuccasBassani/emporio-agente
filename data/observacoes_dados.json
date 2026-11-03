@@ -1,0 +1,20 @@
+{
+  "descricao": "Notas da auditoria de 02/11/2026. Complementam as fontes originais; não alteram os CSVs ou o manual e não são texto original da loja.",
+  "produtos": {
+    "135": {"campos": ["marca", "body"], "evidencia": "Nome Music Man; descrição Fender Jazz Bass e Alder; specs registra Ash."},
+    "137": {"campos": ["marca", "strings"], "evidencia": "Nome Yamaha; descrição Ibanez de 5 cordas; specs registra 4 cordas."},
+    "139": {"campos": ["marca", "shells"], "evidencia": "Nome Yamaha; descrição Pearl Export com Poplar/mogno; specs registra Maple."},
+    "140": {"campos": ["marca", "shells"], "evidencia": "Nome Pearl; descrição Tama com Birch; specs registra Maple."},
+    "142": {"campos": ["marca", "keys"], "evidencia": "Nome Korg; descrição Roland com 88 teclas; specs registra 61."},
+    "144": {"campos": ["marca", "type"], "evidencia": "Nome Roland/sintetizador; descrição Yamaha/arranjador."}
+  },
+  "politicas": [
+    {"id": "frete-limite", "secoes": ["5.1"], "observacao": "O manual define acima e abaixo de R$ 500, mas não exatamente R$ 500. Não há taxa definida para esse limite: é necessário confirmar com a equipe."},
+    {"id": "parcelamento", "secoes": ["3", "3.1"], "observacao": "Interpretação adotada no protótipo: as faixas específicas de 3.1 detalham a tabela geral de 3. De 4x a 6x, mínimo R$ 80; de 7x a 12x, R$ 100. A exceção de R$ 50 em até 3x tem redação ambígua; confirmar se afetar a compra. Pagamentos históricos não são recalculados."},
+    {"id": "contatos", "secoes": ["1.2", "7"], "observacao": "O manual tem números diferentes: 3341-4444 em 1.2 e 3321-4500 em 7. Para pedido explícito de WhatsApp, a seção específica 7 é a referência adotada, com ressalva da divergência. Há também domínio de e-mail com e sem acento; confirmar o e-mail antes de indicá-lo como canal certo."},
+    {"id": "triagem", "secoes": ["4.1", "4.2", "8.1", "8.2"], "observacao": "Data do pedido e previsão de entrega não são recebimento efetivo. Os CSVs não informam canal da compra ou data efetiva de recebimento. Troca em 30 dias da compra, garantia legal em 90 dias do recebimento e garantia do fabricante são regras distintas. Confirmar dados e condições antes de concluir elegibilidade ou cobertura."},
+    {"id": "frete-cotacao", "secoes": ["5.2"], "observacao": "O protótipo não possui cotador, peso ou dimensões dos produtos. Pode explicar modalidades e prazos estimados do manual, mas não calcular nem prometer estimativa de frete recebendo apenas o CEP."},
+    {"id": "acoes", "secoes": ["7.3"], "observacao": "O protótipo consulta e orienta. Não tem integração para registrar reclamação, abrir protocolo, reservar produto ou transferir atendimento."},
+    {"id": "campanhas", "secoes": ["6.1", "6.2"], "observacao": "Campanhas do manual não ativam ofertas pelo mês. A fonte operacional é promotions.csv com is_active=1. Promoções inativas e PIX não devem ser acumulados com a promoção vigente."}
+  ]
+}

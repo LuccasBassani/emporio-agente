@@ -178,6 +178,26 @@ Os testes da interface não demonstram todas as combinações de perguntas. Olla
 - Evidências e orientações registradas em docs/auditoria-dados-2026-11-02.md. As divergências não foram atribuídas à intenção da empresa e não justificam alterar silenciosamente registros ou descartar as falhas da avaliação.
 - Análise e documentação com assistência do Codex. Nenhuma correção do programa foi implementada nesta etapa.
 
+## 02/11/2026 — Correções de consultas, notas de auditoria e validação
+
+### Implementado
+
+- Mantidas as cinco ferramentas, com consulta de modelo por nome/ID inclusive indisponíveis, fallback de modelos indisponíveis em busca vazia e limite padrão de três recomendações aplicado pelo programa.
+- Criado registro separado de conflitos por produto e notas de política em data/observacoes_dados.json. Trechos do manual e CSVs originais preservados; notas aparecem identificadas como interpretação da auditoria nos contextos e exportações.
+- Diferenciado material/quantidade de cordas e tipo elétrico com indicação da origem, sem converter campo ausente em falso.
+- Ajustada validação para permitir repetir orçamento consultado em busca vazia e para oferecer uma correção de referências dentro das quatro rodadas. Não adicionado retry HTTP nem fallback automático.
+- Reorganizadas instruções de consulta, triagem condicional, pergunta única, contexto, escopo e limites de ação. Estilo continua configurável; cumprir o prompt não é uma garantia automática.
+- Adicionada opção de espaçamento entre chamadas na mesma sessão, padrão desativado. Cotas classificadas como condição do provedor/plano, separadas das limitações do protótipo. Erros são informados e podem ser repetidos explicitamente.
+- Escapado símbolo de moeda na apresentação, mantendo exportação sem edição. Documentadas prioridades de evolução do produto com mais tempo em docs/evolucao-produto.md.
+
+### Verificação
+
+- 51 testes automatizados passaram, incluindo regressões de busca de indisponíveis, notas separadas do manual, orçamento sem resultados, correção de fonte, limite de recomendações e espaçamento de requisições com relógio simulado. As dependências não mudaram.
+- Conferida novamente a igualdade byte a byte dos seis CSVs e do manual com os originais fornecidos.
+- Iniciada revalidação real por código, com StoreAgent e Groq, usando intervalo de 65 segundos somente nesta avaliação. Evidências em local/revalidacao-2026-11-02/, separadas da rodada anterior no navegador. Não apresentar testes simulados nem esse modo de execução como novos testes manuais no navegador.
+- C19 e C09 já concluídos com resposta adequada: frete de exatamente R$ 500 reconhecido como indefinido e orçamento de busca vazia repetido sem bloqueio. Demais casos em andamento, a consolidar em registro posterior.
+- Implementação, testes, revalidação e documentação com assistência do Codex.
+
 ## Como registrar as próximas etapas
 
 Para cada etapa, anotar: problema, solução escolhida e motivo, alternativa considerada, teste executado, resultado e limitação restante.

@@ -1,6 +1,7 @@
 """Configuração e chat local. Cada sessão mantém seu próprio cliente e histórico."""
 
 import os
+import re
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -14,6 +15,10 @@ from emporio.orders import Orders
 from emporio.policies import PolicyIndex
 from emporio.profile import DemoConfig, TONES
 from emporio.tools import StoreTools
+
+
+def display_text(text):
+    return re.sub(r"(?<!\\)\$", lambda _: r"\$", text)
 
 
 @st.cache_resource(show_spinner="Lendo catálogo e políticas…")
@@ -127,17 +132,18 @@ def render_app():
         if agent:
             for turn in agent.turns:
                 with st.chat_message("user"):
-                    st.markdown(turn.question)
+                    st.markdown(display_text(turn.question))
                 with st.chat_message("assistant"):
                     st.caption(config.name)
-                    st.markdown(turn.text)
+                    # Evita que dois símbolos R$ sejam interpretados como fórmula LaTeX.
+                    st.markdown(display_text(turn.text))
                     with st.expander("Ver consultas e fontes"):
                         st.json({"consultas": turn.queries, "fontes_citadas": turn.sources})
 
         retry = False
         if st.session_state.failed_question:
             with st.chat_message("user"):
-                st.markdown(st.session_state.failed_question)
+                st.markdown(display_text(st.session_state.failed_question))
             st.error(st.session_state.last_error)
             retry = st.button("Tentar novamente", key="retry_question")
         question = st.chat_input("Escreva uma mensagem para o assistente", max_chars=2000)
