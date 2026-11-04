@@ -41,7 +41,7 @@ class SettingsTests(unittest.TestCase):
         settings = Settings.from_env({"LLM_PROVIDER": "gemini", "GEMINI_API_KEY": "chave-gemini",
                                       "GROQ_API_KEY": "outra-chave"})
         self.assertEqual(settings.api_key, "chave-gemini")
-        self.assertEqual(settings.model, "gemini-3.6-flash")
+        self.assertEqual(settings.model, "gemini-3.5-flash-lite")
         self.assertNotIn("chave-gemini", repr(settings))
 
 

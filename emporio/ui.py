@@ -54,7 +54,7 @@ def render_app():
             provider=os.getenv("LLM_PROVIDER", "ollama"),
             groq_model=os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b"),
             ollama_model=os.getenv("OLLAMA_MODEL", "qwen3:8b"),
-            gemini_model=os.getenv("GEMINI_MODEL", "gemini-3.6-flash"),
+            gemini_model=os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite"),
         )
         st.session_state.form_revision = 0
         clear_conversation()

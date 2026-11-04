@@ -10,7 +10,7 @@ class ProfileTests(unittest.TestCase):
         del data["gemini_model"]
         imported = DemoConfig.from_json(json.dumps(data))
         self.assertEqual(imported.provider, "groq")
-        self.assertEqual(imported.gemini_model, "gemini-3.6-flash")
+        self.assertEqual(imported.gemini_model, "gemini-3.5-flash-lite")
 
     def test_roundtrip_preserves_editable_configuration(self):
         profile = DemoConfig(provider="ollama", name="Bia", instructions="Prefira respostas breves.")

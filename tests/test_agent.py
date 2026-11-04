@@ -10,6 +10,7 @@ from emporio.llm import LLMClient, ProviderError
 from emporio.policies import PolicyIndex
 from emporio.tools import StoreTools
 from emporio.profile import DemoConfig, DEFAULT_INSTRUCTIONS
+from emporio.orders import Orders
 
 
 def call(name, arguments):
@@ -19,6 +20,36 @@ def call(name, arguments):
 
 
 class AgentTests(unittest.TestCase):
+    def test_missing_identity_gets_safe_guidance_without_extra_model_call(self):
+        tools = StoreTools(self.tools.catalog, self.tools.policies, Orders(self.tools.catalog))
+        requests = []
+        with self.client([call("consultar_pedido", {"pedido_id": 8})], requests) as client:
+            turn = StoreAgent(client, tools).respond("Qual o status do pedido 8?")
+        self.assertEqual(len(requests), 1)
+        self.assertIn("selecione o cliente", turn.text)
+        self.assertFalse(turn.sources)
+        self.assertNotIn("BRJL", turn.text)
+
+    def test_missing_and_foreign_orders_have_same_safe_final_response(self):
+        tools = StoreTools(self.tools.catalog, self.tools.policies, Orders(self.tools.catalog), 2)
+        answers = []
+        for order_id in [9, 999999]:
+            with self.client([call("consultar_pedido", {"pedido_id": order_id})]) as client:
+                turn = StoreAgent(client, tools).respond(f"Consulte o pedido {order_id}.")
+                answers.append(turn.text)
+                self.assertFalse(turn.sources)
+                self.assertNotIn("349", turn.text)
+        self.assertEqual(answers[0], answers[1])
+
+    def test_authorized_order_still_uses_model_and_source(self):
+        tools = StoreTools(self.tools.catalog, self.tools.policies, Orders(self.tools.catalog), 2)
+        requests = []
+        with self.client([call("consultar_pedido", {"pedido_id": 8}),
+                          {"content": "O pedido está enviado [O8]."}], requests) as client:
+            turn = StoreAgent(client, tools).respond("Qual o status do pedido 8?")
+        self.assertEqual(len(requests), 2)
+        self.assertEqual(turn.sources[0]["id"], "O8")
+
     @classmethod
     def setUpClass(cls):
         cls.tools = StoreTools(Catalog(), PolicyIndex.from_pdf())

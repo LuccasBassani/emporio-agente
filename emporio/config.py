@@ -42,7 +42,7 @@ class Settings:
             key = values.get("GEMINI_API_KEY", "").strip()
             if not key:
                 raise ValueError("Preencha GEMINI_API_KEY no .env para usar o Gemini.")
-            model = values.get("GEMINI_MODEL", "gemini-3.6-flash").strip()
+            model = values.get("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
             url = "https://generativelanguage.googleapis.com/v1beta/openai"
         elif provider == "ollama":
             key = ""  # A chave Groq nunca é enviada ao servidor Ollama.

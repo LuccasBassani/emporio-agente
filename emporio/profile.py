@@ -35,7 +35,7 @@ class DemoConfig:
     name: str = "Lia"
     tone: str = TONES[0]
     instructions: str = DEFAULT_INSTRUCTIONS
-    gemini_model: str = "gemini-3.6-flash"
+    gemini_model: str = "gemini-3.5-flash-lite"
 
     def __post_init__(self):
         if self.provider not in {"groq", "gemini", "ollama"} or self.tone not in TONES:
