@@ -164,6 +164,10 @@ class StoreAgent:
                     error = "O agente tentou informar valor sem referência de consulta."
                 elif confirms_triage(question, [t.question for t in self.turns], reply.content):
                     error = "A resposta confirmou devolução ou cobertura antes da análise da equipe."
+                elif (any(q["ferramenta"] == "consultar_pedido" and q["resultado"].get("encontrado") for q in queries)
+                      and not any(q["ferramenta"] in {"buscar_produtos", "consultar_produto"} for q in queries)
+                      and "sem frete" in normalize(reply.content)):
+                    error = "A composição de frete do total histórico não consta nos dados. Apresente somente o total registrado; não use a expressão sem frete para esse total."
                 elif unqualified_campaign(reply.content, queries):
                     error = "A campanha do manual não garante desconto vigente. Explique expressamente que o mês não ativa promoções e que descontos dependem do cadastro ativo."
                 if error:

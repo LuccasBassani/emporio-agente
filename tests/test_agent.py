@@ -50,6 +50,15 @@ class AgentTests(unittest.TestCase):
         self.assertEqual(len(requests), 2)
         self.assertEqual(turn.sources[0]["id"], "O8")
 
+    def test_order_total_does_not_inherit_catalog_freight_condition(self):
+        tools = StoreTools(self.tools.catalog, self.tools.policies, Orders(self.tools.catalog), 2)
+        with self.client([call("consultar_pedido", {"pedido_id": 8}),
+                          {"content": "O total é R$ 349,90 sem frete [O8]."},
+                          {"content": "O total histórico registrado é R$ 349,90 [O8]."}]) as client:
+            turn = StoreAgent(client, tools).respond("Qual o total do pedido 8?")
+        self.assertNotIn("sem frete", turn.text)
+        self.assertIn("349,90", turn.text)
+
     @classmethod
     def setUpClass(cls):
         cls.tools = StoreTools(Catalog(), PolicyIndex.from_pdf())
