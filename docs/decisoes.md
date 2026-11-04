@@ -1,58 +1,58 @@
-# Decisões técnicas da versão de entrega
+# Technical decisions for the submission version
 
-Este documento descreve a implementação atual. Os registros datados em `docs/` preservam etapas anteriores; a avaliação principal é a [rodada com Gemini e seus retestes](validacao-gemini-2026-11-03.md).
+This document describes the current implementation. Dated records under `docs/` preserve earlier stages; the main evaluation is the [Gemini run and targeted retests](validacao-gemini-2026-11-03.md).
 
-## Aplicação e arquitetura
+## Application and architecture
 
-Python atende à restrição do desafio. Streamlit concentra configuração, chat e exportações na mesma aplicação, reduzindo a instalação e a integração exigidas por uma interface separada. A referência de experiência foi definida pelo candidato; a implementação é independente.
+Python meets the challenge's language requirement. Streamlit keeps configuration, chat and exports in one application, reducing setup and integration work compared with a separate frontend. The candidate selected the experience reference; the implementation is independent.
 
-O agente usa `httpx`, sem framework de agentes. O modelo solicita uma das cinco ferramentas permitidas: `buscar_produtos`, `consultar_produto`, `buscar_politicas`, `consultar_pedido` e `listar_meus_pedidos`. O Python valida os argumentos e executa a função. A API do provedor não executa essas funções por conta própria.
+The agent uses `httpx` without an agent framework. The model requests one of five allowed tools: `buscar_produtos`, `consultar_produto`, `buscar_politicas`, `consultar_pedido` and `listar_meus_pedidos`. Python validates arguments and runs the function; the provider API does not execute these functions itself.
 
-Cada turno permite até quatro rodadas de geração, com no máximo quatro ferramentas por rodada. Há uma oportunidade de correção de conteúdo dentro desse limite. Isso é separado de retry HTTP, que não é automático. Somente turnos concluídos entram no histórico; os dois anteriores completos são enviados como contexto. O histórico da sessão e as exportações podem conter mais turnos que esse recorte.
+Each turn allows up to four generation rounds and four tool calls per round. One content-correction opportunity fits within that limit. HTTP retries are separate and are not automatic. Only completed turns enter history; the previous two complete turns form model context. Session history and exports can contain more turns than this context window.
 
-## Dados estruturados e preços
+## Structured data and pricing
 
-Os seis CSVs foram preservados em `data/`. As consultas usam uma fotografia carregada em memória, adequada ao volume fornecido. Não há SQL, busca vetorial de produtos ou integração com estoque ao vivo.
+The six supplied CSVs remain unchanged in `data/`. Queries use an in-memory snapshot suited to the supplied volume. There is no SQL, vector product retrieval or live inventory integration.
 
-- Disponibilidade: `status=active` e estoque positivo. Descontinuado e em breve permanecem indisponíveis, mesmo com quantidade cadastrada.
-- Preço: `Decimal` e arredondamento `ROUND_HALF_UP` em centavos. Orçamento considera o preço final para o pagamento escolhido, sem frete.
-- Desconto: promoção com `is_active=1` prevalece; PIX de 5% só se aplica sem promoção ativa. O mês ou o texto da campanha não ativam uma oferta. Mais de uma promoção ativa por produto interrompe a carga do catálogo para esclarecer a ambiguidade.
-- Busca: nome e categoria normalizados, com filtros de orçamento, disponibilidade, material de cordas e classificação elétrica. Nome/ID localiza também modelos indisponíveis. Descrições livres divergentes não entram na identificação textual.
+- Availability: `status=active` and positive stock. Discontinued and coming-soon products remain unavailable despite positive quantities.
+- Prices: `Decimal`, rounded to cents with `ROUND_HALF_UP`. Budget filtering uses the final price for the selected payment method, excluding shipping.
+- Discounts: a promotion with `is_active=1` takes precedence; the 5% PIX discount applies only without an active promotion. Neither month nor campaign text activates an offer. Multiple active promotions for one product stop catalog loading until the ambiguity is resolved.
+- Search: normalized name/category plus budget, availability, string material and electrical classification filters. Name/ID lookups include unavailable models. Conflicting free-text descriptions are excluded from product identification.
 
-Material de cordas é filtrado apenas nas categorias em que o cadastro o informa. Classificação elétrica usa `specs.electronics` ou indicações explícitas no nome/categoria, com origem declarada. Campo ausente não equivale a falso.
+String material is filtered only in categories with that information. Electrical classification uses `specs.electronics` or explicit name/category evidence, with its origin exposed. Missing values are not treated as false.
 
-`data/observacoes_dados.json` registra divergências e interpretações separadamente dos originais. As notas acompanham as consultas pertinentes; não substituem o conteúdo do manual nem corrigem silenciosamente o cadastro.
+`data/observacoes_dados.json` records conflicts and interpretations separately. Relevant notes accompany queries; they do not replace the manual or silently repair source records.
 
-## Pedidos e identificação
+## Orders and identification
 
-A aplicação define o cliente de teste fora dos argumentos enviados pelo modelo. A consulta verifica a associação e dá o mesmo retorno para pedido inexistente e de terceiro. Trocar o cliente na interface limpa a conversa.
+The application selects the test customer outside model-controlled arguments. Queries verify ownership and return the same outcome for nonexistent and another customer's orders. Changing the customer clears the conversation.
 
-As ferramentas de pedidos não retornam nome, telefone, e-mail, endereço, notas ou identificador do cliente. Preservam status, itens, total histórico e rastreamento cadastrado. Não inferem recebimento efetivo, composição de frete ou rastreio ao vivo. Sem identificação ou com pedido não localizado, uma chamada única de pedido recebe orientação determinística do programa.
+Order tools omit customer names, phone numbers, emails, addresses, notes and customer IDs. They preserve status, items, historical total and stored tracking. They do not infer actual receipt, shipping breakdown or live carrier location. A single order-tool call without identification or without an authorized match receives deterministic guidance from the program.
 
-A seleção na tela é uma simulação, não autenticação real. Mensagens digitadas pelo usuário também integram o contexto do modelo; a minimização descrita acima se aplica aos campos consultados pela ferramenta.
+The selector is a demonstration, not real authentication. User-entered messages also reach the model; the minimization above concerns fields returned by the tools.
 
-## Recuperação de políticas
+## Policy retrieval
 
-O PDF gera 27 trechos com seção, página e ID. O ranking BM25 normaliza acentos e um vocabulário explícito de equivalências. Títulos recebem peso adicional e a busca retorna até quatro trechos por padrão. O manual pequeno favoreceu uma solução local e inspecionável.
+The PDF produces 27 passages with section, page and ID. BM25 normalizes accents and explicit vocabulary equivalents. Titles receive extra weight; retrieval returns up to four passages by default. The small manual favored a local, inspectable approach.
 
-Não há embeddings, reranking ou base vetorial. As 14 perguntas de recuperação revisadas encontram as seções esperadas no top 4; isso não cobre todas as reformulações. Score positivo não é garantia de relevância.
+There are no embeddings, reranking or vector database. The expected sections appear in the top four for the 14 reviewed retrieval questions; this does not cover every paraphrase. A positive score is not a relevance guarantee.
 
-No chat, `buscar_politicas` fornece os trechos ao agente. O comando isolado `--ask` usa `PolicyRAG`, sem memória de conversa e com referências sequenciais `[P1]`, `[P2]`. Nesse comando, ausência de trechos encerra a resposta sem chamar o modelo. O chat usa IDs de seção/página, como `[P3.1-p3-1]`.
+In chat, `buscar_politicas` supplies passages to the agent. The standalone `--ask` command uses `PolicyRAG`, without conversation memory and with sequential references such as `[P1]`. If retrieval returns no passages, that command responds without calling the model. Chat instead uses section/page IDs such as `[P3.1-p3-1]`.
 
-A validação verifica os IDs reconhecidos e algumas condições de conteúdo. Não compara automaticamente cada afirmação ou valor com a fonte, nem garante resistência a prompt injection. Triagem e estilo continuam parcialmente dependentes da geração.
+Validation checks recognized IDs and selected content conditions. It does not compare every statement or amount with its source, or guarantee resistance to prompt injection. Triage and style remain partly generation-dependent.
 
-## Provedores e configuração
+## Providers and configuration
 
-Gemini Flash-Lite (`gemini-3.5-flash-lite`) foi selecionado para a demonstração após limites de capacidade nos testes anteriores. A escolha considerou suporte a ferramentas e capacidade gratuita observada, sem benchmark controlado de superioridade. Groq/Qwen continua disponível; Ollama tem contratos HTTP simulados testados, mas não execução validada com modelo instalado.
+Gemini Flash-Lite (`gemini-3.5-flash-lite`) was selected after capacity limits in earlier runs. The choice used observed free-tier capacity and tool support, without a controlled superiority benchmark. Groq/Qwen remains supported; Ollama has mocked HTTP contract tests but no validated run with an installed local model.
 
-Groq e Gemini usam chat compatível com o formato OpenAI; o adaptador preserva as assinaturas opacas das chamadas de ferramenta do Gemini. Ollama usa sua API nativa. Não há troca automática de provedor. O intervalo opcional entre chamadas é por cliente HTTP/sessão e não coordena cotas entre usuários.
+Groq and Gemini use OpenAI-compatible chat; the adapter preserves Gemini's opaque tool-call signatures. Ollama uses its native API. Provider selection never changes automatically. Optional pacing is per HTTP client/session and does not coordinate quotas across users.
 
-`.env.example` e a configuração de ambiente sem seleção explícita usam Ollama. O README orienta selecionar Gemini para reproduzir a demonstração. A interface lê o ambiente e permite aplicar outra seleção; o padrão interno de `DemoConfig` é Groq. Essas opções não provocam chamadas ao abrir a tela.
+`.env.example` and environment configuration without an explicit selection default to Ollama. The README selects Gemini to reproduce the demonstration. The interface reads the environment and supports explicit changes; the internal `DemoConfig` default is Groq. Opening the interface does not call a model.
 
-Chaves são lidas do ambiente/`.env`, fora do Git. A configuração JSON exporta preferências e modelos, sem credenciais ou identidade do cliente. O importador aceita o formato legado sem `gemini_model`; campos extras são rejeitados.
+Keys are read from the environment/`.env`, outside Git. Exported JSON contains preferences and model names, without credentials or customer identity. The importer accepts legacy files without `gemini_model` and rejects unknown fields.
 
-## Condução, testes e limites
+## Project direction, tests and limits
 
-O candidato definiu referência de interface, persona, escopo, provedores e restrições de custo; orientou cenários e resultados esperados, revisou respostas e priorizou correções e simplificações. Codex apoiou implementação, automação, execução de testes e documentação. Os relatórios identificam a execução assistida e os critérios usados na revisão.
+The candidate defined the interface reference, persona, scope, providers and cost constraints; guided scenarios and expected outcomes; reviewed answers; and prioritized fixes and simplifications. Codex supported implementation, automation, execution and documentation. Reports identify assisted execution and review criteria.
 
-A suíte possui 61 testes locais, com respostas de API simuladas. As avaliações reais registram separadamente versão, modelo, falhas e retestes. As cinco conversas de entrega estão em [examples/](../examples/README.md). A [evolução proposta](evolucao-produto.md) não corresponde a funcionalidades já implementadas.
+The suite has 61 local tests with mocked API responses. Real evaluations distinguish revisions, models, failures and retests. The five submission conversations are indexed in [examples/](../examples/README.md). [Proposed improvements](evolucao-produto.md) are not implemented features.

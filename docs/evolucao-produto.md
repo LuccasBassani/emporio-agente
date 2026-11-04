@@ -1,33 +1,33 @@
-# Evolução proposta
+# Proposed evolution
 
-Este plano parte das limitações observadas nos testes. As propostas não são funcionalidades implementadas nem requisitos para executar o protótipo. A versão resumida está na seção [Melhorias com mais tempo](entrega.md#melhorias-com-mais-tempo).
+This plan follows observed limitations. These are proposed features, not requirements for running the prototype or claims of existing functionality. A shorter version appears under [Improvements with more time](entrega.md#improvements-with-more-time).
 
-## 1. Guardrails, triagem e avaliação
+## 1. Guardrails, triage and evaluation
 
-Ampliaria a validação de afirmações de preço, estoque, regras e campos ausentes contra os resultados das ferramentas. A triagem teria campos explícitos de canal, recebimento e condições do item, com encaminhamento à equipe quando faltasse informação. As proteções atuais são parciais e não eliminam alucinações ou desvios de instrução.
+I would expand validation of prices, stock, policies and missing fields against tool results. Triage would track channel, receipt and item condition explicitly, escalating uncertainty to staff. Current protections are partial and do not eliminate hallucinations or instruction overrides.
 
-Para avaliar o ganho, usaria perguntas novas, reformulações, conversas longas e tentativas de desviar as regras. Manteria separados acerto factual, escolha de ferramenta, continuidade, estilo e falha de execução. Os 32 cenários usados no desenvolvimento não seriam o único conjunto de avaliação.
+Evaluation would add unseen questions, paraphrases, long conversations and adversarial instructions. Factual accuracy, tool selection, continuity, style and execution errors would be assessed separately. The 32 development scenarios would not be the only evaluation set.
 
-## 2. Contexto de atendimentos anteriores
+## 2. Previous-interaction context
 
-Começaria por resumos e campos revisáveis por cliente identificado: instrumento de interesse, orçamento, pedido em discussão e informações já fornecidas. O acesso ao histórico teria autorização, retenção definida, origem e validade dos registros.
+I would start with reviewable summaries/fields per identified customer: instrument preferences, budget, the order under discussion and information already provided. History access would have authorization, retention rules, provenance and validity.
 
-Informação antiga não comprova preço, estoque, rastreamento ou política atual. Esses fatos continuariam consultados nas fontes. Os testes verificariam continuidade e ausência de mistura entre clientes.
+Old conversations do not establish current prices, stock, tracking or policy. Those facts would still come from source queries. Tests would check continuity and isolation between customers.
 
-## 3. Recuperação e consultas para bases maiores
+## 3. Retrieval and queries at larger scale
 
-Para mais documentação, avaliaria busca híbrida de BM25 e embeddings, reranking e divisão dos documentos em trechos que preservem contexto. Metadados de seção, versão e vigência ajudariam a filtrar fontes. A comparação mediria recuperação relevante, fidelidade, custo e latência.
+For more documentation, I would evaluate hybrid BM25/embedding search, reranking and context-preserving chunks. Section, version and effective-date metadata would help filter sources. Comparisons would measure retrieval, faithfulness, cost and latency.
 
-Para dados operacionais maiores ou atualizados, substituiria os CSVs por banco de dados ou APIs, com consultas parametrizadas, índices, filtros e paginação. Manteria cálculos e autorização no código, dentro de ferramentas delimitadas. Corrigiria conflitos na origem e registraria a versão dos dados usados na resposta.
+Larger or live operational datasets would use databases/APIs with parameterized queries, indexes, filters and pagination. Pricing and authorization would remain in code behind bounded tools. Conflicts would be corrected upstream and each answer's data version recorded.
 
-## 4. Fine-tuning de comportamento
+## 4. Behavioral fine-tuning
 
-Depois de melhorar dados, prompts e validações, avaliaria adaptação de um modelo compatível com conversas revisadas para tom, triagem e escolha de ferramentas. Treino e avaliação usariam conjuntos separados; a adoção dependeria de ganho medido frente ao modelo base.
+After improving data, prompts and validation, I would evaluate a compatible model trained on reviewed conversations for tone, triage and tool selection. Training and evaluation sets would be separate; adoption would require measured improvement against the base model.
 
-Não há ajuste de pesos implementado. Fine-tuning não substituiria as consultas de preço e disponibilidade nem resolveria, por si só, cadastros inconsistentes.
+No weight adaptation is implemented. Fine-tuning would not replace price/availability queries or independently resolve inconsistent records.
 
-## 5. Requisitos para uso operacional
+## 5. Operational requirements
 
-Acrescentaria autenticação e autorização reais, integrações de estoque/pedidos, atendimento humano e observabilidade de consultas, erros, consumo e latência, com minimização de dados e retenção definida. Operações de escrita exigiriam controle de duplicidade e confirmação apropriada.
+I would add real authentication/authorization, stock/order integrations, human support and observability of queries, errors, usage and latency, with data minimization and retention rules. Write operations would need duplicate prevention and appropriate confirmation.
 
-Dimensionaria o provedor conforme volume e orçamento. O intervalo atual entre chamadas é por sessão e não controla a capacidade global da conta. Eventual retry futuro distinguiria o tipo de erro e manteria explícito o destino dos dados.
+Provider capacity would follow expected volume and budget. Current pacing is per session and does not control account-wide capacity. Future retries would distinguish error types and keep data destinations explicit.

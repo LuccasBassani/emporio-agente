@@ -1,2 +1,2 @@
-# Dependência opcional para exportar README e documentação em PDF.
+# Optional dependency for README/documentation PDF export.
 reportlab>=4.4,<5

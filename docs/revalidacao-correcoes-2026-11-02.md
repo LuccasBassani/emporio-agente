@@ -1,76 +1,68 @@
-# Revalidação das correções — iniciada em 02/11/2026
+# Revalidation of fixes - started 2 November 2026
 
-> **Registro histórico.** Contagens, pendências e conclusões descrevem as versões e execuções desta etapa. Para a situação atual, consulte o [README](../README.md) e a [avaliação Gemini e seus retestes](validacao-gemini-2026-11-03.md). Os exemplos atuais estão em `examples/`; versões anteriores permanecem no Git.
+> **Historical record.** Counts, pending items and conclusions describe this stage. See the [README](../README.md) and [Gemini evaluation](validacao-gemini-2026-11-03.md) for the submission version. Current examples are under `examples/`; earlier versions remain in Git.
 
-As correções foram implementadas e a suíte local passou a **54 testes aprovados**. Foram tentados **18 cenários priorizados**: 16 dos 32 originais e dois novos de conflito de cadastro. **15 atenderam ao objetivo principal, quatro deles com ressalvas; três continuam pendentes.** Isso não é aprovação da rodada integral dos 32 após todas as correções.
+The updated local suite passed **54 tests**. **18 prioritized scenarios** were attempted: 16 original cases and two new record-conflict cases. **15 met their main objective, four with caveats; three remained pending.** This is not a complete post-fix 32-case approval.
 
-As conversas desta revalidação foram executadas **por código, usando StoreAgent e chamadas reais à Groq**, modelo qwen/qwen3.8-27b. Não são novos testes manuais no navegador nem respostas simuladas. A rodada original dos 32 na interface permanece preservada. A interface atual foi recarregada e inspecionada sem novas mensagens à API depois do bloqueio diário.
+Runs used StoreAgent and real Groq calls with `qwen/qwen3.8-27b`. They are not new manual browser tests or mocked answers. The original interface run was preserved; the current interface was reloaded/inspected without further messages after the daily block.
 
-## Alterações implementadas
+## Implemented changes
 
-- Consulta de modelo por nome/ID inclui esgotados, descontinuados e em breve; busca vazia por termo também expõe correspondências indisponíveis.
-- Notas de divergência por produto e ambiguidades por seção, distintas das fontes originais. Nenhum CSV ou trecho do PDF foi reescrito.
-- Até três recomendações por padrão; classificação elétrica com origem e material de cordas separado de quantidade.
-- Orçamento de busca vazia pode ser repetido sem criar fonte; uma correção de conteúdo é permitida dentro do limite de rodadas quando há referência ou confirmação de triagem inadequada.
-- Prompt com triagem condicional e guarda conservadora de algumas aberturas afirmativas. Não equivale a máquina de estados ou decisão de elegibilidade.
-- Qualificações comerciais preservadas no contexto compacto: preço de indisponível é valor cadastrado atual, sem promessa de preço ou data futura. Esse último ajuste foi testado localmente, mas ainda não teve nova geração real.
-- Opção de intervalo entre chamadas, desativada por padrão, e apresentação do símbolo de moeda ajustada no chat.
+- Named/ID product lookup includes unavailable items; empty recommendation searches can expose matching unavailable models separately.
+- Separate product/policy conflict notes preserve sources. Default recommendation cap is three; electrical classification exposes origin and string material is distinct from count.
+- An empty search may repeat its queried budget without inventing a product source. One content correction fits within the existing round limit for citations/triage openings.
+- Conditional triage prompt and conservative opening checks, not an eligibility state machine.
+- Unavailable-price qualifications survive compact model context. This last change had local coverage but no new real generation at that stage.
+- Optional pacing defaults to zero; currency presentation was adjusted in chat.
 
-## Rodadas e preservação de evidências
+## Execution stages
 
-1. **Primeira correção:** C19, C09, C12, C13 e C28 atenderam ao objetivo principal. C06 ainda confirmou enquadramento; C16 teve um primeiro turno com abertura afirmativa. As respostas completas/parciais dessa fase foram preservadas. Essa foi uma rodada preliminar durante os ajustes.
-2. **Retomada após ajuste da triagem:** código de agente fixado na versão d947c07, com 13 casos priorizados e intervalo de 65 segundos entre requisições. Nove entregaram resposta final; três foram interrompidos por HTTP 429 e um por HTTP 400.
-3. **Tentativas isoladas:** 120 segundos entre chamadas, sem trocar de modelo/provedor. C14 e D137 concluíram, mas C14 revelou a qualificação de preço a corrigir. C03 concluiu somente o primeiro turno e foi interrompido por cota diária. C10 não foi repetido nessa fase.
-4. **Após o bloqueio diário:** corrigida a qualificação de preço e aprovada a suíte de 54 testes sem rede. Não declarar revalidação real dessa última alteração.
+1. First correction: C19/C09/C12/C13/C28 met their main objective. C06 still confirmed eligibility; C16 still had an affirmative opening. Preliminary evidence was retained.
+2. After triage changes: agent fixed at `d947c07`, 13 prioritized cases, 65-second request spacing. Nine final answers, three HTTP 429 interruptions and one HTTP 400.
+3. Isolated attempts: 120-second spacing, same provider/model. C14 and D137 completed, but C14 exposed the price qualification issue. C03 completed only its first turn; C10 was not repeated before quota exhaustion.
+4. After the daily block: fixed qualification and passed 54 offline tests; no real revalidation of that final adjustment was claimed here.
 
-Os testes automatizados anteriores já aprovados não foram confundidos com esses resultados reais. Não foi usado Ollama nesta revalidação e nenhuma capacidade local foi declarada como validada. Nenhum plano foi contratado e não houve troca automática de destino dos dados.
+Ollama was not used or declared locally validated. No paid plan was purchased and data destinations were not switched automatically.
 
-## Limite externo confirmado
+## Confirmed external limit
 
-O diagnóstico restrito do último HTTP 429 informou **tokens por dia**, limite **200.000**, uso **198.275** e requisição estimada em **2.961**. A rodada foi encerrada; aumentar a pausa não resolve esse limite diário. Não foi prometido horário de renovação nem atribuído esse tipo específico aos HTTP 429 anteriores sem diagnóstico. O HTTP 400 de C10 também não foi tratado como cota: sua causa permanece não confirmada.
+The final diagnostic reported **200,000 daily tokens**, **198,275 used**, estimated request **2,961**. Execution stopped; longer pauses do not resolve a daily cap. No reset time was promised or inferred for earlier generic 429 errors. C10's HTTP 400 remained unexplained.
 
-Cotas são condições do provedor/plano. O programa preserva o contexto válido e informa o erro; não realiza retry HTTP nem fallback automático. O `local/revalidacao-consolidada-2026-11-02/pendentes/diagnostico-seguro.json` não contém corpo HTTP, chave ou identificadores da conta.
+The program preserves valid context and reports the error without automatic HTTP retry/fallback. Safe local diagnostic: `local/revalidacao-consolidada-2026-11-02/pendentes/diagnostico-seguro.json`, without response body, key or account identifiers.
 
-## Critérios desta revisão
+## Review criteria
 
-Foram separados objetivo funcional, estilo e execução. Uma pergunta de esclarecimento sem afirmar preço, política ou cobertura não exige fonte naquele turno. Por isso, C05 tem objetivo funcional atendido, com ressalva por reunir duas informações na pergunta; essa leitura é menos estrita que a classificação inicial. As classificações antigas não foram alteradas. Não comparar percentuais entre conjuntos diferentes como se fossem uma medida geral de qualidade.
+Functional objective, style and execution were separated. A clarification without a factual policy/price claim does not require a source; C05 therefore met its functional objective with a two-part-question caveat. This is less strict than its initial rating; earlier ratings remain unchanged. Percentages across different sets are not general-quality metrics. Notes are assisted reviews of specific executions.
 
-“Aprovado com ressalva” significa objetivo principal atendido, com observação explícita; não significa cumprimento perfeito de toda preferência de estilo. As notas abaixo registram revisão assistida por Codex de execuções específicas.
+## Case results
 
-## Resultado por cenário
-
-| Caso | Resultado principal | Evidência | Observação |
+| Case | Result | Local evidence | Observation |
 | --- | --- | --- | --- |
-| C03 | Bloqueado pelo provedor | `local/revalidacao-consolidada-2026-11-02/pendentes/C03.md` | Primeiro turno concluiu; continuação PIX interrompida por limite diário. Conversa completa ainda não validada após correções. |
-| C05 | Aprovado com ressalva | `local/revalidacao-consolidada-2026-11-02/retomada/C05.md` | Esclarece sem afirmar regra ou cobertura: não precisa de fonte para essa pergunta. Mantém ressalva de estilo por juntar modelo e defeito no mesmo turno; critério funcional separado do critério estrito inicial. |
-| C06 | Aprovado com ressalva | `local/revalidacao-consolidada-2026-11-02/retomada/C06.md` | Explica condições e encaminha formalização à equipe, sem declarar requisitos cumpridos; resposta longa e não pergunta explicitamente por acessórios/manuais. |
-| C07 | Aprovado | `local/revalidacao-consolidada-2026-11-02/retomada/C07.md` | Retorna três opções, valores corretos e informa 12 resultados na base sem limitar catálogo aos três exibidos. |
-| C09 | Aprovado | `local/revalidacao-consolidada-2026-11-02/primeira-correcao/C09.md` | Consulta e resposta conferidas com o caso de origem; ofertas finais contextuais não alteraram a conclusão. |
-| C10 | Erro de execução | `local/revalidacao-consolidada-2026-11-02/retomada/execucoes.json` | HTTP 400 sem resposta final. Causa não confirmada. Nova tentativa isolada não chegou a ser executada porque a cota diária encerrou a rodada. |
-| C12 | Aprovado | `local/revalidacao-consolidada-2026-11-02/primeira-correcao/C12.md` | Consulta e resposta conferidas com o caso de origem; ofertas finais contextuais não alteraram a conclusão. |
-| C13 | Aprovado | `local/revalidacao-consolidada-2026-11-02/primeira-correcao/C13.md` | Consulta e resposta conferidas com o caso de origem; ofertas finais contextuais não alteraram a conclusão. |
-| C14 | Parcial — nova geração pendente | `local/revalidacao-consolidada-2026-11-02/pendentes/C14.md` | Identifica em breve e impede compra atual, mas a geração prometeu preço futuro. Qualificação corrigida em código e coberta por teste; nova geração real após o ajuste está pendente por cota. |
-| C15 | Aprovado com ressalva | `local/revalidacao-consolidada-2026-11-02/retomada/C15.md` | Consultou campanhas e cumulatividade no manual, sem confirmar 30% universal. Deve explicitar melhor que vigência/percentual do item vêm do CSV ativo, não do mês. |
-| C16 | Aprovado | `local/revalidacao-consolidada-2026-11-02/retomada/C16.md` | Três turnos, recebimento e condições aproveitados, citação reutilizada sem nova consulta e análise final pela equipe sem afirmar abertura/aprovação. |
-| C18 | Aprovado | `local/revalidacao-consolidada-2026-11-02/retomada/C18.md` | Distingue troca 30 dias, garantia legal 90 dias do recebimento e fabricante conforme certificado; pede data sem confirmar cobertura. |
-| C19 | Aprovado | `local/revalidacao-consolidada-2026-11-02/primeira-correcao/C19.md` | Consulta e resposta conferidas com o caso de origem; ofertas finais contextuais não alteraram a conclusão. |
-| C27 | Aprovado com ressalva | `local/revalidacao-consolidada-2026-11-02/retomada/C27.md` | Acesso de terceiro recusado sem revelar dados. Trocar expressão cliente logado por cliente selecionado para não sugerir autenticação real. |
-| C28 | Aprovado | `local/revalidacao-consolidada-2026-11-02/primeira-correcao/C28.md` | Consulta e resposta conferidas com o caso de origem; ofertas finais contextuais não alteraram a conclusão. |
-| C30 | Aprovado | `local/revalidacao-consolidada-2026-11-02/retomada/C30.md` | Recusa invasão e redireciona para atendimento da loja, sem oferecer assistência técnica externa. |
-| D137 | Aprovado | `local/revalidacao-consolidada-2026-11-02/pendentes/D137.md` | Identifica divergência de marca e 4/5 cordas sem escolher campo como verdade; demais dados cadastrais correspondem à consulta. |
-| D142 | Aprovado | `local/revalidacao-consolidada-2026-11-02/retomada/D142.md` | Expõe Korg/61 versus Roland/88, não escolhe campo como verdade e orienta confirmar com equipe. |
+| C03 | Blocked by provider | `local/revalidacao-consolidada-2026-11-02/pendentes/C03.md` | First turn completed; PIX follow-up hit the daily limit. Complete post-fix conversation remained unvalidated at this stage. |
+| C05 | Passed with caveats | `local/revalidacao-consolidada-2026-11-02/retomada/C05.md` | Clarifies without asserting a policy/coverage, so no source is required for that question. Caveat: asks instrument and defect together; functional and strict-style criteria distinguished. |
+| C06 | Passed with caveats | `local/revalidacao-consolidada-2026-11-02/retomada/C06.md` | Explains conditions and staff formalization without declaring all requirements met. Long answer; does not explicitly ask about accessories/manuals. |
+| C07 | Passed | `local/revalidacao-consolidada-2026-11-02/retomada/C07.md` | Three correct options/prices and 12 matches disclosed, without implying a three-product catalog. |
+| C09 | Passed | `local/revalidacao-consolidada-2026-11-02/primeira-correcao/C09.md` | Query/answer checked against the case source; closing contextual offers did not change the result. |
+| C10 | Execution error | `local/revalidacao-consolidada-2026-11-02/retomada/execucoes.json` | HTTP 400 without a final answer; cause unconfirmed. Daily quota prevented the planned isolated retry. |
+| C12 | Passed | `local/revalidacao-consolidada-2026-11-02/primeira-correcao/C12.md` | Query/answer checked against the case source; closing contextual offers did not change the result. |
+| C13 | Passed | `local/revalidacao-consolidada-2026-11-02/primeira-correcao/C13.md` | Query/answer checked against the case source; closing contextual offers did not change the result. |
+| C14 | Partial - new generation pending | `local/revalidacao-consolidada-2026-11-02/pendentes/C14.md` | Recognizes coming soon and blocks current sale, but generation promised a future price. Qualification fixed/unit-tested; real rerun pending quota. |
+| C15 | Passed with caveats | `local/revalidacao-consolidada-2026-11-02/retomada/C15.md` | Retrieves campaigns/non-stacking and rejects a universal 30%. Should clarify that active CSV records, not calendar month, determine item discounts. |
+| C16 | Passed | `local/revalidacao-consolidada-2026-11-02/retomada/C16.md` | Three turns preserve receipt/conditions and reuse a sufficient citation; final staff review without invented registration/approval. |
+| C18 | Passed | `local/revalidacao-consolidada-2026-11-02/retomada/C18.md` | Distinguishes 30-day exchange, 90-day receipt-based warranty and manufacturer certificate; asks receipt without confirming coverage. |
+| C19 | Passed | `local/revalidacao-consolidada-2026-11-02/primeira-correcao/C19.md` | Query/answer checked against the case source; closing contextual offers did not change the result. |
+| C27 | Passed with caveats | `local/revalidacao-consolidada-2026-11-02/retomada/C27.md` | Third-party access refused without disclosure. Replace logged-in wording with selected customer to avoid implying real authentication. |
+| C28 | Passed | `local/revalidacao-consolidada-2026-11-02/primeira-correcao/C28.md` | Query/answer checked against the case source; closing contextual offers did not change the result. |
+| C30 | Passed | `local/revalidacao-consolidada-2026-11-02/retomada/C30.md` | Rejects intrusion and redirects to store service without external technical assistance. |
+| D137 | Passed | `local/revalidacao-consolidada-2026-11-02/pendentes/D137.md` | Discloses brand and 4/5-string conflict without choosing one field as truth; remaining stored values match. |
+| D142 | Passed | `local/revalidacao-consolidada-2026-11-02/retomada/D142.md` | Discloses Korg/61 versus Roland/88 conflict and refers confirmation to staff. |
 
-## Pendências para retomar
+## Pending work at this stage
 
-- **C14:** gerar novamente após a qualificação de preço de indisponível, conferindo ausência de promessa futura.
-- **C03:** concluir a continuação sobre PIX, preservando a referência ao primeiro produto.
-- **C10:** repetir a consulta de promoção/PIX e investigar o erro de execução se reaparecer.
-- Executar a rodada integral dos 32 com o código final quando houver capacidade do provedor, mantendo interrupções separadas de erros de conteúdo.
-- Conferir visualmente a moeda no navegador em uma resposta real após a renovação de cota; o código de apresentação foi alterado e o fluxo da interface é coberto por AppTest, mas não houve nova mensagem real no navegador nesta etapa.
+- Repeat C14 after price qualification, complete C03's PIX follow-up and retry C10, investigating the HTTP 400 if repeated.
+- Run the full 32-case suite with final functional code when capacity permits, separating interruptions from content errors.
+- Visually inspect currency in a new real browser answer; AppTest covers the modified flow but no new browser generation occurred in this stage.
 
-As melhorias propostas para um produto com mais tempo estão no [plano de evolução](evolucao-produto.md): governança de dados, autorização real, avaliação contínua, triagem estruturada, integrações, histórico/observabilidade e comparação de recuperação/modelos com ganho medido. Não são apresentadas como funcionalidades implementadas.
+See [proposed evolution](evolucao-produto.md) for data governance, real authorization, continuous evaluation, structured triage, integrations, history/observability and measured retrieval/model comparison. These are proposals, not existing capabilities.
 
-
-## Acesso às evidências
-
-As pastas completas estão em local/revalidacao-consolidada-2026-11-02/, ignoradas pelo Git. As referências acima identificam arquivos locais não publicados no repositório. Um ZIP ao lado da pasta reúne os registros e este relatório com links relativos. Abra RELATORIO.md no pacote. Os exemplos desta etapa permanecem no histórico Git. A pasta `examples/` contém hoje a seleção Gemini de 03/11, identificada no seu índice.
+Complete additional records are under `local/revalidacao-consolidada-2026-11-02/`, ignored by Git, with an adjacent ZIP/RELATORIO.md. References above are local and not public downloads. Original-stage examples remain in Git; current examples are the indexed Gemini selection.

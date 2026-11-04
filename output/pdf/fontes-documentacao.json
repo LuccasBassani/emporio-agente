@@ -1,8 +1,8 @@
 {
-  "normalizacao": "UTF-8, finais de linha LF",
-  "arquivos": {
-    "README.md": "aae1bb908f467d5b6a941155bf59a63b9b835f641d4c11780a66c012fa972137",
-    "docs/entrega.md": "352fd3e7b988c993b17a0fd3f6c7beb8f1b684341246a10188267c3491fadb88",
+  "normalization": "UTF-8, LF line endings",
+  "files": {
+    "README.md": "1fbf5e36b287b33c8e31814a2a30c8971626f9f02aa9dfe85492bc43a45dbedf",
+    "docs/entrega.md": "b29a1cc26a95f070d80c6ff11c559a909d89472dea41784611e521953c86eee0",
     "examples/catalogo-e-pix.md": "6765ecf5fda55304b7d9a3012f9547b59a90cb989285ad743a97d8c5200c0ecb",
     "examples/rag-promocao-pix.md": "b3519527c9153751342150df135dae367c7d48c796b44ef4a7dcb2089b42d1de",
     "examples/rag-parcelamento.md": "a92965720fe95aeb8f16cef9ff31a5bdffe299e7cbe3e024f248d623c7e7eede",

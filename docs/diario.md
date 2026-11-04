@@ -1,39 +1,40 @@
-# Histórico do desenvolvimento
+# Development history
 
-Registro resumido das etapas realizadas. As contagens de testes e pendências abaixo pertencem a cada momento. O [README](../README.md) e a [avaliação Gemini](validacao-gemini-2026-11-03.md) apresentam a versão de entrega. O histórico completo das alterações permanece nos commits.
+A concise record of completed stages. Test counts and pending items belong to their stated stage. The [README](../README.md) and [Gemini evaluation](validacao-gemini-2026-11-03.md) describe the submission version. Full changes remain in Git history.
 
-## Direcionamento e uso de IA
+## Direction and AI assistance
 
-Conduzi a definição da referência de interface, persona, escopo, provedores e custo. Também orientei os testes e seus resultados esperados, revisei respostas, priorizei correções e simplifiquei propostas desproporcionais ao desafio. Usei Codex como apoio à implementação, automação, execução de testes e documentação. Os relatórios identificam a execução assistida e os critérios usados na revisão.
+I directed the interface reference, persona, scope, providers and cost constraints. I also guided tests and expected outcomes, reviewed answers, prioritized fixes and simplified approaches that were disproportionate to the challenge. Codex supported implementation, automation, execution and documentation. Reports identify assisted execution and review criteria.
 
-## 31/10/2026 - Escopo, dados e primeira implementação
+## 31 October 2026 - Scope, data and first implementation
 
-- Leitura do enunciado, dos seis CSVs e do manual. Levantados 65 produtos, nove categorias, 50 clientes, 20 pedidos e 25 promoções, quatro ativas.
-- Definida aplicação independente em Python, usando como referência uma experiência de configuração e simulação de atendimento. Priorizado uso de opções gratuitas e desenvolvimento incremental.
-- Criados repositório, configuração de ambiente e conectores Groq/Ollama. A suíte inicial tinha sete testes de configuração e protocolo; Ollama não foi validado com modelo instalado.
-- Implementado RAG lexical sobre 27 trechos, com 14 perguntas de recuperação. A suíte chegou a 13 testes. Chamadas reais à Groq verificaram saudação e retorno de ferramenta.
-- O primeiro teste real de devolução confirmou possibilidade de devolver sem pedir a data de recebimento. A orientação de triagem foi ajustada e o cenário repetido; a nova resposta pediu a informação ausente.
-- Implementados catálogo e descontos com `Decimal`, cinco ferramentas de atendimento, contexto dos dois turnos anteriores e exportação. Uma primeira continuação de catálogo foi bloqueada por cota; outra sessão concluiu a consulta de PIX.
-- Acrescentados pedidos restritos ao cliente de teste e interface Streamlit. A suíte chegou a 42 testes. A instalação em um segundo ambiente foi conferida nessa etapa; o navegador foi usado para verificar mensagens, importação e downloads.
+- Read the challenge, six CSVs and manual. Identified 65 products, nine categories, 50 customers, 20 orders and 25 promotions, four active.
+- Defined an independent Python application inspired by an agent-configuration/service-simulation experience. Prioritized free options and incremental development.
+- Created the repository, environment configuration and Groq/Ollama connectors. The initial suite had seven configuration/protocol tests; Ollama was not validated with an installed model.
+- Implemented lexical RAG over 27 passages and 14 retrieval questions. The suite reached 13 tests. Real Groq requests checked greeting and tool round-trip behavior.
+- The first real return-policy answer confirmed a return before asking when the item was received. Triage instructions were adjusted and the scenario repeated; the new answer asked for the missing information.
+- Implemented catalog/pricing with `Decimal`, five service tools, two-turn context and exports. A catalog follow-up initially hit quota; another session completed the PIX query.
+- Added customer-scoped orders and Streamlit. The suite reached 42 tests. A second environment installation was checked at that stage; browser checks covered messages, imports and downloads.
 
-## 02/11/2026 - Persona, avaliação e correções
+## 2 November 2026 - Persona, evaluation and fixes
 
-- Consolidada a persona padrão da Lia e um roteiro com 32 cenários e resultados esperados.
-- A rodada assistida pelo navegador, com Groq/Qwen, registrou nove aprovados, dez com ressalvas, 12 falhas e um bloqueado por cota. As respostas foram preservadas como evidência da versão testada.
-- A auditoria identificou descrições divergentes, status comerciais incompatíveis com uma oferta de compra e ambiguidades do manual. Notas separadas passaram a acompanhar as consultas, preservando os dados originais.
-- Corrigidas busca de modelos indisponíveis, tratamento de orçamento sem resultado, instruções de triagem, limites de recomendações e apresentação de moeda. A suíte chegou a 54 testes.
-- A revalidação priorizada teve 18 cenários tentados: 15 atenderam ao objetivo principal, quatro com ressalvas; três ficaram pendentes naquela etapa. A interrupção diária e o HTTP 400 sem causa confirmada foram registrados separadamente dos erros de conteúdo.
+- Consolidated Lia's default persona and 32 scenarios with expected outcomes.
+- The assisted browser run with Groq/Qwen recorded nine passes, ten passes with caveats, 12 failures and one quota block. Answers were retained as evidence of that revision.
+- The audit identified conflicting descriptions, commercial statuses incompatible with immediate purchase, and policy ambiguities. Separate notes were added to queries while preserving original data.
+- Fixed unavailable-model lookup, empty-budget handling, triage instructions, recommendation limits and currency rendering. The suite reached 54 tests.
+- Targeted revalidation attempted 18 scenarios: 15 met their main objective, four with caveats; three remained pending at that stage. Daily quota interruption and an unexplained HTTP 400 were recorded separately from content failures.
 
-## 03/11/2026 - Retomada e alternativa de provedor
+## 3 November 2026 - Resumption and alternative provider
 
-- A tentativa inicial da rodada completa concluiu C14 e parte de C03 antes de nova interrupção por cota.
-- Na retomada Qwen, 24 casos concluíram: 14 aprovados, nove com ressalvas e uma falha de campanha. C25 foi interrompido e C26-C32 não começaram.
-- A escolha explícita de Gemini preservou o mesmo agente e as ferramentas. Flash 3.6 teve oito casos concluídos antes do limite diário observado; Flash-Lite permitiu executar os 32 cenários. Essas rodadas não são um benchmark controlado entre modelos.
+- The first complete-run attempt finished C14 and part of C03 before another quota interruption.
+- Qwen resumption completed 24 cases: 14 passes, nine passes with caveats and one campaign failure. C25 was interrupted; C26-C32 did not start.
+- Explicit Gemini selection retained the agent/tools. Flash 3.6 completed eight cases before the observed daily limit; Flash-Lite enabled the full 32-scenario run. These runs are not a controlled model benchmark.
 
-## 03/11/2026 - Avaliação Gemini e versão de entrega
+## 3 November 2026 - Gemini evaluation and submission version
 
-- A rodada integral com Flash-Lite teve 12 aprovados, 15 com ressalvas e cinco falhas. Execução por Streamlit AppTest e API real, com leitura assistida das respostas, consultas e fontes.
-- Nove casos foram repetidos após ajustes. Estados de pedido sem identificação/não localizado receberam orientação determinística, e as instruções foram revistas para status comercial, canal já informado e escopo.
-- Uma regressão acrescentou condição de frete ao total histórico de pedido. Foi incluída validação conservadora com teste de regressão; o caso foi repetido na API real, com dados corretos e ressalva de linguagem.
-- A suíte chegou a 61 testes. As cinco falhas iniciais tiveram o objetivo principal atendido nos retestes, com ressalvas em dois casos. Não houve nova rodada integral após a última alteração.
-- Selecionadas cinco conversas reais com variedade de fluxos. O README e o PDF foram consolidados, com declaração da condução do candidato, uso do Codex e limites da avaliação. Registros históricos ficaram fora do PDF de seis páginas.
+- The full Flash-Lite run had 12 passes, 15 passes with caveats and five failures. Execution used Streamlit AppTest and the real API, with assisted review of answers, queries and sources.
+- Nine cases were repeated after changes. Missing identification/not-found order states received deterministic guidance; instructions clarified commercial status, previously supplied channel and service scope.
+- A regression added an unsupported shipping qualification to a historical order total. Conservative validation and a regression test were added; the real-API rerun returned correct data with a language caveat.
+- The suite reached 61 tests. The five original failures met their main objective in retests, with caveats in two. There was no full rerun after the last functional change.
+- Selected five real conversations. Consolidated the README/PDF with the candidate's direction, Codex assistance and evaluation limits; historical records were excluded from the six-page PDF.
+- Prepared English submission documentation as required by the application email. Original Portuguese dialogue and supplied data were preserved; this language revision did not add new real-model evaluations.

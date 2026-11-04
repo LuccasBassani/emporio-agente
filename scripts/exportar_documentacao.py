@@ -1,4 +1,4 @@
-"""Exporta o README e a documentação selecionada para o PDF de entrega."""
+"""Export the README and selected documentation to the submission PDF."""
 
 import argparse
 import hashlib
@@ -105,13 +105,13 @@ def architecture(width):
                                 fillColor=ACCENT, strokeColor=ACCENT))
 
     box(0, 84, 126, "Interface", "Streamlit / terminal")
-    box(182, 84, 126, "Agente Python", "regras e ferramentas")
-    box(364, 84, 126, "Modelo", "Gemini / Groq / Ollama")
+    box(182, 84, 126, "Python agent", "rules and tools")
+    box(364, 84, 126, "Model", "Gemini / Groq / Ollama")
     arrow(128, 105, 180, 105, both=True)
     arrow(310, 105, 362, 105, both=True)
-    box(0, 8, 145, "Catálogo e preços", "produtos e promoções / CSV")
-    box(172, 8, 145, "Pedidos", "acesso por cliente / CSV")
-    box(344, 8, 145, "Políticas", "recuperação BM25 / PDF")
+    box(0, 8, 145, "Catalog and prices", "products and promotions / CSV")
+    box(172, 8, 145, "Orders", "customer-scoped access / CSV")
+    box(344, 8, 145, "Policies", "BM25 retrieval / PDF")
     drawing.add(Line(x(245), 84, x(245), 67, strokeColor=ACCENT, strokeWidth=.8))
     drawing.add(Line(x(72.5), 67, x(416.5), 67, strokeColor=ACCENT, strokeWidth=.8))
     for center in (72.5, 245, 416.5):
@@ -157,7 +157,7 @@ def markdown(source, root, width, sty):
             story.append(PageBreak())
             continue
         if line.startswith("<!--"):
-            raise ValueError(f"Marcador não resolvido em {source.name}: {line}")
+            raise ValueError(f"Unresolved marker in {source.name}: {line}")
         if line.startswith("```"):
             language, block = line[3:], []
             while index < len(lines) and not lines[index].strip().startswith("```"):
@@ -203,7 +203,7 @@ def markdown(source, root, width, sty):
             level = min(len(heading[1]), 3)
             story.append(Paragraph(inline(heading[2], source, root), sty[f"h{level}"]))
             continue
-        if line in {"**Cliente**", "**Lia**"}:
+        if line in {"**Customer**", "**Lia**"}:
             story.append(Paragraph(line.strip("*"), sty["label"]))
             continue
         bullet = re.match(r"^([-*]|\d+[.)])\s+(.+)$", line)
@@ -217,7 +217,7 @@ def markdown(source, root, width, sty):
             parts.append(lines[index].strip())
             index += 1
         text = " ".join(parts)
-        style = sty["small"] if text.startswith(("Luccas Bassani |", "Arquivo completo:")) else sty["body"]
+        style = sty["small"] if text.startswith(("Luccas Bassani |", "Full export:")) else sty["body"]
         story.append(Paragraph(inline(text, source, root), style))
     return story
 
@@ -230,7 +230,7 @@ def build(root=DEFAULT_ROOT, target=None):
     doc = BaseDocTemplate(
         str(target), pagesize=A4, leftMargin=18 * mm, rightMargin=18 * mm,
         topMargin=21 * mm, bottomMargin=20 * mm,
-        title="Empório da Música - README e documentação", author="Luccas Bassani",
+        title="Empório da Música - README and documentation", author="Luccas Bassani",
     )
 
     def page(canvas, document):
@@ -239,7 +239,7 @@ def build(root=DEFAULT_ROOT, target=None):
         canvas.setFont("DocBold", 7.6)
         canvas.drawString(18 * mm, A4[1] - 12 * mm, "EMPÓRIO DA MÚSICA")
         canvas.setFont("Doc", 7.6)
-        canvas.drawRightString(A4[0] - 18 * mm, A4[1] - 12 * mm, "README e documentação técnica")
+        canvas.drawRightString(A4[0] - 18 * mm, A4[1] - 12 * mm, "README and technical documentation")
         canvas.setStrokeColor(RULE)
         canvas.setLineWidth(.5)
         canvas.line(18 * mm, 15 * mm, A4[0] - 18 * mm, 15 * mm)
@@ -261,8 +261,8 @@ def build(root=DEFAULT_ROOT, target=None):
 
     used = [*SOURCES, *("examples/" + name for name in EXAMPLES)]
     manifest = {
-        "normalizacao": "UTF-8, finais de linha LF",
-        "arquivos": {
+        "normalization": "UTF-8, LF line endings",
+        "files": {
             relative: hashlib.sha256((root / relative).read_text(encoding="utf-8").encode("utf-8")).hexdigest()
             for relative in used
         },

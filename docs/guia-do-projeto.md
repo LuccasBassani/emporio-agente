@@ -1,27 +1,27 @@
-# Guia de execução e leitura
+# Execution and reading guide
 
-As instruções de instalação e seleção do provedor estão no [README](../README.md). A demonstração documentada usa Gemini Flash-Lite. Groq é alternativa configurável; Ollama depende de servidor e modelo local e ainda não teve sua geração validada neste projeto.
+Setup and provider selection are documented in the [README](../README.md). The recorded demonstration uses Gemini Flash-Lite. Groq is configurable; Ollama requires a local server/model and its generation has not been validated in this project.
 
-## Demonstrar o atendimento
+## Demonstrate the service
 
-1. Instale as dependências, configure o `.env` conforme o README e inicie Streamlit.
-2. Mantenha a persona padrão da Lia. Pergunte por duas opções de violões até R$ 1.000 e depois pelo preço do primeiro no PIX.
-3. Abra **Ver consultas e fontes** e confronte o texto com os resultados das ferramentas.
-4. Selecione **Cliente #2** e consulte o **pedido 8**. Uma consulta ao pedido 9, de outro cliente, não deve revelar seus dados. O cliente é uma seleção de teste, sem autenticação real.
-5. Teste uma política, por exemplo parcelamento de R$ 480 em seis vezes. Confira a seção recuperada do PDF.
-6. Exporte a conversa antes de trocar cliente, aplicar configuração ou iniciar outra conversa, pois essas ações limpam o histórico da sessão.
+1. Install dependencies, configure `.env` as described in the README, and start Streamlit.
+2. Keep Lia's default persona. Ask for two acoustic guitars under R$ 1,000, then ask for the first one's PIX price. The interface and customer dialogue use Brazilian Portuguese.
+3. Expand the queries/sources panel and compare the answer with tool results.
+4. Select **test customer #2** and ask about **order 8**. A request for order 9, owned by another customer, must not reveal its data. Customer selection is a test mechanism, not real authentication.
+5. Ask about a policy, such as paying R$ 480 in six installments. Inspect the retrieved PDF section.
+6. Export the conversation before changing customer, applying configuration or starting another conversation; these actions clear session history.
 
-A interface permite baixar conversas em Markdown/TXT e configurações em JSON. Credenciais do ambiente não são campos da configuração exportada. A imagem [interface.png](interface.png) mostra o fluxo de uma resposta.
+The interface exports Markdown/TXT conversations and JSON configurations. Environment credentials are not exported configuration fields. [interface.png](interface.png) shows an answer flow.
 
-## Conferir o projeto
+## Inspect the project
 
-- [Decisões técnicas](decisoes.md): comportamento atual de consultas, recuperação, contexto e provedores.
-- [Cenários e critérios de aceitação](cenarios-de-teste.md): resultados esperados, separados das execuções.
-- [Avaliação Gemini](validacao-gemini-2026-11-03.md): 32 cenários e retestes nas versões indicadas.
-- [Cinco exemplos reais](../examples/README.md): seleção publicada com consultas e fontes.
-- [Exemplos de atendimento e revisão](entrega.md): falas selecionadas e melhorias propostas, incorporadas ao PDF.
-- [Gerar o PDF](gerar-pdf.md): instruções do exportador, fora do documento entregue.
+- [Technical decisions](decisoes.md): queries, retrieval, context and providers.
+- [Scenarios and acceptance criteria](cenarios-de-teste.md): expected behavior, separate from results.
+- [Gemini evaluation](validacao-gemini-2026-11-03.md): 32 scenarios and revision-specific retests.
+- [Five real examples](../examples/README.md): published exports with queries and sources.
+- [Interaction examples and review](entrega.md): selected original dialogue and proposed improvements included in the PDF.
+- [Generate the PDF](gerar-pdf.md): exporter instructions outside the submitted document.
 
-Os 61 testes automatizados usam respostas de API simuladas e não consomem cota. Uma avaliação real depende de chave, modelo e capacidade do provedor. Erro de execução, falha factual e ressalva de linguagem devem ser registrados separadamente.
+The 61 automated tests mock API responses and do not consume quota. Real evaluation depends on the selected key, model and provider capacity. Execution errors, factual failures and language caveats must be recorded separately.
 
-Os registros datados e o [diário](diario.md) documentam a evolução. Pendências ou contagens antigas descrevem a etapa correspondente; a última correção não foi seguida por outra rodada integral dos 32 cenários. O [índice da documentação](README.md) identifica o material atual e o histórico.
+Dated records and the [development history](diario.md) document progress. Old counts and pending items describe the corresponding stage; the last functional fix was not followed by another complete run of all 32 scenarios. The [documentation index](README.md) separates current material from historical reports.

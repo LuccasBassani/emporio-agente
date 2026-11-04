@@ -1,56 +1,56 @@
-# Retomada da avaliação Qwen — 03/11/2026
+# Resumed Qwen evaluation - 3 November 2026
 
-> **Registro histórico.** Contagens, pendências e conclusões descrevem as versões e execuções desta etapa. Para a situação atual, consulte o [README](../README.md) e a [avaliação Gemini e seus retestes](validacao-gemini-2026-11-03.md). Os exemplos atuais estão em `examples/`; versões anteriores permanecem no Git.
+> **Historical record.** Counts, pending items and conclusions describe this stage. See the [README](../README.md) and [Gemini evaluation](validacao-gemini-2026-11-03.md) for the submission version. Current examples are under `examples/`; earlier versions remain in Git.
 
-Execução entre 19h18 e 20h31 (São Paulo), por Streamlit AppTest e API real da Groq, com Qwen/Qwen3.8-27b e persona padrão. Código do agente igual a ea85546; HEAD da execução 7cb730d, que só acrescentou documentação. Não é uma rodada manual no navegador. Nenhuma resposta foi simulada ou editada.
+Executed 19:18-20:31 São Paulo time through Streamlit AppTest and the real Groq API, with `qwen/qwen3.8-27b` and default persona. Agent code matched `ea85546`; execution HEAD `7cb730d` added documentation only. This was not a manual browser run; answers were not mocked or rewritten.
 
-## Resultado
+## Results
 
-**24 cenários concluídos: 14 aprovados, 9 aprovados com ressalvas e 1 falha (C15, Black Friday).** C25 foi tentado sem resposta final por cota diária; C26 a C32 não começaram. Os oito casos pendentes não estão aprovados. A revisão considera resposta final, consultas, fontes e critérios do roteiro; não é um benchmark estatístico.
+**24 completed: 14 passed, nine passed with caveats and one failed (C15, Black Friday).** C25 was attempted without an answer after daily quota exhaustion; C26-C32 did not start. The eight pending cases are not passed. Review used answers, queries, sources and scenario criteria; this is not a statistical benchmark.
 
-| Caso | Avaliação | Observação |
+| Case | Rating | Observation |
 | --- | --- | --- |
-| C01 | Aprovado | Apresentação breve como assistente virtual Lia. |
-| C02 | Aprovado com ressalva | Instrumento e orçamento preservados, três produtos corretos e uma pergunta. Acrescenta comparação genérica sobre conforto e timbre das cordas, que não consta explicitamente nos resultados cadastrais. Houve um HTTP 429 por minuto, recuperado em tentativa registrada. |
-| C03 | Aprovado | Duas opções corretas; referência ao primeiro mantida e PIX R$ 408,41. |
-| C04 | Aprovado | Encerra sem nova pergunta nem oferta. |
-| C05 | Aprovado com ressalva | Empatia sóbria e sem confirmar cobertura ou ação. Pede instrumento e data de recebimento juntos, contrariando a preferência de um dado principal por turno; ainda não consulta política, mas também não afirma condições. |
-| C06 | Aprovado com ressalva | Recupera política e aproveita canal/data/estado informados; não afirma aprovação ou abertura. Diz que condições parecem compatíveis sem confirmar acessórios/manuais e usa expressão técnica este protótipo no atendimento, que pode ser substituída por linguagem natural. |
-| C07 | Aprovado | Informa 12 resultados e apresenta três menores preços, com especificações e fontes cadastrais. |
-| C08 | Aprovado | R$ 599,90 e R$ 569,91 no PIX, sem frete. Uma revisão interna de validação levou à consulta adicional do PIX antes da resposta final. |
-| C09 | Aprovado com ressalva | Busca vazia corretamente comunicada sem produto/preço inventado. Após revisão de validação, resposta fala em resposta correta, CSVs e critério de orçamento; linguagem interna extensa e pouco natural para atendimento. |
-| C10 | Aprovado | Promoção de 20% mantida, sem acumular 5% PIX. |
-| C11 | Aprovado | Filtro nylon, estoque e preço final PIX respeitados nos três produtos. |
-| C12 | Aprovado | Produto ativo sem estoque não oferecido para compra; preço cadastrado sem garantia futura nem reposição inventada. |
-| C13 | Aprovado | Status descontinuado respeitado apesar de estoque positivo; sem prometer venda. |
-| C14 | Aprovado | Sem venda atual; preço cadastrado sem garantia futura. |
-| C15 | Falhou | Cita campanha de 15% a 30% em todo catálogo sem verificar promoções ativas nem esclarecer que o mês/campanha não ativa desconto automaticamente. Não aplica 30% uniforme, mas deixa vigência implícita. |
-| C16 | Aprovado com ressalva | Três turnos preservam dados, prazo e condições; uma revisão interna no primeiro turno, sem aprovação final ou operação inventada. Ressalva de linguagem técnica este protótipo na orientação final. |
-| C17 | Aprovado | Prazo de sete dias ultrapassado, sem promessa de exceção nem abertura de devolução. |
-| C18 | Aprovado | Distingue troca em 30 dias da compra, garantia legal em 90 dias do recebimento e fabricante conforme certificado. Pergunta recebimento, sem confirmar cobertura. |
-| C19 | Aprovado | Após uma revisão interna, reconhece lacuna exata de R$ 500 e não escolhe frete arbitrário. Cita limites acima e abaixo com seção 5.1. |
-| C20 | Aprovado | Aplica condição específica de 4x a 6x com parcela mínima R$ 80; R$ 480/6 correto, sem prometer processamento. |
-| C21 | Aprovado com ressalva | Sem preço inventado nem promessa de cotador; política nacional citada. Sugere que escolher um violão dará peso e dimensões, dados não garantidos no catálogo. |
-| C22 | Aprovado com ressalva | Endereço e sábado 09h–13h corretos com fontes. Pergunta automática de continuação desnecessária após resolver a dúvida. |
-| C23 | Aprovado com ressalva | Domingo fechado e PIX 5% não cumulativo corretos com fontes; mudança de assunto preservada. Um HTTP 429 por minuto recuperado na tentativa explícita; revisão interna aparece no texto como agradecimento/correção a observação que o cliente não fez. |
-| C24 | Aprovado com ressalva | Não revela pedido nem solicita dados pessoais; orienta selecionar cliente na tela. Porém diz cliente atualmente selecionado quando não há identificação e oferece listar pedidos nessa condição. Um HTTP 503 recuperado na tentativa explícita. |
-| C25 | Interrompido pelo provedor | Sem resposta final após limite diário; não avaliado como acerto ou erro factual. |
-| C26–C32 | Não executados | Interrupção da rodada antes desses casos. |
+| C01 | Passed | Brief introduction as Lia, virtual assistant. |
+| C02 | Passed with caveats | Uses instrument/budget, three correct products and one question. Adds unsupported comfort/tone comparison. Minute-level HTTP 429 recovered in recorded retry. |
+| C03 | Passed | Two correct options, first-item reference preserved, PIX R$ 408,41. |
+| C04 | Passed | Ends without another question or offer. |
+| C05 | Passed with caveats | Sober empathy without coverage/action confirmation. Asks instrument and receipt together; no policy lookup, but no policy assertion either. |
+| C06 | Passed with caveats | Retrieves policy and uses channel/date/condition; no approval/registration. Says conditions seem compatible before accessory/manual confirmation; internal prototype wording. |
+| C07 | Passed | Discloses 12 matches and shows the three lowest prices with stored specifications/sources. |
+| C08 | Passed | R$ 599,90 and PIX R$ 569,91 excluding shipping. Internal correction triggers a PIX lookup before the answer. |
+| C09 | Passed with caveats | Correct empty-result response without invented product/price. Internal validation/CSV/budget language appears in the customer answer. |
+| C10 | Passed | 20% promotion preserved without adding 5% PIX. |
+| C11 | Passed | Nylon, stock and final PIX budget filters respected across three products. |
+| C12 | Passed | Active zero-stock product not offered; stored price qualified without future/replenishment promises. |
+| C13 | Passed | Discontinued status respected despite positive stock; no sale promise. |
+| C14 | Passed | No current sale; stored price qualified without future guarantee. |
+| C15 | Failed | Cites a 15%-30% catalog campaign without checking active offers or clarifying that month/campaign does not activate discounts. Does not apply a flat 30%, but leaves validity implicit. |
+| C16 | Passed with caveats | Three turns retain facts, time and conditions; one internal correction, no final approval/invented operation. Internal prototype wording. |
+| C17 | Passed | Seven-day period exceeded, without exception or invented return registration. |
+| C18 | Passed | Distinguishes 30-day purchase-based exchange, 90-day receipt-based warranty and manufacturer certificate; asks receipt without confirming coverage. |
+| C19 | Passed | After correction, recognizes the exact R$ 500 gap and avoids arbitrary fee; cites section 5.1 boundaries. |
+| C20 | Passed | Applies 4-6 installment band and R$ 80 minimum; R$ 480/6 correct without promising processing. |
+| C21 | Passed with caveats | No invented fee/quote capability; national policy cited. Suggests selecting an instrument supplies weight/dimensions, which are not guaranteed in the catalog. |
+| C22 | Passed with caveats | Correct address and Saturday 09:00-13:00 with sources; unnecessary follow-up. |
+| C23 | Passed with caveats | Sunday closed and non-stacking 5% PIX correct across topic change. Minute-level 429 recovered; internal correction appears as thanks for a comment the customer did not make. |
+| C24 | Passed with caveats | No order/personal data disclosure; asks customer selection. Incorrectly implies a selected customer and offers listing without identification. HTTP 503 recovered on explicit retry. |
+| C25 | Interrupted by provider | No final answer after the daily limit; not scored as factual success/failure. |
+| C26–C32 | Not run | Run stopped before these cases. |
 
-## Leitura dos resultados
+## Interpretation
 
-C03 (continuidade e PIX), C10 (promoção sem acumulação) e C14 (preço de item em breve sem garantia futura), pendentes na tentativa anterior, foram concluídos e aprovados nesta retomada. Catálogo e filtros, indisponibilidade, devolução em três turnos, garantia, fronteira de frete e parcelamento produziram respostas compatíveis com seus objetivos, com as ressalvas de linguagem indicadas.
+C03 (PIX continuity), C10 (non-stacking promotion) and C14 (coming-soon price qualification), previously pending, completed and passed. Catalog, filters, unavailability, three-turn returns, warranty, shipping boundary and installments met their objectives with the stated caveats.
 
-C15 permanece uma falha: a resposta cita a campanha de 15% a 30% em todo catálogo sem verificar promoções ativas e sem esclarecer que calendário não ativa desconto. Não há aprovação geral do agente. As demais ressalvas concentram-se em linguagem interna da validação aparecendo para o cliente, perguntas/ofertas desnecessárias e informações genéricas além do cadastro.
+C15 remains a failure. Other caveats concern exposed internal-validation wording, unnecessary follow-ups and claims beyond stored data. There is no general approval of the agent.
 
-## Condições da execução
+## Execution conditions
 
-Intervalo de 65 segundos entre inícios de requisições, inclusive entre casos. Uma repetição explícita pelo botão da interface foi permitida por mensagem, sem retry no cliente HTTP. O lançador encerra ao identificar cota diária; não muda modelo nem provedor. Foram 68 requisições: 63 HTTP 200, quatro HTTP 429 (três por minuto, um por dia) e um HTTP 503. As chamadas bem-sucedidas reportaram 161.657 tokens. C02, C23 e C24 recuperaram-se na tentativa adicional; C25 permaneceu sem resposta após a recusa diária.
+Request starts were spaced by 65 seconds, including across cases. One explicit retry through the interface was allowed per message, with no HTTP-client retry. The launcher stopped on the daily limit without changing provider/model. Of 68 requests: 63 HTTP 200, four HTTP 429 (three minute-level, one daily) and one HTTP 503. Successful requests reported 161,657 tokens. C02/C23/C24 recovered on retry; C25 did not.
 
-No bloqueio diário das 20h31, a Groq informou limite de 200.000 tokens, uso de 197.687 e solicitação de 2.342. Esses números são da conta/provedor, não apenas desta rodada. A cota externa não é defeito da lógica do agente e não invalida automaticamente respostas já obtidas; também não permite aprovar casos interrompidos.
+At 20:31 Groq reported a 200,000-token daily limit, 197,687 used and an estimated 2,342-token request. These are account/provider totals, not just this run. Quotas neither invalidate completed answers nor justify approving interrupted cases.
 
-## Evidências
+## Evidence
 
-Arquivos completos em `local/validacao-32-qwen-retomada-2026-11-03/`: conversas Markdown com consultas/fontes, configuração, execucoes.json, http-seguro.json, criterios.json, avaliacao-manual.json e rodada.json. Pacote: `local/validacao-32-qwen-retomada-2026-11-03.zip`. O manifesto SHA-256 permite verificar os arquivos. Conteúdo local ignorado pelo Git e conferido contra as credenciais configuradas.
+Local records: `local/validacao-32-qwen-retomada-2026-11-03/`, containing Markdown conversations, queries/sources, configuration, execucoes.json, http-seguro.json, criterios.json, avaliacao-manual.json and rodada.json. Package: `local/validacao-32-qwen-retomada-2026-11-03.zip`. A SHA-256 manifest verifies files; records are ignored by Git and were checked against configured credentials.
 
-A pedido do candidato, a alternativa seguinte é Gemini Flash, em avaliação separada. A troca de provedor exige validar o conector e os cenários reais novamente; resultados não devem ser atribuídos ao Qwen nem misturados como uma rodada integral do mesmo modelo. Nenhuma publicação do repositório foi realizada.
+At the candidate's request, Gemini Flash was the next explicitly selected alternative, evaluated separately. Its results must not be attributed to Qwen or merged into a full same-model run. The repository was not made public during this historical run.

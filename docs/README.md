@@ -1,19 +1,21 @@
-# Documentação do projeto
+# Project documentation
 
-## Versão de entrega
+The submission documentation is in English. The application, supplied business data and original conversation exports remain in Brazilian Portuguese. Original dialogue is retained as evidence rather than presented as an English-language model run.
 
-- [README principal](../README.md): escopo, instalação, arquitetura, validação e uso de IA.
-- [Decisões técnicas](decisoes.md): contratos e limites da implementação atual.
-- [Guia de execução](guia-do-projeto.md): roteiro curto para demonstrar o atendimento.
-- [Exemplos de atendimento e revisão](entrega.md): cinco conversas, ajustes e melhorias propostas, incorporados ao PDF.
-- [Cinco exportações reais](../examples/README.md): consultas e fontes completas dos exemplos.
-- [Avaliação Gemini e retestes](validacao-gemini-2026-11-03.md): resultados da rodada integral e das revisões posteriores.
-- [Cenários e critérios](cenarios-de-teste.md): expectativas usadas na avaliação, separadas de seus resultados.
-- [Evolução proposta](evolucao-produto.md): guardrails, contexto, recuperação, consultas e fine-tuning.
-- [Gerar o PDF](gerar-pdf.md): instruções de exportação, fora do PDF de entrega.
+## Submission version
 
-## Registros históricos
+- [Main README](../README.md): scope, setup, architecture, validation and AI assistance.
+- [Technical decisions](decisoes.md): current implementation contracts and limits.
+- [Execution guide](guia-do-projeto.md): short demonstration walkthrough.
+- [Interaction examples and review](entrega.md): five conversations, fixes and proposed improvements included in the PDF.
+- [Five real exports](../examples/README.md): complete queries and sources.
+- [Gemini evaluation and retests](validacao-gemini-2026-11-03.md): full evaluation and subsequent revisions.
+- [Scenarios and criteria](cenarios-de-teste.md): expected behavior, separate from execution results.
+- [Proposed evolution](evolucao-produto.md): guardrails, context, retrieval, queries and fine-tuning.
+- [Generate the PDF](gerar-pdf.md): exporter instructions, excluded from the submission PDF.
 
-O [histórico do desenvolvimento](diario.md), a [auditoria dos dados](auditoria-dados-2026-11-02.md) e os relatórios datados de Groq/Qwen e Flash 3.6 descrevem as versões e execuções de cada etapa. Contagens, pendências e exemplos antigos devem ser lidos nesse contexto. As revisões anteriores dos exemplos permanecem no Git; a pasta `examples/` contém a seleção atual.
+## Historical records
 
-Os relatórios preservam as falhas observadas e não constituem aprovação geral da versão final. Evidências adicionais em `local/` não são publicadas; suas referências são identificadas como registros locais, sem links de download. As cinco conversas publicadas permitem inspecionar os fluxos selecionados.
+The [development history](diario.md), [data audit](auditoria-dados-2026-11-02.md) and dated Groq/Qwen and Flash 3.6 reports describe their respective revisions. Counts, pending cases and older examples must be read in that context. Earlier example revisions remain in Git; `examples/` contains the current selection.
+
+Reports preserve observed failures and do not establish general approval of the final version. Additional evidence under `local/` is not published; references identify local records rather than download links. The five published conversations support inspection of the selected flows.
