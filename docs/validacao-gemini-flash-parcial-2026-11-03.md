@@ -1,5 +1,7 @@
 # Avaliação parcial Gemini Flash 3.6 - 03/11/2026
 
+> **Registro histórico.** Contagens, pendências e conclusões descrevem as versões e execuções desta etapa. Para a situação atual, consulte o [README](../README.md) e a [avaliação Gemini e seus retestes](validacao-gemini-2026-11-03.md). Os exemplos atuais estão em `examples/`; versões anteriores permanecem no Git.
+
 API real, Streamlit AppTest, código 163ef3c, persona padrão e modelo `gemini-3.6-flash`. Oito cenários foram concluídos; C31 ficou sem resposta por HTTP 429. C01–C14 e C16–C24 não foram iniciados. Não é uma rodada integral nem comparação isolada entre modelos.
 
 O diagnóstico seguro da API informou `RESOURCE_EXHAUSTED`, limite de 20 requisições por dia por projeto/modelo no nível gratuito. Houve duas respostas HTTP 200 em C32 posteriores ao primeiro bloqueio; isso não prova renovação. O lançador foi interrompido após a identificação da cota, e os arquivos foram preservados.

@@ -1,131 +1,58 @@
-# Decisões e questões em aberto
+# Decisões técnicas da versão de entrega
 
-Este documento registra escolhas implementadas, motivos e limitações. Pendências estão indicadas explicitamente.
+Este documento descreve a implementação atual. Os registros datados em `docs/` preservam etapas anteriores; a avaliação principal é a [rodada com Gemini e seus retestes](validacao-gemini-2026-11-03.md).
 
-## 1. Python e Streamlit
+## Aplicação e arquitetura
 
-Motivo: atender à exigência de Python e concentrar interface e agente na mesma linguagem, reduzindo a complexidade de instalação e integração dentro do prazo de entrega.
-Streamlit oferece elementos de chat e download de arquivos.
-Alternativa considerada: interface React com API Python. Adicionaria duas aplicações e mais configuração sem necessidade para o protótipo.
-Limitação: menor liberdade de interface que uma aplicação web personalizada.
+Python atende à restrição do desafio. Streamlit concentra configuração, chat e exportações na mesma aplicação, reduzindo a instalação e a integração exigidas por uma interface separada. A referência de experiência foi definida pelo candidato; a implementação é independente.
 
-Implementada tela com configuração e chat lado a lado, importação/exportação JSON e download de conversa em Markdown/TXT, com evidências opcionais. Aplicar ou importar configuração e trocar de cliente iniciam conversa nova. Dados de catálogo/políticas são compartilhados em cache de leitura, enquanto cliente HTTP, contexto de cliente e histórico ficam na sessão do usuário.
+O agente usa `httpx`, sem framework de agentes. O modelo solicita uma das cinco ferramentas permitidas: `buscar_produtos`, `consultar_produto`, `buscar_politicas`, `consultar_pedido` e `listar_meus_pedidos`. O Python valida os argumentos e executa a função. A API do provedor não executa essas funções por conta própria.
 
-A chave não é um campo de configuração exportável. JSON importado aceita somente os campos conhecidos; campos extras, credenciais e identidade são rejeitados. A escolha de cliente fica fora do JSON de estilo/modelo.
+Cada turno permite até quatro rodadas de geração, com no máximo quatro ferramentas por rodada. Há uma oportunidade de correção de conteúdo dentro desse limite. Isso é separado de retry HTTP, que não é automático. Somente turnos concluídos entram no histórico; os dois anteriores completos são enviados como contexto. O histórico da sessão e as exportações podem conter mais turnos que esse recorte.
 
-Requisitos fixados: Python 3.12 ou superior, devido ao NumPy instalado como dependência do Streamlit. Ambiente testado: Python 3.14.4 no Windows.
+## Dados estruturados e preços
 
-## 2. Consultas estruturadas para dados operacionais
+Os seis CSVs foram preservados em `data/`. As consultas usam uma fotografia carregada em memória, adequada ao volume fornecido. Não há SQL, busca vetorial de produtos ou integração com estoque ao vivo.
 
-Implementada leitura direta dos CSVs por funções Python com parâmetros definidos. O modelo solicita a consulta; o código valida e executa. Preços, estoque, status e descontos não dependem de similaridade textual. SQLite não foi necessário para o tamanho e as consultas atuais.
+- Disponibilidade: `status=active` e estoque positivo. Descontinuado e em breve permanecem indisponíveis, mesmo com quantidade cadastrada.
+- Preço: `Decimal` e arredondamento `ROUND_HALF_UP` em centavos. Orçamento considera o preço final para o pagamento escolhido, sem frete.
+- Desconto: promoção com `is_active=1` prevalece; PIX de 5% só se aplica sem promoção ativa. O mês ou o texto da campanha não ativam uma oferta. Mais de uma promoção ativa por produto interrompe a carga do catálogo para esclarecer a ambiguidade.
+- Busca: nome e categoria normalizados, com filtros de orçamento, disponibilidade, material de cordas e classificação elétrica. Nome/ID localiza também modelos indisponíveis. Descrições livres divergentes não entram na identificação textual.
 
-Orçamento: filtrar pelo preço final arredondado para o pagamento escolhido, sem frete. Decimal com ROUND_HALF_UP evita aritmética binária de ponto flutuante. Promoção ativa prevalece; não aplicar PIX adicional. Sem promoção, PIX aplica 5% sobre a tabela. Múltiplas promoções ativas para um produto são consideradas ambíguas, sem selecionar uma arbitrariamente.
+Material de cordas é filtrado apenas nas categorias em que o cadastro o informa. Classificação elétrica usa `specs.electronics` ou indicações explícitas no nome/categoria, com origem declarada. Campo ausente não equivale a falso.
 
-Disponibilidade: status active e estoque positivo. Preservar motivos distintos para esgotado, descontinuado e coming_soon. Estoque positivo não reativa um produto. Os dados são uma fotografia carregada no início da sessão.
+`data/observacoes_dados.json` registra divergências e interpretações separadamente dos originais. As notas acompanham as consultas pertinentes; não substituem o conteúdo do manual nem corrigem silenciosamente o cadastro.
 
-Busca: normalizar acentos e consultar nome/categoria, sem usar descrições livres divergentes para identificar marcas ou modelos. Filtros de cordas e captação usam specs; valores ausentes não são inferidos. Ordenar pelo preço final e informar quando existem mais resultados do que os exibidos.
+## Pedidos e identificação
 
-Agente: lista fechada de cinco ferramentas, limite de quatro rodadas por turno e histórico dos dois últimos turnos completos. Chamadas e respostas de ferramenta permanecem juntas; turnos com falha não entram no histórico. A exportação registra consultas completas, enquanto o contexto enviado ao modelo omite metadados repetidos para economizar tokens.
+A aplicação define o cliente de teste fora dos argumentos enviados pelo modelo. A consulta verifica a associação e dá o mesmo retorno para pedido inexistente e de terceiro. Trocar o cliente na interface limpa a conversa.
 
-Pedidos: identidade vinculada pela aplicação e ausente do schema das ferramentas. Pedido de terceiro e pedido inexistente geram resposta equivalente. A seleção local simula identificação, sem pretender autenticação real. As ferramentas enviam somente número/status/itens/total/rastreamento e referências; não enviam nome, contato, notas ou data estimada de entrega. Preservar o total histórico e a ausência de rastreamento/data real de recebimento.
+As ferramentas de pedidos não retornam nome, telefone, e-mail, endereço, notas ou identificador do cliente. Preservam status, itens, total histórico e rastreamento cadastrado. Não inferem recebimento efetivo, composição de frete ou rastreio ao vivo. Sem identificação ou com pedido não localizado, uma chamada única de pedido recebe orientação determinística do programa.
 
-Limitação observada: uma conversa rápida na Groq atingiu a cota gratuita durante uma pergunta de continuação. Não fazer fallback ou retry automático; orientar nova tentativa após renovar a cota.
+A seleção na tela é uma simulação, não autenticação real. Mensagens digitadas pelo usuário também integram o contexto do modelo; a minimização descrita acima se aplica aos campos consultados pela ferramenta.
 
-## 3. Recuperação de políticas
+## Recuperação de políticas
 
-Implementado RAG lexical: extrair o PDF com pypdf em modo layout, separar por título de seção e página, limitar o tamanho dos trechos e preservar as continuações entre páginas. O manual atual gerou 27 trechos.
+O PDF gera 27 trechos com seção, página e ID. O ranking BM25 normaliza acentos e um vocabulário explícito de equivalências. Títulos recebem peso adicional e a busca retorna até quatro trechos por padrão. O manual pequeno favoreceu uma solução local e inspecionável.
 
-Ranking escolhido: BM25 com normalização de acentos e equivalências explícitas de vocabulário. Os títulos recebem peso adicional; até quatro trechos são fornecidos ao modelo por pergunta. Motivo: o manual é pequeno e a estratégia é local, inspecionável e não exige outro serviço de IA.
+Não há embeddings, reranking ou base vetorial. As 14 perguntas de recuperação revisadas encontram as seções esperadas no top 4; isso não cobre todas as reformulações. Score positivo não é garantia de relevância.
 
-Verificação inicial: as seções esperadas foram recuperadas entre os quatro primeiros resultados nas 14 perguntas revisadas. Isso é cobertura desse conjunto, não garantia de relevância geral. Não há embeddings nem busca semântica. Se surgirem falhas em reformulações ou perguntas com vários assuntos, registrar o caso e comparar alternativas.
+No chat, `buscar_politicas` fornece os trechos ao agente. O comando isolado `--ask` usa `PolicyRAG`, sem memória de conversa e com referências sequenciais `[P1]`, `[P2]`. Nesse comando, ausência de trechos encerra a resposta sem chamar o modelo. O chat usa IDs de seção/página, como `[P3.1-p3-1]`.
 
-O modelo precisa citar IDs dos trechos fornecidos. IDs inexistentes e ausência de citações são rejeitados. Essa validação não verifica automaticamente se o conteúdo da resposta é fiel à fonte; é necessário revisar os exemplos gerados.
+A validação verifica os IDs reconhecidos e algumas condições de conteúdo. Não compara automaticamente cada afirmação ou valor com a fonte, nem garante resistência a prompt injection. Triagem e estilo continuam parcialmente dependentes da geração.
 
-Validação real inicial: executados e revisados dois cenários na Groq, com autorização para envio dos trechos do manual. O cenário de devolução mostrou uma confirmação antecipada sem data de recebimento. A instrução foi reforçada para explicar condições sem confirmar elegibilidade e perguntar explicitamente a data ausente; a repetição passou nessa revisão. Essa correção de prompt não garante acerto em todas as perguntas e deve continuar sendo avaliada com variações.
+## Provedores e configuração
 
-Dados sem correspondência não provocam geração. Não há memória de conversa nessa primeira versão do RAG por terminal. O envio do conteúdo do manual a um provedor externo depende de autorização.
+Gemini Flash-Lite (`gemini-3.5-flash-lite`) foi selecionado para a demonstração após limites de capacidade nos testes anteriores. A escolha considerou suporte a ferramentas e capacidade gratuita observada, sem benchmark controlado de superioridade. Groq/Qwen continua disponível; Ollama tem contratos HTTP simulados testados, mas não execução validada com modelo instalado.
 
-## 4. Provedores do modelo: Groq e Ollama
+Groq e Gemini usam chat compatível com o formato OpenAI; o adaptador preserva as assinaturas opacas das chamadas de ferramenta do Gemini. Ollama usa sua API nativa. Não há troca automática de provedor. O intervalo opcional entre chamadas é por cliente HTTP/sessão e não coordena cotas entre usuários.
 
-Decisão confirmada em 31/10/2026: suportar Groq e Ollama, com escolha explícita por configuração. A alternativa inicial DeepSeek foi substituída por esta combinação para permitir uso do plano gratuito da Groq ou execução local.
+`.env.example` e a configuração de ambiente sem seleção explícita usam Ollama. O README orienta selecionar Gemini para reproduzir a demonstração. A interface lê o ambiente e permite aplicar outra seleção; o padrão interno de `DemoConfig` é Groq. Essas opções não provocam chamadas ao abrir a tela.
 
-Modelos iniciais configuráveis: `qwen/qwen3.8-27b` na Groq e `qwen3:8b` no Ollama. Groq validada em chamadas reais de saudação e chamada/retorno de ferramenta. Ollama ainda não validado com modelo local. Nenhuma contratação ou gasto pago foi autorizado; conferir cotas antes de novas chamadas.
+Chaves são lidas do ambiente/`.env`, fora do Git. A configuração JSON exporta preferências e modelos, sem credenciais ou identidade do cliente. O importador aceita o formato legado sem `gemini_model`; campos extras são rejeitados.
 
-Implementação: HTTP com httpx, sem framework de agentes nesta etapa. Groq usa o endpoint de chat compatível com o formato OpenAI; Ollama usa sua API nativa, permitindo desabilitar thinking e configurar contexto local. As diferenças de argumentos e respostas de ferramentas são normalizadas no conector.
+## Condução, testes e limites
 
-Motivo: separar o atendimento do provedor e tornar explícita a requisição enviada, sem exigir dois SDKs. Alternativa: usar um único SDK de compatibilidade para ambos. A API nativa do Ollama facilita controlar suas opções específicas; a camada comum mantém o restante do código independente.
+O candidato definiu referência de interface, persona, escopo, provedores e restrições de custo; orientou cenários e resultados esperados, revisou respostas e priorizou correções e simplificações. Codex apoiou implementação, automação, execução de testes e documentação. Os relatórios identificam a execução assistida e os critérios usados na revisão.
 
-Não há fallback automático, retries automáticos ou execução de ferramentas dentro do conector. O programa chamador deve validar a ferramenta solicitada e executar apenas as funções permitidas. A chave Groq não é retida na configuração Ollama nem enviada ao servidor local. Corpos de erros HTTP não são mostrados ao usuário.
-
-Um intermediário adicional de modelos não é necessário nesta versão. A integração direta reduz dependências de instalação e configuração para reproduzir o projeto.
-
-## 5. Inspiração e implementação independente
-
-Usar como inspiração o padrão de configuração e simulação de atendimento de um projeto já desenvolvido. Implementar o desafio em Python com dados e configurações próprios, sem dependência da infraestrutura do projeto de referência.
-
-## 6. Dados e limitações que precisam de tratamento
-
-- Status ativo não garante estoque; há item ativo esgotado.
-- Há itens descontinuados e um item coming_soon, inclusive com estoque positivo.
-- Algumas descrições divergem dos nomes e das especificações. Não completar essas divergências por suposição.
-- Os pedidos não fornecem data efetiva de recebimento nem canal de compra; solicitar esses dados para analisar arrependimento.
-- Totais históricos de pedidos podem diferir do catálogo atual; conservar o total registrado.
-- O manual traz contatos diferentes e regras gerais/específicas de parcelamento. Registrar como interpretar e quando encaminhar a dúvida.
-- A regra de frete não explicita a condição para exatamente R$ 500.
-- CSVs representam uma fotografia dos dados, não uma integração com estoque ou rastreamento ao vivo.
-- Definir uma identificação de cliente simulada e limitar pedidos ao cliente selecionado. Isso não equivale a autenticação de produção.
-- Instruções editáveis de estilo não devem permitir desativar as regras de consulta, privacidade e fidelidade às fontes.
-
-## 7. Critérios propostos para testar o agente
-
-Em 02/11/2026, a configuração inicial passou a incluir a persona completa definida para Lia: acolhedora, objetiva e consultiva; linguagem natural, sem emojis por padrão; até três opções; uma pergunta principal necessária por turno e encerramento sem insistência. O padrão é compartilhado entre terminal e interface por `DemoConfig`, mantendo personalização opcional e prioridade das regras fixas. As sessões e configurações anteriormente salvas não são sobrescritas.
-
-O roteiro `cenarios-de-teste.md` amplia a avaliação proposta para 32 casos, incluindo tom, continuidade, políticas ambíguas, disponibilidade, descontos, pedidos e tentativas de indução. Ter um resultado esperado não equivale a já ter executado a conversa com o modelo.
-
-1. Encontrar violões disponíveis dentro de um orçamento e manter o contexto no turno seguinte.
-2. Aplicar promoção ativa e explicar por que não acumula com PIX.
-3. Explicar uma devolução pedindo as informações ausentes.
-4. Consultar pedido do cliente de teste, sem inventar rastreamento ausente.
-5. Responder a pergunta fora do escopo e oferecer alternativa para produto indisponível.
-
-Além das conversas, testar funções críticas de preço, filtros e acesso a pedidos. Conferir manualmente as fontes recuperadas para as perguntas sobre políticas.
-
-## Correções após a auditoria e a rodada real de 02/11
-
-- Mantida a arquitetura Python com cinco ferramentas. `consultar_produto` aceita exatamente ID ou termo e localiza indisponíveis. A busca de recomendação mantém o filtro e, quando fica vazia por termo, também retorna modelos correspondentes indisponíveis em campo separado.
-- Criado `data/observacoes_dados.json` com evidências de divergência e notas por seção do manual. As notas têm origem própria, são distintas do texto recuperado e não substituem os dados fornecidos. Não há mapeamento de perguntas dos testes para respostas prontas.
-- Material de cordas é tratado somente em violões/ukuleles. Tipo elétrico usa o campo existente ou indicação explícita no nome/descrição da categoria, com origem declarada; ausência permanece desconhecida. Não inferir captação ou material a partir de campo contraditório.
-- O programa aplica até três resultados de recomendação por padrão; quantidade explícita de uma a cinco pode ampliar/reduzir o limite. A exportação mostra argumentos solicitados e efetivamente aplicados quando diferentes.
-- A validação permite repetir orçamento de busca vazia, mas não libera qualquer valor recebido do usuário. Referência inválida/ausente ou valor não fundamentado recebem uma oportunidade de correção de conteúdo, dentro das quatro rodadas; turnos só entram no histórico quando concluem. Isso é distinto de retry HTTP, que continua desativado.
-- Reorganizado o prompt com consulta, triagem, limites e fontes. Reforçadas respostas condicionais, aproveitamento do contexto, uma pergunta principal seguida de espera e escopo comercial. Essas instruções ainda dependem de cumprimento pelo modelo; não há alegação de máquina de estados ou aprovação automática de devoluções.
-- Adicionado intervalo opcional entre requisições na mesma sessão, padrão 0. Cotas pertencem ao provedor/plano e ficam separadas das limitações do protótipo. A opção não coordena sessões concorrentes nem garante evitar todo tipo de cota.
-- Escapados símbolos de moeda apenas na apresentação do chat para evitar interpretação LaTeX; o texto exportado permanece original.
-- Suíte ampliada de 42 para 53 testes, com regressões úteis para os casos observados. Após nova falha real de triagem, incluída guarda conservadora para algumas aberturas de confirmação em casos pessoais, com correção de conteúdo dentro do limite existente. Não é classificador completo nem validação de elegibilidade. Revalidação real em andamento, separada da primeira rodada no navegador; evidências antigas preservadas.
-- Evolução proposta para um produto real documentada em `evolucao-produto.md`, com prioridades e critérios, sem tratar propostas como capacidades implementadas.
-
-## Pendências atualizadas
-
-- Prazo informado pelo candidato: 03/11/2026 às 23h59. Conferir eventual fuso específico no e-mail. Priorizar uma primeira versão completa em 31/10.
-- Groq configurada e testada; validar Ollama com modelo instalado e respeitar as cotas disponíveis.
-- Revisar as cinco conversas e ampliar testes com variações, ambiguidades e tentativa de induzir respostas sem fontes.
-- Revisão final da entrega e mudança do repositório para público permanecem pendentes; não publicar a aplicação nem enviar e-mail automaticamente.
-
-## 03/11/2026 - Provedor alternativo e vigência de campanhas
-
-Após a interrupção da rodada Qwen por cota diária, foi escolhido explicitamente Gemini Flash como alternativa externa. O conector mantém o mesmo agente, as mesmas cinco ferramentas, a recuperação lexical e os dados originais. Cada provedor tem sua credencial e endpoint fixos, sem reaproveitar chaves nem selecionar outro destino automaticamente.
-
-A listagem da API confirmou modelos Flash disponíveis. O Flash 3.8 apresentou indisponibilidade por alta demanda; o Flash 3.6 respondeu à geração curta e concluiu chamada/retorno de ferramenta. Por isso, o modelo preparado para a avaliação Gemini é `gemini-3.6-flash`. A API compatível exige devolver as assinaturas opacas das chamadas de ferramentas, preservadas pelo adaptador. Não são raciocínio exposto ao cliente.
-
-O importador aceita configurações antigas sem o campo Gemini, acrescentando somente o modelo padrão, sem mudar o provedor escolhido. Campos extras e credenciais continuam rejeitados. A suíte chegou a 57 testes passando, incluindo contratos de três provedores e regressão da campanha.
-
-Uma resposta real Qwen citou a campanha do manual sem qualificar a vigência operacional. Foi incluída guarda conservadora que solicita uma revisão quando uma campanha recuperada é mencionada sem ressalva sobre ativação/cadastro. Não é um classificador completo de promoções nem uma regra específica para o texto do cenário. O cadastro de ofertas ativas permanece a fonte de preço. A rodada Gemini usa um novo código fixado e não demonstra isoladamente que a troca do modelo causou melhora.
-
-## 03/11/2026 - Consolidação da avaliação e estados de pedido
-
-A rodada integral foi executada em Flash-Lite 3.5, após o limite diário observado no Flash 3.6. As 32 perguntas foram preservadas e os resultados separados por versão/modelo. Os cinco problemas iniciais motivaram retestes dirigidos; as respostas antigas permaneceram nas evidências.
-
-Pedido sem identificação ou não localizado é um estado normal da ferramenta, não um fato que precise de citação inventada. Para uma chamada única de consulta/listagem nesses estados, o programa apresenta orientação determinística a partir do resultado. Pedido ausente e de terceiro continuam com a mesma resposta. Pedidos autorizados seguem a geração com os dados minimizados e o total histórico.
-
-Foram esclarecidas as instruções sobre canal online já informado, status descontinuado com estoque positivo, escopo de instrumentos e qualificação de preços. Uma regressão de texto atribuiu sem frete ao total histórico; incluímos validação conservadora e teste reproduzível para impedir essa afirmação não documentada. A suíte final passou em 61 testes. Os retestes e suas ressalvas estão em validacao-gemini-2026-11-03.md.
-
-A entrega seleciona cinco exportações reais por variedade e demonstração dos fluxos. O relatório completo preserva as falhas e o histórico de revisão. Guardrails mais amplos, contexto de atendimentos anteriores e eventual fine-tuning são evolução proposta, com critérios de avaliação, não funcionalidades anunciadas como prontas.
+A suíte possui 61 testes locais, com respostas de API simuladas. As avaliações reais registram separadamente versão, modelo, falhas e retestes. As cinco conversas de entrega estão em [examples/](../examples/README.md). A [evolução proposta](evolucao-produto.md) não corresponde a funcionalidades já implementadas.

@@ -1,59 +1,40 @@
-# Agente de atendimento — Empório da Música
+# Empório da Música - agente de atendimento
 
-Protótipo do desafio técnico de AI Engineer da Artefact.
+Luccas Bassani | Desafio técnico de AI Engineer - Artefact | 03/11/2026
 
-## Situação atual
+[Repositório do projeto](https://github.com/LuccasBassani/emporio-agente)
 
-Desenvolvimento iniciado em 31/10/2026. Protótipo local com interface de configuração e chat, RAG sobre políticas, catálogo/preços, pedidos por cliente de teste, fontes e exportações implementados. A demonstração atual usa Gemini Flash-Lite; Groq e Ollama continuam configuráveis. Ollama permanece sem validação com modelo instalado.
+Protótipo em Python para responder dúvidas sobre instrumentos, preços, disponibilidade, pedidos e políticas da loja. Priorizei uma aplicação local simples de executar, com consultas verificáveis aos dados fornecidos e exemplos reais de atendimento.
 
-## Funcionalidades da primeira versão
+## Escopo e persona
 
-- Aplicação local em Python com interface Streamlit.
-- Configuração de nome, tom e instruções adicionais do agente.
-- Chat com histórico da sessão e botão para começar outra conversa.
-- Consulta de catálogo, disponibilidade, preços, promoções e pedidos nos CSVs.
-- Busca de trechos relevantes no PDF de políticas, com indicação da seção/página.
-- Exportação da conversa em Markdown ou texto e da configuração em JSON.
-- Visualização opcional das consultas e fontes usadas, sem expor raciocínio interno do modelo.
-- Pedidos restritos ao cliente fictício selecionado, sem enviar nomes ou contatos ao modelo.
+A Lia atende em português, com tom acolhedor, objetivo e consultivo. Deve aproveitar o contexto, fazer uma pergunta necessária por vez e redirecionar assuntos fora da loja. Em devoluções e garantias, orienta a análise pela equipe sem aprovar solicitações.
 
-### Persona e estratégia de conversa
+Defini a referência de interface, a persona e o escopo. A tela permite configurar o agente, conversar, conferir consultas e exportar conversas e configurações. A implementação é independente da referência utilizada e concentra a aplicação em Python.
 
-A Lia já inicia configurada como assistente virtual acolhedora, objetiva e consultiva, sem pressionar a compra. A configuração padrão orienta português brasileiro natural, ausência de emojis por padrão, parágrafos curtos, até três opções de produto e uma pergunta principal por turno somente quando necessária. Em reclamações e devoluções, deve manter empatia e explicar condições sem antecipar elegibilidade. O texto completo fica em `DEFAULT_INSTRUCTIONS`, em `emporio/profile.py`, e aparece preenchido na interface.
-
-Nome, tom e instruções continuam editáveis; a personalização é opcional. O estilo é enviado ao modelo junto das regras fixas de consulta e acesso, que têm prioridade. São orientações de geração, não garantias automáticas de comportamento. Configurações importadas preservam o conteúdo salvo, inclusive instruções vazias; sessões já abertas precisam ser reiniciadas para carregar o novo padrão.
-
-O [roteiro de cenários](docs/cenarios-de-teste.md) permite avaliar tom, continuidade, consultas e situações difíceis com critérios de aprovação explícitos. Ele distingue cenários propostos de evidências já executadas.
-
-O agente é inspirado na experiência de configuração e simulação de atendimento de um projeto já desenvolvido. A implementação é independente, em Python, sem copiar código ou depender da infraestrutura do projeto de referência.
-
-## Arquitetura
-
-Interface Streamlit -> agente Python -> ferramentas de consulta -> CSVs e políticas.
-O agente usa uma API de modelo para escolher ferramentas e redigir respostas.
-Filtros, cálculos de preço e validação dos parâmetros ficam no código Python.
+## Arquitetura e decisões técnicas
 
 ```mermaid
 flowchart LR
-    UI[Interface ou terminal] --> AG[Agente Python]
-    AG <--> LLM[Groq, Gemini ou Ollama]
-    AG --> CAT[Consultas estruturadas nos CSVs]
-    AG --> RAG[Recuperação BM25 no PDF]
-    CAT --> AG
-    RAG --> AG
-    AG --> OUT[Resposta com fontes e exportação]
+    UI[Interface Streamlit] <--> AG[Agente Python]
+    AG <--> LLM[Gemini, Groq ou Ollama]
+    AG <--> CAT[Catálogo: CSVs]
+    AG <--> ORD[Pedidos: CSVs]
+    AG <--> RAG[Políticas: BM25 no PDF]
 ```
 
-Groq, Gemini e Ollama são os provedores suportados. A seleção é explícita em `LLM_PROVIDER`, sem troca automática entre processamento local e externo.
-Groq e Gemini dependem de chaves próprias e das cotas disponíveis em cada conta. Ollama depende do servidor local e do modelo baixado.
-As chaves ficam em variáveis de ambiente ou `.env` local, fora do Git. Variáveis já definidas no ambiente têm prioridade sobre o arquivo; a seleção aplicada na interface controla o provedor/modelo das novas conversas. Os modelos são configuráveis. A Groq passou nos diagnósticos reais de saudação e chamada/retorno de ferramenta e em dois cenários de RAG sobre o manual, revisados manualmente. Ollama ainda não foi validado com modelo em execução.
+- **Python e Streamlit:** interface e agente na mesma linguagem, com pouca configuração para demonstrar o atendimento.
+- **Function calling e funções Python:** o modelo escolhe entre cinco ferramentas; o código valida argumentos, consulta CSVs e calcula preços com `Decimal`. O volume fornecido permite consultas diretas, sem banco de dados adicional.
+- **RAG lexical com BM25:** o manual é pequeno. A busca local recupera até quatro trechos, preservando seção e página, sem exigir um serviço de embeddings.
+- **Gemini Flash-Lite na demonstração:** suporte a ferramentas e capacidade gratuita observada nos testes. Groq é alternativa configurável; Ollama é opção local implementada, ainda sem validação com modelo instalado.
 
-A configuração atual de demonstração usa Gemini Flash-Lite 3.5, com suporte a ferramentas e capacidade gratuita observada na avaliação. Qwen na Groq permanece como alternativa compatível. A escolha não representa um benchmark controlado de superioridade: as execuções e revisões estão identificadas nos relatórios. Ollama é a opção local preparada, cuja qualidade ainda precisa de validação com um modelo instalado.
+O agente usa `httpx`, sem framework de agentes, para manter explícito o ciclo de chamada, execução e retorno das ferramentas. O prompt separa regras de consulta, limites e fontes das preferências de estilo. O contexto mantém os dois turnos anteriores completos.
 
-## Preparar e executar
+<!-- pagebreak -->
 
-Requer Python 3.12 ou superior para as versões fixadas das dependências. Ambiente verificado: Python 3.14.4 no Windows.
-No PowerShell, a partir da pasta do projeto:
+## Instalação e execução
+
+Requer Python 3.12 ou superior. Ambiente conferido: Windows com Python 3.14.4. No PowerShell, dentro da pasta do repositório:
 
 ```powershell
 python -m venv .venv
@@ -61,258 +42,59 @@ python -m venv .venv
 Copy-Item .env.example .env
 ```
 
-Copie o exemplo apenas na primeira configuração; preserve o `.env` se ele já contiver sua chave. Não é necessário ativar o ambiente virtual para usar os comandos abaixo.
-`requirements.txt` declara as dependências diretas; `requirements.lock.txt` registra as versões instaladas nesta etapa, incluindo dependências transitivas.
+Copie o exemplo apenas na primeira configuração. No `.env`, selecione Gemini e preencha sua chave, criada no [Google AI Studio](https://aistudio.google.com/apikey):
 
-### Abrir a interface
+```dotenv
+LLM_PROVIDER=gemini
+GEMINI_API_KEY=sua_chave
+GEMINI_MODEL=gemini-3.5-flash-lite
+```
 
 ```powershell
 .\.venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-Abra http://127.0.0.1:8501 no navegador. O servidor usa somente a interface local do computador. Para encerrar, pressione Ctrl+C no terminal.
+Abra [http://127.0.0.1:8501](http://127.0.0.1:8501). A Lia já vem configurada. Para testar pedidos, selecione **Cliente #2** e consulte o **pedido 8**; o **Cliente #6** tem o **pedido 9**, sem rastreamento. O expansor de cada resposta mostra consultas e fontes. A [captura da interface](docs/interface.png) apresenta o fluxo.
 
-1. Escolha nome, tom e instruções adicionais; selecione Groq, Gemini ou Ollama e confira o modelo.
-2. Clique em **Aplicar e iniciar nova conversa**. Alterações em rascunho não mudam uma conversa em andamento.
-3. Para testar pedidos, selecione o cliente fictício. **Cliente #2** tem o **pedido 8**; o **Cliente #6** tem o **pedido 9**, sem código de rastreamento.
-4. Envie mensagens. Em **Ver consultas e fontes**, confira os argumentos, resultados e trechos usados.
-5. Baixe a conversa em Markdown ou TXT. A caixa de seleção permite incluir ou omitir consultas e fontes.
-6. Baixe a configuração em JSON e recarregue-a por **Importar configuração** quando quiser reproduzir o estilo e a seleção de modelo.
+Trocar cliente, aplicar configuração ou iniciar nova conversa limpa o histórico atual. Os botões de download salvam a conversa em Markdown/TXT e a configuração em JSON. Chaves ficam no `.env`, fora do Git e das exportações; reinicie o servidor após alterá-las. Variáveis já definidas no processo têm prioridade sobre o arquivo.
 
-Aplicar ou importar configuração, trocar o cliente ou clicar em **Nova conversa** limpa o histórico atual. Exporte antes de trocar, se quiser guardá-lo. A configuração JSON não inclui chave, histórico ou identidade do cliente. Credenciais são lidas do `.env`; reinicie o servidor após alterá-las.
+### Outros provedores
 
-![Interface local de configuração e chat](docs/interface.png)
+Para Groq, use `LLM_PROVIDER=groq`, `GROQ_API_KEY` e `GROQ_MODEL=qwen/qwen3.8-27b`. Para Ollama, instale o servidor, execute `ollama pull qwen3:8b` e use `LLM_PROVIDER=ollama`, `OLLAMA_MODEL=qwen3:8b` e `OLLAMA_BASE_URL=http://127.0.0.1:11434`.
 
-### Usar Groq
+A seleção é explícita, sem troca automática de provedor. APIs externas dependem das cotas da conta. No nível gratuito do Gemini, confira as [condições de uso dos dados](https://aistudio.google.com/docs/pricing); esta demonstração utiliza dados fictícios e omite contatos pessoais nas consultas ao modelo.
 
-Edite somente o `.env` local:
-
-```dotenv
-LLM_PROVIDER=groq
-GROQ_API_KEY=sua_chave_pessoal
-GROQ_MODEL=qwen/qwen3.8-27b
-```
-
-Crie sua chave na [conta Groq](https://console.groq.com/keys) e confira as cotas do plano gratuito antes dos testes. A disponibilidade do modelo também depende da conta. Não coloque a chave em mensagens, commits ou capturas de tela.
-
-### Usar Gemini Flash
-
-```dotenv
-LLM_PROVIDER=gemini
-GEMINI_API_KEY=sua_chave_local
-GEMINI_MODEL=gemini-3.5-flash-lite
-```
-
-Crie a chave no [Google AI Studio](https://aistudio.google.com/apikey) e confira o nível gratuito e as cotas do projeto. O conector usa o endpoint compatível de chat e preserva as assinaturas opacas das chamadas de ferramentas. A chave é exclusiva deste provedor: uma chave da Groq ou a variável genérica `GOOGLE_API_KEY` não são reaproveitadas.
-
-Flash 3.6 passou nos diagnósticos e foi avaliado parcialmente, mas apresentou limite diário de 20 requisições no nível gratuito. Flash 3.8 retornou alta demanda nas sondagens. Flash-Lite passou em chamada/retorno de ferramenta e permitiu concluir a rodada dos 32. A escolha prioriza capacidade gratuita observada e integração simples; os resultados não constituem benchmark comparativo entre modelos.
-
-No nível gratuito, a [política do Google](https://aistudio.google.com/docs/pricing) informa uso do conteúdo para melhoria de produtos. Use apenas dados autorizados. Os testes do desafio usam trechos de políticas e catálogo fictícios e somente campos operacionais de pedidos, sem dados pessoais de clientes. Não há troca automática de provedor.
-
-### Usar Ollama local
-
-Instale o [Ollama](https://ollama.com/download/windows), deixe o servidor em execução e baixe o modelo:
-
-```powershell
-ollama pull qwen3:8b
-```
-
-Configure o `.env`:
-
-```dotenv
-LLM_PROVIDER=ollama
-OLLAMA_BASE_URL=http://127.0.0.1:11434
-OLLAMA_MODEL=qwen3:8b
-```
-
-Essa opção não exige chave Groq. A configuração acima usa o modelo no computador; não seleciona um modelo cloud. O download e o consumo de memória são requisitos adicionais para quem executar localmente.
-
-### Verificar o provedor
-
-```powershell
-.\.venv\Scripts\python.exe -m emporio --check
-.\.venv\Scripts\python.exe -m emporio --test-tools
-```
-
-`--check` faz uma chamada real de saudação. `--test-tools` verifica se o modelo solicita uma ferramenta de diagnóstico e usa seu resultado na resposta. Esse comando não testa catálogo ou políticas. Cada execução em um provedor externo consome a cota da API selecionada.
-
-Variáveis já definidas no processo têm prioridade sobre o `.env`. Rodar sem opções mostra a ajuda e não chama nenhum modelo.
-
-### Testes sem modelo
+### Testes e terminal
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv\Scripts\python.exe -m emporio --help
 ```
 
-Os testes usam respostas HTTP simuladas para verificar os dois protocolos, retorno de ferramentas, configurações e falhas. Não precisam de internet, chave ou modelo instalado e não demonstram a qualidade do atendimento real.
+Os testes locais não precisam de chave ou rede. O terminal também oferece catálogo, busca de políticas e chat. `--check` e `--test-tools` fazem chamadas reais de diagnóstico ao provedor selecionado.
 
-## Organização atual
+<!-- pagebreak -->
 
-- `emporio/config.py`: leitura e validação das configurações.
-- `emporio/llm.py`: requisições Groq/Gemini/Ollama e normalização de texto e ferramentas.
-- `emporio/catalog.py`: consultas e cálculos de preço em Python.
-- `emporio/tools.py`: ferramentas permitidas e validação de argumentos.
-- `emporio/agent.py`: escolha de ferramentas pelo modelo, histórico e exportação.
-- `emporio/orders.py`: pedidos vinculados ao cliente de teste definido pela aplicação.
-- `emporio/profile.py`: configuração validada e exportável, sem credenciais.
-- `emporio/ui.py` e `app.py`: interface Streamlit de configuração e chat.
-- `emporio/__main__.py`: diagnósticos, consultas e chat por terminal.
-- `emporio/policies.py`: extração por seção/página e busca lexical BM25.
-- `emporio/rag.py`: recuperação, geração e validação dos identificadores de fonte.
-- `data/`: cópias dos seis CSVs e do manual fornecido, sem alterar os originais.
-- `tests/`: testes de integração simulada dos conectores.
-- `docs/`: decisões, guia e diário.
+## Regras de dados e validação
 
-## Catálogo e agente por terminal
+Disponibilidade exige status ativo e estoque positivo. Uma promoção cadastrada como ativa prevalece sobre o desconto PIX, sem acumulação. Totais históricos dos pedidos são preservados. Divergências cadastrais e lacunas do manual ficam em notas separadas, sem alterar as fontes originais.
 
-Consulte os CSVs sem chamar o modelo:
+A aplicação fixa o cliente fora dos argumentos do modelo e restringe os pedidos a essa seleção. Pedido ausente e pedido de outro cliente recebem a mesma orientação. As ferramentas de pedidos retornam somente os campos operacionais necessários, sem nomes ou contatos de clientes.
 
-```powershell
-.\.venv\Scripts\python.exe -m emporio --catalog --category-id 5 --max-price 1000 --limit 3
-.\.venv\Scripts\python.exe -m emporio --catalog --query "Yamaha C40" --payment pix
-```
+**61 testes automatizados passaram**, cobrindo preços, acesso a pedidos, recuperação, contratos dos provedores e interface. As respostas de API são simuladas nesses testes. Uma avaliação com API real cobriu **32 cenários: 12 aprovados, 15 com ressalvas e cinco falhas**. Após correções, os cinco casos tiveram o objetivo principal atendido nos retestes, com ressalvas em dois deles. Uma regressão de frete no texto de pedido também foi corrigida e repetida.
 
-O orçamento considera o preço final para o pagamento escolhido, sem frete. Uma promoção ativa tem prioridade sobre o desconto PIX, sem acumulação. As promoções são determinadas pelo campo is_active, sem inferir vigência pela descrição ou pelo mês atual. Se houver mais de uma promoção ativa para o mesmo produto, o catálogo recusa a cotação até a regra ser esclarecida.
+Não houve nova rodada integral após a última correção. O [relatório de avaliação](docs/validacao-gemini-2026-11-03.md) distingue as revisões. Há [cinco exemplos reais](examples/README.md), também apresentados na seção de [exemplos de atendimento e revisão](docs/entrega.md).
 
-Valores monetários são calculados com Decimal e arredondamento ROUND_HALF_UP em centavos. Disponibilidade exige status active e estoque positivo. Itens discontinued ou coming_soon não são oferecidos para compra, mesmo com estoque cadastrado. O preço de um item indisponível pode ser informado como valor cadastrado, acompanhado do motivo da indisponibilidade.
+## Limitações e próximos passos
 
-Converse com o agente usando o provedor configurado:
+- A recuperação lexical pode perder reformulações; citações válidas não comprovam toda afirmação. Tom, triagem e condições de preço ainda variam na geração.
+- O cliente é selecionado para demonstração, sem autenticação real. CSVs são uma fotografia; o agente não executa compras, devoluções ou consultas ao vivo à transportadora.
+- O histórico fica na sessão, com dois turnos anteriores no contexto. Ollama ainda precisa de teste com modelo local; APIs externas dependem de disponibilidade e cota.
 
-```powershell
-.\.venv\Scripts\python.exe -m emporio --message "Quais violões disponíveis custam até R$ 1.000?"
-.\.venv\Scripts\python.exe -m emporio --chat --export local/conversa.md
-```
+Com mais tempo, priorizaria guardrails, triagem estruturada e memória de atendimentos anteriores. Para bases maiores, avaliaria busca híbrida no RAG e consultas a banco de dados ou APIs. Fine-tuning seria um experimento posterior para tom e comportamento, com conversas revisadas e avaliação independente. As propostas estão detalhadas na seção [Melhorias com mais tempo](docs/entrega.md#melhorias-com-mais-tempo).
 
-No chat, use `/sair` para encerrar e salvar a conversa. `--show-sources` mostra consultas e resultados. A exportação contém as mensagens, parâmetros e resultados completos das ferramentas, além das fontes citadas, sem credencial.
+## Uso de IA e condução do trabalho
 
-O modelo pode escolher buscar_produtos, consultar_produto, buscar_politicas, consultar_pedido ou listar_meus_pedidos. A ferramenta de políticas executa a recuperação do PDF antes de devolver contexto ao modelo; consultas operacionais ficam nas funções de catálogo/pedidos. Os nomes de funções são uma lista fechada, sem execução de código sugerido pelo modelo.
+Usei o Codex como ferramenta de apoio à implementação, à criação e execução de testes e à documentação. Conduzi a definição da referência de interface, persona, escopo e provedores, com atenção ao custo e à simplicidade da solução.
 
-Cada turno é limitado a quatro rodadas de geração e quatro chamadas de ferramenta por rodada. Somente turnos concluídos entram no histórico; o contexto inclui os dois últimos turnos completos. Não há persistência ou carregamento automático de sessões anteriores. As consultas usam a fotografia dos CSVs carregada ao iniciar a sessão, sem integração com estoque ao vivo.
-
-Os resultados enviados ao modelo omitem metadados repetidos de origem para reduzir o uso de tokens; a exportação preserva a consulta completa. Referências D83 identificam o produto 83 e referências P6.2-p6-1 identificam trechos das políticas. A validação de referências não verifica automaticamente a fidelidade de todas as afirmações ou valores da resposta.
-
-No plano gratuito da Groq, uma pergunta pode exigir várias chamadas ao modelo e exceder a cota de tokens por minuto. O programa informa o erro sem trocar de provedor ou repetir automaticamente. Aguarde a renovação da cota antes de tentar novamente. Uma conversa rápida de teste atingiu esse limite durante a validação inicial.
-
-A conversa real de [catálogo e PIX](examples/catalogo-e-pix.md) foi concluída com intervalo entre os turnos: o agente recuperou duas opções, interpretou a referência ao primeiro produto e consultou o preço no PIX. Essa execução foi revisada contra os CSVs e o cálculo Python; não demonstra acerto para todas as reformulações.
-
-Buscas por marca/modelo usam nome e categoria. As descrições livres não entram na busca porque há divergências no material fornecido. Filtros de cordas e captação usam os valores de specs; campo ausente não é tratado como falso. Ainda é necessário revisar divergências nas especificações antes de afirmar características não comprovadas.
-
-A consulta de um modelo específico aceita nome ou ID e inclui itens indisponíveis, preservando esgotado, descontinuado e em breve. A busca de recomendações continua filtrando disponíveis; se uma busca por termo não encontrar opções disponíveis, também expõe os modelos indisponíveis correspondentes. O agente limita a três recomendações por padrão; quantidades explícitas de uma a cinco podem ser atendidas. A exportação distingue parâmetros solicitados e aplicados quando o limite é ajustado.
-
-`data/observacoes_dados.json` registra conflitos por produto e ambiguidades por seção, com origem e orientação. Essas notas não alteram as fontes fornecidas e são identificadas separadamente do texto do manual. A busca de políticas e o RAG isolado incluem as notas pertinentes e preservam os trechos originais. O material de cordas só é filtrado em violões/ukuleles; para tipo elétrico, usa-se electronics quando existe ou indicação explícita no nome/descrição da categoria, sem tratar campo ausente como falso.
-
-Uma busca vazia pode repetir o orçamento consultado sem inventar uma fonte de produto. Valores sem referência que não correspondem a esse orçamento e referências inválidas recebem uma oportunidade de correção pelo modelo, dentro das quatro rodadas existentes. Isso não é retry de erro HTTP e não garante fidelidade de todas as afirmações. O prompt reforça triagem condicional, uma pergunta principal por vez e redirecionamento ao atendimento da loja.
-
-Uma checagem conservadora também pede revisão de algumas aberturas afirmativas em casos pessoais de devolução/garantia. Ela não decide elegibilidade, não cobre todas as paráfrases e pode ser insuficiente; o protótipo orienta a análise pela equipe. Uma triagem estruturada é uma evolução proposta, descrita no plano do produto.
-
-Qualificações comerciais como preço cadastrado atual e ausência de garantia de preço futuro são preservadas também no contexto compacto enviado ao modelo. Esse ajuste adicional foi coberto por teste automatizado; sua nova geração real ainda aguarda disponibilidade de cota.
-
-## Pedidos e cliente de teste
-
-A aplicação fixa o cliente fora dos argumentos do modelo. Uma consulta verifica essa associação antes de devolver informações; pedido inexistente e pedido de outro cliente recebem a mesma resposta. A interface começa uma conversa nova ao mudar a seleção para impedir mistura de históricos. Essa seleção é uma simulação local, não autenticação de produção.
-
-As ferramentas devolvem somente número, status, itens, total histórico e rastreamento, com metadados das fontes. Não incluem nome, telefone, e-mail, endereço, notas ou identidade do cliente. O total do pedido não é recalculado com os preços atuais. Código ausente permanece ausente, e não existe consulta ao site da transportadora nem data efetiva de recebimento.
-
-No terminal, o mesmo contexto pode ser selecionado explicitamente:
-
-```powershell
-.\.venv\Scripts\python.exe -m emporio --customer-id 2 --message "Qual o status do pedido 8?"
-```
-
-## Validação e limitações conhecidas
-
-A [avaliação inicial da persona em 02/11](docs/avaliacao-persona-2026-11-02.md) tentou os 32 cenários pela interface: 9 aprovados, 10 aprovados com ressalvas, 12 falhas e 1 bloqueado por cota. Foram exportadas 29 conversas completas. Essa rodada orientou as correções, mantendo as evidências originais.
-
-As [revalidações de 02/11](docs/revalidacao-correcoes-2026-11-02.md) e a [retomada Qwen de 03/11](docs/validacao-qwen-retomada-2026-11-03.md) preservam o histórico de correções. Na retomada Qwen, 24 cenários foram concluídos: 14 aprovados, 9 com ressalvas e 1 falha em campanha. C25 foi interrompido por cota diária e C26–C32 não começaram. Os casos de continuidade/PIX, promoção sem acumulação e preço de indisponível foram concluídos nessa retomada. A descrição da campanha recebeu depois uma guarda de validação com teste de regressão.
-
-A [avaliação completa com Gemini Flash-Lite](docs/validacao-gemini-2026-11-03.md) tentou os 32 cenários com API real e Streamlit AppTest: 12 aprovados, 15 com ressalvas e 5 falhas. Após ajustes pequenos, nove casos foram repetidos e houve uma conferência adicional de pedido. Os cinco problemas iniciais tiveram o objetivo principal atendido nos retestes; permanecem ressalvas de linguagem, condições de preço e condução de atendimento. O relatório mantém as falhas iniciais, as revisões de código e os limites da revalidação, sem declarar uma nova rodada integral na última revisão.
-
-- 61 testes automatizados de preços, disponibilidade, acesso a pedidos, recuperação, observações de auditoria, qualificações comerciais, correção de referências e aberturas de triagem, protocolos de IA, espaçamento opcional e fluxo da interface via Streamlit AppTest. As chamadas nesses testes são simuladas e não consomem API. A instalação em um segundo ambiente limpo foi conferida anteriormente com a suíte de 42 testes; as dependências não mudaram nesta correção.
-- Exemplos reais em [examples/](examples/README.md), com catálogo/continuação, políticas, pedido e atendimento fora do escopo. A seleção atual foi executada com Gemini Flash-Lite pela interface via AppTest; modelos e revisões constam do índice dos exemplos. Envio de mensagem, importação da configuração e downloads Markdown/TXT/JSON também foram conferidos no navegador.
-- RAG lexical pode falhar em reformulações ou recuperar trechos incompletos; citações válidas não garantem fidelidade de todas as afirmações. O comportamento de triagem de devolução ainda depende do modelo.
-- Instruções de estilo são subordinadas às regras fixas no prompt e às validações do código. Isso não é uma garantia absoluta contra prompt injection.
-- Histórico em memória da sessão, com dois turnos anteriores no contexto. Sem gravação automática de conversas nem credenciais exportadas. Recarregar ou encerrar a sessão pode perder o histórico; use o download.
-- Ollama tem suporte de protocolo testado com respostas simuladas, mas ainda não foi validado com um modelo local instalado.
-- Os dados e políticas são uma fotografia fornecida pelo desafio. Não há integração com WhatsApp real, estoque ao vivo, transportadora ou operações de compra/devolução.
-
-### Condições de execução do provedor
-
-As execuções externas usam os provedores selecionados e ficam sujeitas às cotas e à disponibilidade de cada conta/modelo. Interrupções por cota são registradas separadamente da avaliação de conteúdo. Capacidade e disponibilidade dependem do modelo e do plano utilizados; alterar o provedor/modelo exige nova validação. A cota externa não é um defeito da lógica do agente. O programa informa o erro, mantém a pergunta e oferece nova tentativa explícita, sem retry HTTP ou fallback automático.
-
-`LLM_MIN_INTERVAL_SECONDS` permite espaçar chamadas na mesma sessão, inclusive chamadas internas de ferramentas. O padrão é 0 (desativado); por exemplo, 65 aplica 65 segundos entre os inícios das requisições. Reinicie a aplicação após alterar o `.env`. É uma opção de execução conforme a conta utilizada, sem garantia de evitar limites de tamanho, minuto ou dia, e não coordena cotas entre várias sessões.
-
-### Com mais tempo de desenvolvimento
-
-Priorizaríamos guardrails de resposta e recuperação de erros; correção dos dados na origem e políticas versionadas; identificação/autorização reais; avaliação contínua; triagem estruturada e contexto de atendimentos anteriores com retenção e controle de acesso. Integrações de estoque, frete e atendimento humano viriam conforme necessidade. Fine-tuning seria avaliado depois, com conversas revisadas e teste independente, para comportamento e tom; preços e disponibilidade continuariam consultados nas fontes. Compararíamos outros modelos e recuperação semântica somente mediante ganho medido sobre BM25. O [plano de evolução do produto](docs/evolucao-produto.md) explica prioridades e critérios de aceitação. Essas propostas não são apresentadas como funcionalidades existentes.
-
-## RAG sobre políticas
-
-O fluxo implementado é: pergunta -> busca no índice do PDF -> seleção de até quatro trechos -> geração pelo modelo -> resposta com citações e registro das fontes. O modelo recebe os trechos selecionados, não o manual inteiro.
-
-A extração preserva seção, página e um identificador para cada trecho. Uma seção que continua na página seguinte mantém seu número e recebe a página correta. A busca usa BM25 com normalização de acentos e um vocabulário explícito de equivalências em português. Não usa embeddings nem banco vetorial.
-
-Para verificar somente a recuperação, sem enviar dados à API:
-
-```powershell
-.\.venv\Scripts\python.exe -m emporio --retrieve "Posso acumular promoção com PIX?" --show-sources
-```
-
-Para gerar uma resposta real e exportar a evidência:
-
-```powershell
-.\.venv\Scripts\python.exe -m emporio --ask "Comprei online e quero devolver. Como funciona?" --show-sources --export local/teste-rag.md
-```
-
-`--ask` envia os trechos recuperados ao provedor selecionado. Com Groq ou Gemini, isso transmite conteúdo do manual ao serviço externo selecionado; use apenas com autorização sobre esse conteúdo. Com o endereço local padrão do Ollama e modelo local, a geração é feita no computador.
-
-A exportação inclui pergunta, resposta, modelo/provedor e os trechos recuperados com seção e página. Citações `[P1]`, `[P2]`, etc., identificam esses trechos. O programa rejeita uma resposta sem citação ou com ID inexistente; isso verifica a referência, mas não prova que cada afirmação foi corretamente interpretada. A revisão de fidelidade continua sendo parte dos testes.
-
-Se não houver correspondência lexical, o programa informa a ausência e não chama o modelo. Um score positivo não é uma probabilidade de relevância. Perguntas reformuladas fora do vocabulário podem falhar, e perguntas com muitos assuntos podem exigir mais contexto. O comando atual trata uma pergunta por execução, sem memória de conversa.
-
-`tests/policy_questions.json` contém 14 perguntas revisadas para verificar a presença das seções esperadas entre os quatro primeiros resultados. O conjunto é pequeno e não representa uma avaliação ampla de qualidade.
-
-Dois cenários reais de geração, sobre promoção/PIX e devolução, estão registrados em [examples/](examples/README.md), com as respostas exportadas e os trechos recuperados. O teste de devolução levou a um ajuste da instrução para pedir a data de recebimento antes de concluir elegibilidade. O cenário foi repetido e a nova resposta revisada; o ajuste de prompt não garante esse comportamento em todas as reformulações.
-
-## Entrega planejada
-
-- Código com instruções reproduzíveis de instalação e execução.
-- Justificativas, suposições e limitações conhecidas.
-- Entre 3 e 5 conversas reais de teste exportadas, incluindo aplicação de regras.
-- Histórico de commits representando etapas reais do desenvolvimento.
-- Declaração de uso de IA.
-
-## Uso de IA até o momento
-
-Codex foi usado para ler o enunciado, examinar os dados, consultar documentação oficial, analisar a referência de interface, implementar o protótipo e seus testes, executar avaliações assistidas via AppTest e preparar documentação e exportação em PDF. As escolhas de escopo e provedores foram discutidas durante o desenvolvimento. O fluxo de trabalho foi incremental: implementar, executar testes locais e reais, revisar falhas, registrar decisões e salvar commits. Um exemplo foi a correção da triagem de devolução após uma resposta que confirmou elegibilidade antes de perguntar a data de recebimento. Evidências e limitações estão registradas no diário.
-
-## Documentação
-
-- [Auditoria dos dados e ambiguidades do material fornecido](docs/auditoria-dados-2026-11-02.md)
-- [Avaliação Gemini e retestes](docs/validacao-gemini-2026-11-03.md)
-- [Evolução proposta: guardrails, contexto e fine-tuning](docs/evolucao-produto.md)
-- [Guia para acompanhar as etapas](docs/guia-do-projeto.md)
-- [Decisões e questões em aberto](docs/decisoes.md)
-- [Diário do desenvolvimento](docs/diario.md)
-
-## Referências técnicas consultadas
-
-- https://docs.streamlit.io/develop/api-reference/chat
-- https://docs.streamlit.io/develop/api-reference/widgets/st.download_button
-- https://console.groq.com/docs/openai
-- https://console.groq.com/docs/tool-use/overview
-- https://console.groq.com/docs/rate-limits
-- https://docs.ollama.com/api/chat
-- https://docs.ollama.com/capabilities/tool-calling
-
-## Exportar a documentação em PDF
-
-O exportador reúne este README e os arquivos Markdown de `docs/`, com sumário, links, paginação e manifesto SHA-256 das fontes Markdown normalizadas em UTF-8/LF. Registros datados permanecem como histórico; a situação atual é apresentada neste README e na avaliação mais recente.
-
-```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements-docs.txt
-.\.venv\Scripts\python.exe scripts/exportar_documentacao.py
-```
-
-Saída: `output/pdf/emporio-agente-readme-documentacao.pdf`. O script usa as fontes Arial e Consolas disponíveis no Windows; essa dependência é apenas do exportador, não do atendimento. O PDF não incorpora `.env`, credenciais nem conversas locais não selecionadas.
-
-Referências do conector Gemini: [compatibilidade de chat](https://aistudio.google.com/docs/openai), [assinaturas de ferramentas](https://ai.google.dev/gemini-api/docs/generate-content/thought-signatures) e [modelos](https://aistudio.google.com/docs/models).
+Também orientei os cenários de teste e os resultados esperados, revisei respostas e priorizei correções. Ao identificar propostas complexas para o desafio, direcionei sua simplificação. O trabalho avançou em incrementos, usando consultas, respostas e testes para revisar o resultado de cada etapa.

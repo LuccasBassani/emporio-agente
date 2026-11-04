@@ -6,6 +6,8 @@ Rodada integral de 32 cenários com `gemini-3.5-flash-lite`, persona padrão da 
 
 Código da rodada integral: `163ef3c`. A instrumentação espaçou inícios de chamadas em 20 segundos e registrou metadados seguros. As respostas não foram simuladas nem editadas manualmente. A leitura assistida por Codex comparou respostas, consultas e fontes com os critérios previamente definidos em `cenarios-de-teste.md`. Classificações incluem objetivo funcional, estilo e execução.
 
+O candidato orientou os cenários e resultados esperados, participou da revisão das respostas e priorizou as correções. Codex apoiou a automação, a execução e a leitura das evidências. Cada resultado abaixo pertence à revisão de código indicada; os retestes não substituem a rodada integral inicial.
+
 ## Rodada integral
 
 **32 casos tentados: 12 aprovados, 15 aprovados com ressalvas e 5 falhas.** Foram 30 conversas concluídas; C24 e C27 terminaram em erro de referências, mesmo após uma tentativa adicional pelo botão. Os outros três casos com falha entregaram uma resposta com desvio de conteúdo ou continuidade.

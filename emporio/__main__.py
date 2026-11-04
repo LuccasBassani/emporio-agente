@@ -17,7 +17,7 @@ from emporio.orders import Orders
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Diagnóstico de IA e RAG das políticas da loja.")
+    parser = argparse.ArgumentParser(description="Agente de atendimento: catálogo, políticas, pedidos e diagnósticos de IA.")
     commands = parser.add_mutually_exclusive_group()
     commands.add_argument("--check", action="store_true", help="Faz uma chamada real ao modelo.")
     commands.add_argument("--test-tools", action="store_true", help="Testa chamada e retorno de uma ferramenta real de diagnóstico.")
@@ -33,7 +33,7 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=5, help="Limite de resultados na consulta local.")
     parser.add_argument("--customer-id", type=int, help="Cliente fictício para consultas de pedidos nesta sessão.")
     parser.add_argument("--show-sources", action="store_true", help="Exibe o texto completo dos trechos recuperados.")
-    parser.add_argument("--export", type=Path, metavar="ARQUIVO.md", help="Exporta pergunta, resposta e trechos do teste de RAG.")
+    parser.add_argument("--export", type=Path, metavar="ARQUIVO.md", help="Exporta a conversa ou resposta de RAG, com consultas e fontes.")
     args = parser.parse_args()
     if args.export and not (args.ask or args.message or args.chat):
         parser.error("--export requer --ask, --message ou --chat")

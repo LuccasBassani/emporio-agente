@@ -1,34 +1,33 @@
-# O que melhoraríamos com mais tempo
+# Evolução proposta
 
-O protótipo prioriza um atendimento reproduzível com Python, fontes inspecionáveis e consultas de leitura. Esta lista descreve evolução proposta para um produto real; não são funcionalidades existentes nem requisitos adicionais para executar o desafio.
+Este plano parte das limitações observadas nos testes. As propostas não são funcionalidades implementadas nem requisitos para executar o protótipo. A versão resumida está na seção [Melhorias com mais tempo](entrega.md#melhorias-com-mais-tempo).
 
-| Prioridade | Melhoria | Por que importa | Como avaliar |
-| --- | --- | --- | --- |
-| 1 | Guardrails de resposta e recuperação de erros | Além de validar argumentos e fontes, conferir afirmações de estoque/status, escopo comercial e dados ausentes. Ampliar o tratamento de estados normais, já aplicado a pedidos sem identificação/não localizados, com resposta segura e clara. | Nenhuma confusão entre descontinuado e estoque zero; nenhuma oferta fora do catálogo; resposta adequada mesmo sem pedido autorizado; redução de falhas de referência. |
-| 1 | Governança do catálogo e das políticas | As fontes divergem e não têm histórico operacional completo. Validar cadastros na origem, definir responsáveis, versão e vigência; manter um fluxo de revisão das observações. | Redução de conflitos abertos; rastreabilidade de qual versão fundamentou cada resposta; nenhuma alteração silenciosa de histórico. |
-| 1 | Identificação e autorização reais | A escolha de cliente na tela é apenas demonstração. Integrar autenticação e autorização por pedido, com minimização de dados e separação de sessões. | Testes de acesso cruzado, expiração de sessão e ausência de exposição de dados pessoais em logs ou respostas. |
-| 1 | Avaliação contínua do atendimento | Os exemplos atuais são pequenos e o comportamento depende do modelo. Ampliar paráfrases, conversas longas, perguntas ambíguas e tentativas de desviar as regras. Separar acerto factual, estilo e falha de execução. | Comparar versões sobre conjunto fixo e perguntas novas; medir escolha de ferramenta, fidelidade à fonte, triagem e conclusão do atendimento. |
-| 2 | Triagem estruturada de devolução e garantia | A instrução de uma pergunta por vez não garante coleta completa. Modelar campos pendentes e estados de atendimento, com confirmação humana para decisões e exceções. | Nenhuma elegibilidade confirmada sem dados obrigatórios; aproveitamento de informações já fornecidas; encaminhamento em caso de dúvida. |
-| 2 | Integrações operacionais e atendimento humano | Os CSVs são uma fotografia. Conectar estoque, pedidos, frete e suporte por interfaces autenticadas. Separar claramente consulta de qualquer ação de escrita e exigir confirmação quando cabível. | Contratos de integração, dados atualizados, protocolo real quando houver registro e recuperação de erros sem duplicar ações. |
-| 2 | Histórico e observabilidade com retenção definida | Hoje o histórico é de sessão. Salvar somente o necessário, com consentimento/regras de retenção, controle de acesso e registros de consultas, erros, latência, consumo e versões de configuração. | Reproduzir incidentes sem registrar credenciais ou dados excessivos; apagar dados conforme a retenção definida. |
-| 2 | Contexto de atendimentos anteriores | Recuperar preferências e informações já fornecidas pelo próprio cliente identificado, com resumo estruturado, origem e validade. Separar isso dos dados operacionais atuais. | Não repetir canal ou recebimento já informados; lembrar preferências relevantes em conversas longas; nunca misturar clientes; consultar novamente preços e estoque. |
-| 3 | Comparar recuperação e modelos | BM25 é simples para este manual. Testar busca híbrida/semântica e reranking apenas se houver falhas medidas. Comparar modelos locais e APIs usando o mesmo conjunto de avaliação. | Ganho de relevância e fidelidade que justifique custo, latência e complexidade adicionais; não assumir que embeddings são automaticamente melhores. |
-| 3 | Avaliar fine-tuning orientado a comportamento | Depois de melhorar prompts, dados e validação, estudar adaptação de um modelo compatível usando conversas revisadas para tom, triagem e escolha de ferramentas. | Comparar com o modelo base em perguntas novas e conjunto separado de avaliação; medir qualidade, custo e latência antes de adotar. |
+## 1. Guardrails, triagem e avaliação
 
-## Guardrails, memória e adaptação do modelo
+Ampliaria a validação de afirmações de preço, estoque, regras e campos ausentes contra os resultados das ferramentas. A triagem teria campos explícitos de canal, recebimento e condições do item, com encaminhamento à equipe quando faltasse informação. As proteções atuais são parciais e não eliminam alucinações ou desvios de instrução.
 
-Os testes reais mostram por que instruções no prompt não bastam: houve repetição de dados já informados, confusão entre status e estoque e dificuldade de responder quando uma consulta não produz fontes. A próxima evolução seria combinar regras determinísticas nas ferramentas, validação da resposta e encaminhamento claro quando faltar informação. As proteções existentes são parciais; não constituem garantia geral contra alucinação ou desvio de instruções.
+Para avaliar o ganho, usaria perguntas novas, reformulações, conversas longas e tentativas de desviar as regras. Manteria separados acerto factual, escolha de ferramenta, continuidade, estilo e falha de execução. Os 32 cenários usados no desenvolvimento não seriam o único conjunto de avaliação.
 
-Para memória de atendimento, começaríamos com campos resumidos e revisáveis, como instrumento de interesse, orçamento, pedido em discussão e condições de uma solicitação. Só recuperaríamos histórico vinculado à identificação/autorização do cliente, com retenção definida. Preço, disponibilidade, rastreamento e política vigente continuariam consultados nas fontes operacionais; uma conversa antiga não comprova esses fatos atuais.
+## 2. Contexto de atendimentos anteriores
 
-Fine-tuning seria um experimento posterior de comportamento, não um mecanismo de atualização do catálogo. Exigiria exemplos curados, base legal/consentimento para os dados e suporte do modelo/serviço escolhido. Os 32 cenários usados no desenvolvimento não bastariam como único conjunto de avaliação: separaríamos treinamento, validação e perguntas novas para medir generalização. Não há treinamento, contratação ou ajuste de pesos implementado neste protótipo. A abordagem de medir o modelo base antes de adaptar e usar avaliação separada segue as orientações de [tuning do Google](https://cloud.google.com/blog/products/ai-machine-learning/master-gemini-sft) e de [avaliação de comportamento](https://ai.google.dev/responsible/docs/alignment).
+Começaria por resumos e campos revisáveis por cliente identificado: instrumento de interesse, orçamento, pedido em discussão e informações já fornecidas. O acesso ao histórico teria autorização, retenção definida, origem e validade dos registros.
 
-## Provedor e capacidade de execução
+Informação antiga não comprova preço, estoque, rastreamento ou política atual. Esses fatos continuariam consultados nas fontes. Os testes verificariam continuidade e ausência de mistura entre clientes.
 
-Cotas pertencem ao provedor e ao plano escolhido. Para operação contínua, dimensionar volume esperado, modelo, disponibilidade e orçamento; medir chamadas e tokens por atendimento. Um plano com capacidade adequada pode remover o gargalo observado no plano gratuito, mas qualquer novo modelo/provedor precisa passar pela mesma avaliação funcional.
+## 3. Recuperação e consultas para bases maiores
 
-O programa deve informar falhas com clareza e preservar o contexto válido. O intervalo entre chamadas é uma opção de execução, desativada por padrão; não é uma solução geral para toda cota. Eventual retry futuro deve considerar o tipo de erro e a indicação do provedor, sem repetir operações de escrita nem mudar silenciosamente o destino dos dados.
+Para mais documentação, avaliaria busca híbrida de BM25 e embeddings, reranking e divisão dos documentos em trechos que preservem contexto. Metadados de seção, versão e vigência ajudariam a filtrar fontes. A comparação mediria recuperação relevante, fidelidade, custo e latência.
 
-## O que evitaríamos agora
+Para dados operacionais maiores ou atualizados, substituiria os CSVs por banco de dados ou APIs, com consultas parametrizadas, índices, filtros e paginação. Manteria cálculos e autorização no código, dentro de ferramentas delimitadas. Corrigiria conflitos na origem e registraria a versão dos dados usados na resposta.
 
-Não adicionaríamos infraestrutura de produção, canais reais ou um banco vetorial apenas para aumentar a quantidade de tecnologias. A próxima etapa seria corrigir os casos reproduzidos e comparar os resultados antes e depois. Cada evolução acima deve responder a uma necessidade observada e ter um critério de aceitação.
+## 4. Fine-tuning de comportamento
+
+Depois de melhorar dados, prompts e validações, avaliaria adaptação de um modelo compatível com conversas revisadas para tom, triagem e escolha de ferramentas. Treino e avaliação usariam conjuntos separados; a adoção dependeria de ganho medido frente ao modelo base.
+
+Não há ajuste de pesos implementado. Fine-tuning não substituiria as consultas de preço e disponibilidade nem resolveria, por si só, cadastros inconsistentes.
+
+## 5. Requisitos para uso operacional
+
+Acrescentaria autenticação e autorização reais, integrações de estoque/pedidos, atendimento humano e observabilidade de consultas, erros, consumo e latência, com minimização de dados e retenção definida. Operações de escrita exigiriam controle de duplicidade e confirmação apropriada.
+
+Dimensionaria o provedor conforme volume e orçamento. O intervalo atual entre chamadas é por sessão e não controla a capacidade global da conta. Eventual retry futuro distinguiria o tipo de erro e manteria explícito o destino dos dados.

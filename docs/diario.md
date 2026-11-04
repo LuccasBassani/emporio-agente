@@ -1,250 +1,39 @@
-# Diário do desenvolvimento
+# Histórico do desenvolvimento
 
-Registrar apenas ações realmente realizadas. Separar observação, decisão e resultado de teste.
+Registro resumido das etapas realizadas. As contagens de testes e pendências abaixo pertencem a cada momento. O [README](../README.md) e a [avaliação Gemini](validacao-gemini-2026-11-03.md) apresentam a versão de entrega. O histórico completo das alterações permanece nos commits.
 
-## 31/10/2026 — Entendimento e levantamento inicial
+## Direcionamento e uso de IA
 
-### Realizado
+Conduzi a definição da referência de interface, persona, escopo, provedores e custo. Também orientei os testes e seus resultados esperados, revisei respostas, priorizei correções e simplifiquei propostas desproporcionais ao desafio. Usei Codex como apoio à implementação, automação, execução de testes e documentação. Os relatórios identificam a execução assistida e os critérios usados na revisão.
 
-- Leitura do enunciado, do manual de políticas e dos seis CSVs com assistência do Codex.
-- Identificação de 65 produtos, 9 categorias, 50 clientes, 20 pedidos, 22 registros de itens e 25 promoções, sendo 4 ativas.
-- Verificação de que os itens referenciam produtos existentes e os pedidos referenciam clientes existentes.
-- Identificação de limitações e divergências dos dados, registradas em decisoes.md.
-- Análise da experiência de configuração de agente e simulação de atendimento de um projeto já desenvolvido, como inspiração para a interface.
-- Consulta à documentação oficial de preços e ferramentas da DeepSeek e aos elementos de chat e download do Streamlit.
-- Criação destes documentos iniciais em uma pasta independente.
-- Registrado o prazo de entrega em 03/11/2026.
-- Candidato solicitou iniciar o repositorio no GitHub como privado, com commits por etapas reais. A publicacao final devera atender a exigencia de repositorio publico do desafio.
-- Preparado .gitignore para evitar versionar credenciais, ambiente Python e exportacoes locais. Exemplos de entrega deverao ser revisados e incluidos explicitamente.
-- Criado o repositório privado LuccasBassani/emporio-agente, vinculado à pasta local. Primeiro envio com a documentação inicial e .gitignore.
-- Configurada autoria local com o perfil pessoal e endereço noreply do GitHub, sem alterar a configuração global do computador.
-- Criado guia com etapas, critérios de conclusão, conceitos técnicos e preparação da entrega.
-- Candidato confirmou entrega em 03/11 às 23h59, preferência por créditos gratuitos e intenção de adiantar a maior parte em 31/10.
+## 31/10/2026 - Escopo, dados e primeira implementação
 
-### Propostas ainda não implementadas
+- Leitura do enunciado, dos seis CSVs e do manual. Levantados 65 produtos, nove categorias, 50 clientes, 20 pedidos e 25 promoções, quatro ativas.
+- Definida aplicação independente em Python, usando como referência uma experiência de configuração e simulação de atendimento. Priorizado uso de opções gratuitas e desenvolvimento incremental.
+- Criados repositório, configuração de ambiente e conectores Groq/Ollama. A suíte inicial tinha sete testes de configuração e protocolo; Ollama não foi validado com modelo instalado.
+- Implementado RAG lexical sobre 27 trechos, com 14 perguntas de recuperação. A suíte chegou a 13 testes. Chamadas reais à Groq verificaram saudação e retorno de ferramenta.
+- O primeiro teste real de devolução confirmou possibilidade de devolver sem pedir a data de recebimento. A orientação de triagem foi ajustada e o cenário repetido; a nova resposta pediu a informação ausente.
+- Implementados catálogo e descontos com `Decimal`, cinco ferramentas de atendimento, contexto dos dois turnos anteriores e exportação. Uma primeira continuação de catálogo foi bloqueada por cota; outra sessão concluiu a consulta de PIX.
+- Acrescentados pedidos restritos ao cliente de teste e interface Streamlit. A suíte chegou a 42 testes. A instalação em um segundo ambiente foi conferida nessa etapa; o navegador foi usado para verificar mensagens, importação e downloads.
 
-- Aplicação Streamlit com configuração, chat, consultas e exportação.
-- Dados operacionais consultados por funções Python e políticas recuperadas por trechos.
-- Provedor de modelo configurável, inicialmente considerando DeepSeek.
+## 02/11/2026 - Persona, avaliação e correções
 
-### Resultados de testes
+- Consolidada a persona padrão da Lia e um roteiro com 32 cenários e resultados esperados.
+- A rodada assistida pelo navegador, com Groq/Qwen, registrou nove aprovados, dez com ressalvas, 12 falhas e um bloqueado por cota. As respostas foram preservadas como evidência da versão testada.
+- A auditoria identificou descrições divergentes, status comerciais incompatíveis com uma oferta de compra e ambiguidades do manual. Notas separadas passaram a acompanhar as consultas, preservando os dados originais.
+- Corrigidas busca de modelos indisponíveis, tratamento de orçamento sem resultado, instruções de triagem, limites de recomendações e apresentação de moeda. A suíte chegou a 54 testes.
+- A revalidação priorizada teve 18 cenários tentados: 15 atenderam ao objetivo principal, quatro com ressalvas; três ficaram pendentes naquela etapa. A interrupção diária e o HTTP 400 sem causa confirmada foram registrados separadamente dos erros de conteúdo.
 
-Ainda não há testes do agente nem chamadas à API. A verificação dos arquivos não demonstra qualidade de atendimento.
+## 03/11/2026 - Retomada e alternativa de provedor
 
-## 31/10/2026 — Ambiente e conectores de modelo
+- A tentativa inicial da rodada completa concluiu C14 e parte de C03 antes de nova interrupção por cota.
+- Na retomada Qwen, 24 casos concluíram: 14 aprovados, nove com ressalvas e uma falha de campanha. C25 foi interrompido e C26-C32 não começaram.
+- A escolha explícita de Gemini preservou o mesmo agente e as ferramentas. Flash 3.6 teve oito casos concluídos antes do limite diário observado; Flash-Lite permitiu executar os 32 cenários. Essas rodadas não são um benchmark controlado entre modelos.
 
-### Realizado
+## 03/11/2026 - Avaliação Gemini e versão de entrega
 
-- Confirmado suporte a Groq e Ollama, com seleção explícita de provedor e modelo.
-- Criado ambiente virtual com Python 3.14.4; instalados httpx e python-dotenv e registradas versões em requirements.lock.txt.
-- Copiados os seis CSVs e o manual para data/, preservando o conteúdo dos arquivos fornecidos. Os nomes dos CSVs foram reduzidos ao nome da tabela e o PDF foi nomeado politicas_da_loja.pdf.
-- Implementadas validação da configuração, camada comum de resposta e adaptação dos protocolos de ferramentas da Groq e Ollama.
-- Adicionados diagnósticos por terminal para saudação e chamada/retorno de uma ferramenta de teste.
-- Preparado .env local sem chave e confirmado que ele e o ambiente virtual são ignorados pelo Git.
-- Implementação e documentação realizadas com assistência do Codex.
-
-### Verificação
-
-- Sete testes automatizados passaram, com subcasos para os dois provedores, retorno de ferramenta, isolamento de credencial, parâmetros inválidos, erros HTTP, timeout e resposta inválida/interrompida.
-- pip check não identificou incompatibilidades e o comando de ajuda executou corretamente.
-- Não foi encontrado serviço respondendo na porta local padrão do Ollama durante o levantamento inicial.
-
-### Limitações
-
-Não houve geração real: não foi configurada chave Groq e não foi encontrado Ollama em execução. Testes simulados validam o protocolo implementado, não disponibilidade de modelo, desempenho, qualidade em português ou qualidade do futuro atendimento. O agente de negócio e a interface continuam pendentes.
-
-## 31/10/2026 — Diagnóstico real Groq e RAG de políticas
-
-### Realizado
-
-- Configuração local selecionada como Groq, preservando a chave fora do Git.
-- Diagnósticos reais de saudação em português e chamada/retorno da ferramenta de teste concluídos com sucesso no modelo qwen/qwen3.8-27b.
-- Extraído o manual em 27 trechos com seção, página e ID. Implementada recuperação lexical BM25 com equivalências explícitas de vocabulário.
-- Implementado o fluxo de recuperação e geração, validação de IDs de citação e exportação de pergunta/resposta/trechos por terminal.
-- Adicionado conjunto de 14 perguntas revisadas e testes de recuperação, continuação de seções entre páginas e geração simulada.
-
-### Verificação e limitações
-
-- Treze testes automatizados passaram, incluindo os conectores e o RAG. Todas as 14 perguntas de recuperação encontraram as seções esperadas no top 4.
-- O teste de envio de políticas à Groq foi bloqueado antes da execução pela revisão automática porque o manual está marcado como interno. Solicitada autorização específica; nenhuma resposta real de políticas foi gerada até este registro.
-- A verificação lexical e de IDs não demonstra fidelidade de todas as afirmações do modelo. A geração real, perguntas adicionais e comportamento com histórico ainda precisam ser avaliados.
-- Código, testes e documentação desta etapa desenvolvidos com assistência do Codex.
-
-## 31/10/2026 — Validação real do RAG
-
-### Realizado
-
-- Recebida autorização explícita para enviar os trechos pertinentes das políticas da loja fictícia à Groq e salvar os resultados dos dois cenários no repositório privado.
-- Executado o cenário promoção + PIX; a resposta correspondeu à regra recuperada e citou a seção pertinente.
-- Executado o cenário de devolução online sem data de recebimento. A resposta inicial explicou o manual, mas começou com uma confirmação e não perguntou a data, contrariando o comportamento esperado.
-- Ajustada a instrução de triagem: em pedido de devolução específico com dados ausentes, apresentar condições sem confirmar elegibilidade e perguntar explicitamente quando o produto foi recebido.
-- Repetido o cenário de devolução; a nova resposta explicou as condições e perguntou a data de recebimento. Resposta revisada em relação aos trechos enviados.
-- Salvas as duas respostas finais reais em examples/, com pergunta, provedor/modelo e trechos recuperados. As respostas exportadas não foram editadas manualmente.
-
-### Limitações
-
-As evidências cobrem dois cenários de um turno, não todas as reformulações nem o conjunto completo do desafio. O ajuste depende de cumprimento da instrução pelo modelo. Não houve envio de dados de clientes. Ollama, continuidade de conversa, catálogo e pedidos continuam pendentes.
-
-## 31/10/2026 — Catálogo, preços e agente com ferramentas
-
-### Realizado
-
-- Implementadas consultas diretas aos CSVs de produtos, categorias e promoções, com filtros de orçamento final, nome/categoria, cordas, captação e disponibilidade.
-- Implementados cálculos Decimal, PIX não cumulativo e rejeição de múltiplas promoções ativas ambíguas. Produtos ativos esgotados, descontinuados e coming_soon preservam motivos distintos.
-- Implementado agente com ferramentas permitidas, recuperação de políticas, histórico dos dois últimos turnos completos e exportação de mensagens, consultas e fontes.
-- Adicionados comandos de consulta local, mensagem única e chat interativo no terminal.
-- Desenvolvidos código, testes e documentação com assistência do Codex.
-
-### Verificação inicial
-
-- Vinte e oito testes automatizados passaram, incluindo orçamento e arredondamento, promoções, status/estoque, chamada/retorno de ferramentas, fontes, histórico após erro e limites de execução.
-- Consulta local à categoria de violões até R$ 1.000 encontrou 12 produtos disponíveis; os resultados foram comparados aos CSVs.
-- Primeira busca real pela Groq apresentou corretamente as duas opções mais baratas. A pergunta de continuação atingiu a cota gratuita; não foi apresentada como um teste completo aprovado.
-- Removidos metadados repetidos dos resultados enviados ao modelo, preservando os dados completos nas evidências. Iniciada nova sessão para verificar o fluxo com intervalo entre turnos.
-- Nova sessão concluída e revisada: duas opções retornadas pelo catálogo e pergunta "o primeiro no PIX" corretamente relacionada ao produto 83. A ferramenta calculou R$ 408,41, valor que foi apresentado pelo modelo. Evidência real salva em examples/catalogo-e-pix.md, sem edição das respostas.
-- Acrescentado teste para o limite de contexto, verificando que mantém dois turnos completos e não separa chamadas dos resultados de ferramentas. A suíte final desta etapa contém 29 testes.
-
-### Limitações
-
-As verificações de referência e o teste de valores sem fonte não comprovam automaticamente a fidelidade de todas as afirmações. A geração segue dependendo da escolha correta de ferramentas e da interpretação pelo modelo. Não há consulta de pedidos, persistência de sessão nem interface gráfica nesta etapa.
-
-## 31/10/2026 — Pedidos e interface de configuração/chat
-
-### Realizado
-
-- Implementadas consulta e listagem de pedidos vinculadas ao cliente escolhido pela aplicação, sem permitir que o modelo forneça outra identidade.
-- Preservados total histórico, rastreamento ausente e ausência de data real de recebimento. Nome, contato, e-mail, notas e datas de pedidos não fazem parte do retorno para o modelo.
-- Implementadas configuração de nome/tom/instruções/modelos, importação e exportação JSON, chat com fontes, nova conversa e downloads Markdown/TXT com evidências opcionais.
-- Troca de cliente, aplicação e importação de configuração limpam a conversa anterior. Pergunta com erro pode ser repetida explicitamente e não entra no histórico até concluir.
-- Instalado Streamlit 1.66.1 no ambiente Python 3.14.4; revisado requisito mínimo de Python para 3.12 por causa das versões fixadas das dependências.
-
-### Verificação
-
-- Quarenta e um testes passaram na primeira rodada, incluindo pedidos, configuração e Streamlit AppTest com API simulada. Adicionado teste para conferir aplicação do perfil no prompt e exportação sem evidências; a suíte passou a conter 42 testes.
-- Após autorização explícita, a consulta real do pedido fictício 8 foi executada pela interface via AppTest com cliente #2. Status, item, total e rastreamento corresponderam aos CSVs. Evidência salva em examples/pedido-rastreamento.md.
-- Interface iniciada em 127.0.0.1:8501 e inspecionada no navegador. Uma pergunta sobre acessórios foi respondida conforme o escopo fixo e exportada em examples/fora-do-escopo.md.
-- Downloads Markdown, TXT e JSON realizados pelo navegador e conteúdo dos arquivos conferido. Configuração importada mudou o nome para Bia e limpou o chat; ao final, a configuração inicial Lia foi restaurada.
-- Captura da interface salva em docs/interface.png. O servidor local foi deixado em execução para revisão do candidato.
-- Dependências de requirements.lock.txt instaladas em um segundo ambiente virtual limpo com Python 3.14.4. Os 42 testes e o comando de ajuda passaram nesse ambiente; pip check não identificou incompatibilidades.
-- Código, testes, documentação e verificações desta etapa realizados com assistência do Codex.
-
-### Limitações
-
-Os testes da interface não demonstram todas as combinações de perguntas. Ollama não foi validado com modelo local em execução. Identificação é simulada; não há autenticação de produção, atendimento humano real ou operações de escrita em pedidos. A revisão para publicação e entrega continua pendente.
-
-## 02/11/2026 — Persona padrão e roteiro de avaliação
-
-### Realizado
-
-- Incorporado como padrão o texto de persona definido pelo candidato para Lia, preservando a possibilidade de personalização. O mesmo `DemoConfig` alimenta a interface e o agente por terminal; configurações importadas e sessões existentes não são sobrescritas.
-- Atualizada a apresentação da interface para indicar que a assistente já vem configurada; documentadas a estratégia de conversa e a precedência das regras fixas.
-- Preparados 32 cenários manuais com mensagens, cliente de teste quando necessário, critérios de aprovação e orientação de registro. Preços, status de itens, pedidos e políticas usados como resultados esperados foram conferidos nas fontes locais. Selecionados dez casos iniciais para uma rodada menor.
-- Atualizados testes existentes para verificar que as instruções padrão chegam ao prompt e aparecem preenchidas na interface.
-- Código, roteiro e verificação realizados com assistência do Codex.
-
-### Verificação e limites
-
-- Os 42 testes automatizados passaram; `git diff --check` não encontrou problemas de whitespace.
-- Esta etapa não fez chamadas reais à Groq nem ao Ollama. O roteiro é uma proposta de avaliação, não um registro de 32 conversas aprovadas. Os cinco exemplos anteriores continuam sendo evidências da configuração anterior à nova persona.
-- As instruções de estilo não garantem cumprimento em todas as respostas. Avaliar as conversas reais e registrar falhas antes de afirmar melhora de qualidade.
-
-## 02/11/2026 — Rodada real dos 32 cenários pela interface
-
-### Realizado
-
-- Com autorização do candidato, tentados todos os 32 casos do roteiro no navegador, pela interface Streamlit, com Groq e a persona padrão do commit 06a2fcd. Não houve alteração do código ou das instruções durante a rodada.
-- Exportadas 29 conversas completas em Markdown com consultas/fontes, cópias intermediárias dos casos de vários turnos e a configuração JSON usada. Casos sem resposta final receberam registro da mensagem de erro e captura da tela quando disponível.
-- Guardados arquivos completos em local/avaliacao/2026-11-02-persona/, fora do Git, com relatório navegável, resultados JSON e horários dos envios. Preparado pacote ZIP das evidências sem credenciais. O resumo foi registrado em docs/avaliacao-persona-2026-11-02.md, preservando os cinco exemplos de entrega anteriores.
-- O controle de cadência da automação inicialmente não aplicou os intervalos previstos. Após o primeiro bloqueio de C07, foi corrigido; os envios seguintes tiveram pelo menos 70 segundos entre si. Isso não eliminou bloqueios de perguntas que fazem várias chamadas internas.
-- Registradas novas tentativas em casos de cota, sem troca de provedor ou repetição automática pelo aplicativo. C13 permaneceu bloqueado após três tentativas; C27 e C31 concluíram após nova tentativa.
-- Operação do navegador, revisão de resultados e documentação realizadas com assistência do Codex.
-
-### Resultados e limites
-
-- 9 aprovados, 10 aprovados com ressalvas, 12 falhas e 1 bloqueado por cota. Os 32 foram tentados; isso não significa que os 32 geraram resposta final.
-- C09 e C28 não entregaram resposta por bloqueio de valor sem referência; o conteúdo recusado não foi exibido pela interface, então a causa completa ainda precisa de investigação. C13 não permite concluir sobre conteúdo por não ter resposta final.
-- Encontradas confirmação prematura de devolução/cobertura, interpretação indevida do frete de exatamente R$ 500, busca que omite modelos indisponíveis, excesso de opções, consultas omitidas e redirecionamento fora do escopo da loja. As citações válidas não impediram erros de interpretação.
-- A primeira falha de C06 teve somente registro incremental incompleto; sua causa não foi diagnosticada. A execução posterior concluída foi exportada e avaliada.
-- Os resultados não são apresentados como corrigidos. O código do agente permaneceu inalterado; os próximos passos são corrigir os casos reproduzidos, adicionar verificações úteis e repetir as conversas afetadas. Não foram repetidos os testes automatizados, pois esta etapa alterou apenas documentação e gerou evidências.
-
-## 02/11/2026 — Auditoria dos materiais antes das correções
-
-- Reexaminados os seis CSVs, o manual e as orientações do desafio, sem chamadas a modelos e sem modificar os dados. Confirmada igualdade byte a byte das cópias em data/ com os originais recebidos.
-- Conferidos IDs duplicados, referências entre tabelas, itens por pedido, JSONs de especificações, campos ausentes, promoções ativas e cálculos de reconciliação com preços atuais.
-- Confirmadas divergências entre marca/modelo, descrição e specs; combinações de status/estoque; totais históricos; parcelamentos inferiores aos limites do manual; catálogo parcial e campos de specs com sentidos diferentes conforme a categoria.
-- Identificado e-mail idêntico nos clientes 11 e 43, documentando somente os IDs. Não usar contato como chave única de identidade.
-- Revisitadas ambiguidades de frete, parcelamento e contatos do manual, distinguindo regras de troca/garantia, informações ausentes e procedimentos que o protótipo não executa.
-- Nenhuma referência órfã ou chave primária duplicada foi encontrada; todos os pedidos têm itens. A busca textual de padrões comuns de instrução maliciosa não encontrou ocorrências, sem prometer inspeção exaustiva de conteúdo oculto.
-- Evidências e orientações registradas em docs/auditoria-dados-2026-11-02.md. As divergências não foram atribuídas à intenção da empresa e não justificam alterar silenciosamente registros ou descartar as falhas da avaliação.
-- Análise e documentação com assistência do Codex. Nenhuma correção do programa foi implementada nesta etapa.
-
-## 02/11/2026 — Correções de consultas, notas de auditoria e validação
-
-### Implementado
-
-- Mantidas as cinco ferramentas, com consulta de modelo por nome/ID inclusive indisponíveis, fallback de modelos indisponíveis em busca vazia e limite padrão de três recomendações aplicado pelo programa.
-- Criado registro separado de conflitos por produto e notas de política em data/observacoes_dados.json. Trechos do manual e CSVs originais preservados; notas aparecem identificadas como interpretação da auditoria nos contextos e exportações.
-- Diferenciado material/quantidade de cordas e tipo elétrico com indicação da origem, sem converter campo ausente em falso.
-- Ajustada validação para permitir repetir orçamento consultado em busca vazia e para oferecer uma correção de referências dentro das quatro rodadas. Não adicionado retry HTTP nem fallback automático.
-- Reorganizadas instruções de consulta, triagem condicional, pergunta única, contexto, escopo e limites de ação. Estilo continua configurável; cumprir o prompt não é uma garantia automática.
-- Adicionada opção de espaçamento entre chamadas na mesma sessão, padrão desativado. Cotas classificadas como condição do provedor/plano, separadas das limitações do protótipo. Erros são informados e podem ser repetidos explicitamente.
-- Escapado símbolo de moeda na apresentação, mantendo exportação sem edição. Documentadas prioridades de evolução do produto com mais tempo em docs/evolucao-produto.md.
-
-### Verificação
-
-- 51 testes automatizados passaram, incluindo regressões de busca de indisponíveis, notas separadas do manual, orçamento sem resultados, correção de fonte, limite de recomendações e espaçamento de requisições com relógio simulado. As dependências não mudaram.
-- Conferida novamente a igualdade byte a byte dos seis CSVs e do manual com os originais fornecidos.
-- Iniciada revalidação real por código, com StoreAgent e Groq, usando intervalo de 65 segundos somente nesta avaliação. Evidências em local/revalidacao-2026-11-02/, separadas da rodada anterior no navegador. Não apresentar testes simulados nem esse modo de execução como novos testes manuais no navegador.
-- C19 e C09 já concluídos com resposta adequada: frete de exatamente R$ 500 reconhecido como indefinido e orçamento de busca vazia repetido sem bloqueio. Demais casos em andamento, a consolidar em registro posterior.
-- Implementação, testes, revalidação e documentação com assistência do Codex.
-
-## 02/11/2026 — Ajuste adicional após a primeira revalidação
-
-- A primeira rodada de correções concluiu C19, C09, C12, C13 e C28 com objetivo principal atendido. C06 ainda confirmou enquadramento sem todas as condições; o primeiro turno de C16 também teve abertura afirmativa. Preservados C06 completo e C16 parcial, sem reescrever as respostas.
-- Interrompida somente a rotina de avaliação iniciada nesta etapa, para não continuar validando a versão anterior da triagem. O servidor da aplicação permaneceu independente.
-- Adicionada checagem conservadora de algumas aberturas de confirmação em casos pessoais de devolução/garantia e revisão da resposta pelo modelo dentro do limite existente. Essa heurística não decide elegibilidade nem cobre toda formulação possível; manter a análise pela equipe.
-- Suíte de 53 testes passou, incluindo a revisão de uma confirmação de devolução e a preservação de resposta afirmativa normal sobre PIX.
-- Retomada a avaliação em local/revalidacao-v2-2026-11-02/, com chamadas reais, espaçamento de 65 segundos e metadados sem credenciais. O código ficou fixo nesta retomada; versões e evidências anteriores permaneceram separadas.
-- Reiniciado somente o servidor Streamlit identificado na porta local 8501 para carregar os módulos atuais e evitar recursos antigos em cache. Não há exposição pública da aplicação.
-
-## 02/11/2026 — Limite diário confirmado e qualificação do preço indisponível
-
-- Concluída a retomada de 13 cenários com intervalo de 65 segundos. Nove geraram resposta final; C14, D137 e C03 foram interrompidos por HTTP 429 e C10 por HTTP 400, sem diagnosticar retroativamente a causa deste último.
-- Feitas tentativas isoladas com 120 segundos entre chamadas e diagnóstico restrito, sem registrar corpo HTTP, credenciais ou identificadores da conta. C14 e D137 concluíram; C03 concluiu apenas o primeiro turno antes de novo bloqueio.
-- O diagnóstico do último HTTP 429 confirmou tokens por dia: limite 200.000, uso informado 198.275 e requisição estimada em 2.961. Interrompidas novas chamadas; espaçamento adicional não resolve limite diário. C10 não foi repetido nessa rodada isolada e seu HTTP 400 permanece sem causa confirmada.
-- C14 identificou corretamente o status em breve, mas prometeu preço na futura liberação. Ajustada a observação do catálogo para qualificar valor cadastrado atual e não garantir preço/data futura. A compactação passou a preservar esse campo para o modelo. A suíte passou a 54 testes, todos aprovados; a geração real após esse último ajuste permanece pendente por cota.
-- As rodadas e respostas anteriores foram preservadas. Não houve contratação de plano, troca automática de provedor, instalação de Ollama ou mudança nos CSVs/manual originais. Consulta local não encontrou o executável Ollama nos caminhos verificados.
-- A rodada integral dos 32 após todas as correções não foi concluída; não declarar aprovação geral. O plano de evolução com mais tempo está documentado independentemente das restrições do plano gratuito.
-
-## 02/11/2026 — Consolidação e encerramento da rodada por cota
-
-- Consolidados 18 cenários priorizados: 16 dos 32 originais e dois conflitos adicionais de cadastro. Quinze atenderam ao objetivo principal, quatro com ressalvas; C14 após qualificação de preço, continuação de C03 e repetição de C10 continuam pendentes.
-- Separados objetivo funcional, estilo e execução. C05 não afirma uma regra antes de consultar; sua pergunta de esclarecimento não foi tratada como falha factual, mantendo a ressalva por juntar duas informações. As classificações da rodada inicial não foram alteradas nem usadas como comparação percentual entre conjuntos diferentes.
-- Relatório versionado em docs/revalidacao-correcoes-2026-11-02.md e evidências consolidadas em local/revalidacao-consolidada-2026-11-02/, com pacote ZIP local. As conversas dessa revalidação são por código, não novos testes manuais no navegador.
-- Servidor Streamlit recarregado após o ajuste final; interface inspecionada sem mensagens adicionais à API. A conferência visual da moeda em resposta real permanece pendente junto das chamadas bloqueadas.
-- Documentadas as melhorias com mais tempo e mantida a distinção entre limitações do protótipo e condições de capacidade do provedor/plano. Repositório permanece privado; publicação e envio final não foram realizados.
-
-## 03/11/2026 — Tentativa da rodada integral após meia-noite
-
-- Conferidas as cotas na documentação oficial da Groq e feita chamada mínima, que retornou 200. Registrada a distinção: isso não confirma renovação integral do saldo diário de tokens.
-- Preparado lançador de 32 cenários via Streamlit AppTest com API real, sem simular respostas, com cliente de teste por cenário, metadados seguros, consumo reportado e cadência global de 120 segundos. O código do agente permaneceu fixo em ea85546.
-- C14 passou com a qualificação de preço indisponível corrigida. C03 concluiu o primeiro turno; a continuação foi bloqueada por limite diário de tokens. Os outros 30 cenários não foram iniciados.
-- O último HTTP 429 informou limite 200.000, uso 197.575 e requisição estimada em 3.466. Interrompida a rodada, preservando os arquivos completos e o resultado parcial; não registrar aprovação dos 32.
-- Consultada a lista de modelos pela API, sem inferência adicional ou envio do desafio. Preparada configuração alternativa GPT-OSS 20B com mesma persona/provedor, sem aplicá-la. Solicitada escolha explícita entre avaliar outro modelo gratuito e aguardar o Qwen, mantendo a seleção de destino transparente.
-- Documentação e registros em docs/validacao-32-2026-11-03.md e local/validacao-32-2026-11-03/. Nenhum plano contratado, chave exposta ou dado original alterado.
-
-## 03/11/2026 - Avaliação integral com Gemini e consolidação
-
-- Retomada Qwen concluiu 24 cenários, com 14 aprovados, nove ressalvas e uma falha de campanha; a cota diária interrompeu C25.
-- Conector Gemini implementado com chave própria, assinaturas de ferramenta preservadas e importação compatível com configurações antigas. Flash 3.8 apresentou alta demanda; Flash 3.6 gerou respostas, mas sua rodada foi parcial com recusa diária de 20 requisições.
-- Flash-Lite 3.5 concluiu a tentativa dos 32: 12 aprovados, 15 com ressalvas e cinco falhas, em 86 requisições HTTP 200. Evidências originais preservadas.
-- Tratados estados normais de pedido sem identificação/não localizado, mantendo retorno indistinguível para pedido ausente e de terceiro. Instruções esclarecidas para as demais falhas. Nove casos reexecutados; uma regressão de condição de frete em total histórico recebeu guarda conservadora e novo teste unitário.
-- Conferência real final de C25 entregou status, total e rastreamento corretos, sem qualificar frete. Suíte final: 61 testes locais passando. Não houve nova rodada integral após o último ajuste; versões e ressalvas foram mantidas no relatório.
-- Selecionadas cinco conversas reais sem editar respostas. Exportador do README e Markdown de documentação criado com sumário, links, paginação, imagem da interface e manifesto das fontes. Fontes originais do desafio conferidas como byte-idênticas.
-- Plano de evolução ampliado com guardrails, contexto de atendimento e avaliação de fine-tuning baseada em conversas revisadas e conjunto independente.
-
-## Como registrar as próximas etapas
-
-Para cada etapa, anotar: problema, solução escolhida e motivo, alternativa considerada, teste executado, resultado e limitação restante.
-Atualizar a seção de uso de IA do README conforme a assistência efetivamente utilizada.
-Gerar commits por mudanças reais e manter os exemplos como conversas executadas, sem apresentá-los como testes antes de rodá-los.
+- A rodada integral com Flash-Lite teve 12 aprovados, 15 com ressalvas e cinco falhas. Execução por Streamlit AppTest e API real, com leitura assistida das respostas, consultas e fontes.
+- Nove casos foram repetidos após ajustes. Estados de pedido sem identificação/não localizado receberam orientação determinística, e as instruções foram revistas para status comercial, canal já informado e escopo.
+- Uma regressão acrescentou condição de frete ao total histórico de pedido. Foi incluída validação conservadora com teste de regressão; o caso foi repetido na API real, com dados corretos e ressalva de linguagem.
+- A suíte chegou a 61 testes. As cinco falhas iniciais tiveram o objetivo principal atendido nos retestes, com ressalvas em dois casos. Não houve nova rodada integral após a última alteração.
+- Selecionadas cinco conversas reais com variedade de fluxos. O README e o PDF foram consolidados, com declaração da condução do candidato, uso do Codex e limites da avaliação. Registros históricos ficaram fora do PDF de seis páginas.

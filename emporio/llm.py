@@ -136,7 +136,7 @@ class LLMClient:
 
     @staticmethod
     def _ollama_message(message: dict) -> dict:
-        """Ollama recebe argumentos como objeto; Groq usa uma string JSON."""
+        """Ollama recebe argumentos como objeto; Groq e Gemini usam string JSON."""
         result = {k: v for k, v in message.items() if k not in {"tool_call_id", "name"}}
         if message.get("role") == "tool":
             result["tool_name"] = message["name"]

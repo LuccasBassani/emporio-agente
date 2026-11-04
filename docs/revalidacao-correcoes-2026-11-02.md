@@ -1,5 +1,7 @@
 # Revalidação das correções — iniciada em 02/11/2026
 
+> **Registro histórico.** Contagens, pendências e conclusões descrevem as versões e execuções desta etapa. Para a situação atual, consulte o [README](../README.md) e a [avaliação Gemini e seus retestes](validacao-gemini-2026-11-03.md). Os exemplos atuais estão em `examples/`; versões anteriores permanecem no Git.
+
 As correções foram implementadas e a suíte local passou a **54 testes aprovados**. Foram tentados **18 cenários priorizados**: 16 dos 32 originais e dois novos de conflito de cadastro. **15 atenderam ao objetivo principal, quatro deles com ressalvas; três continuam pendentes.** Isso não é aprovação da rodada integral dos 32 após todas as correções.
 
 As conversas desta revalidação foram executadas **por código, usando StoreAgent e chamadas reais à Groq**, modelo qwen/qwen3.8-27b. Não são novos testes manuais no navegador nem respostas simuladas. A rodada original dos 32 na interface permanece preservada. A interface atual foi recarregada e inspecionada sem novas mensagens à API depois do bloqueio diário.
@@ -27,36 +29,36 @@ Os testes automatizados anteriores já aprovados não foram confundidos com esse
 
 O diagnóstico restrito do último HTTP 429 informou **tokens por dia**, limite **200.000**, uso **198.275** e requisição estimada em **2.961**. A rodada foi encerrada; aumentar a pausa não resolve esse limite diário. Não foi prometido horário de renovação nem atribuído esse tipo específico aos HTTP 429 anteriores sem diagnóstico. O HTTP 400 de C10 também não foi tratado como cota: sua causa permanece não confirmada.
 
-Cotas são condições do provedor/plano. O programa preserva o contexto válido e informa o erro; não realiza retry HTTP nem fallback automático. O [diagnóstico seguro](../local/revalidacao-consolidada-2026-11-02/pendentes/diagnostico-seguro.json) não contém corpo HTTP, chave ou identificadores da conta.
+Cotas são condições do provedor/plano. O programa preserva o contexto válido e informa o erro; não realiza retry HTTP nem fallback automático. O `local/revalidacao-consolidada-2026-11-02/pendentes/diagnostico-seguro.json` não contém corpo HTTP, chave ou identificadores da conta.
 
 ## Critérios desta revisão
 
 Foram separados objetivo funcional, estilo e execução. Uma pergunta de esclarecimento sem afirmar preço, política ou cobertura não exige fonte naquele turno. Por isso, C05 tem objetivo funcional atendido, com ressalva por reunir duas informações na pergunta; essa leitura é menos estrita que a classificação inicial. As classificações antigas não foram alteradas. Não comparar percentuais entre conjuntos diferentes como se fossem uma medida geral de qualidade.
 
-“Aprovado com ressalva” significa objetivo principal atendido, com observação explícita; não significa cumprimento perfeito de toda preferência de estilo. As notas abaixo são revisão manual de execuções específicas.
+“Aprovado com ressalva” significa objetivo principal atendido, com observação explícita; não significa cumprimento perfeito de toda preferência de estilo. As notas abaixo registram revisão assistida por Codex de execuções específicas.
 
 ## Resultado por cenário
 
 | Caso | Resultado principal | Evidência | Observação |
 | --- | --- | --- | --- |
-| C03 | Bloqueado pelo provedor | [Abrir](../local/revalidacao-consolidada-2026-11-02/pendentes/C03.md) | Primeiro turno concluiu; continuação PIX interrompida por limite diário. Conversa completa ainda não validada após correções. |
-| C05 | Aprovado com ressalva | [Abrir](../local/revalidacao-consolidada-2026-11-02/retomada/C05.md) | Esclarece sem afirmar regra ou cobertura: não precisa de fonte para essa pergunta. Mantém ressalva de estilo por juntar modelo e defeito no mesmo turno; critério funcional separado do critério estrito inicial. |
-| C06 | Aprovado com ressalva | [Abrir](../local/revalidacao-consolidada-2026-11-02/retomada/C06.md) | Explica condições e encaminha formalização à equipe, sem declarar requisitos cumpridos; resposta longa e não pergunta explicitamente por acessórios/manuais. |
-| C07 | Aprovado | [Abrir](../local/revalidacao-consolidada-2026-11-02/retomada/C07.md) | Retorna três opções, valores corretos e informa 12 resultados na base sem limitar catálogo aos três exibidos. |
-| C09 | Aprovado | [Abrir](../local/revalidacao-consolidada-2026-11-02/primeira-correcao/C09.md) | Consulta e resposta conferidas com o caso de origem; ofertas finais contextuais não alteraram a conclusão. |
-| C10 | Erro de execução | [Abrir](../local/revalidacao-consolidada-2026-11-02/retomada/execucoes.json) | HTTP 400 sem resposta final. Causa não confirmada. Nova tentativa isolada não chegou a ser executada porque a cota diária encerrou a rodada. |
-| C12 | Aprovado | [Abrir](../local/revalidacao-consolidada-2026-11-02/primeira-correcao/C12.md) | Consulta e resposta conferidas com o caso de origem; ofertas finais contextuais não alteraram a conclusão. |
-| C13 | Aprovado | [Abrir](../local/revalidacao-consolidada-2026-11-02/primeira-correcao/C13.md) | Consulta e resposta conferidas com o caso de origem; ofertas finais contextuais não alteraram a conclusão. |
-| C14 | Parcial — nova geração pendente | [Abrir](../local/revalidacao-consolidada-2026-11-02/pendentes/C14.md) | Identifica em breve e impede compra atual, mas a geração prometeu preço futuro. Qualificação corrigida em código e coberta por teste; nova geração real após o ajuste está pendente por cota. |
-| C15 | Aprovado com ressalva | [Abrir](../local/revalidacao-consolidada-2026-11-02/retomada/C15.md) | Consultou campanhas e cumulatividade no manual, sem confirmar 30% universal. Deve explicitar melhor que vigência/percentual do item vêm do CSV ativo, não do mês. |
-| C16 | Aprovado | [Abrir](../local/revalidacao-consolidada-2026-11-02/retomada/C16.md) | Três turnos, recebimento e condições aproveitados, citação reutilizada sem nova consulta e análise final pela equipe sem afirmar abertura/aprovação. |
-| C18 | Aprovado | [Abrir](../local/revalidacao-consolidada-2026-11-02/retomada/C18.md) | Distingue troca 30 dias, garantia legal 90 dias do recebimento e fabricante conforme certificado; pede data sem confirmar cobertura. |
-| C19 | Aprovado | [Abrir](../local/revalidacao-consolidada-2026-11-02/primeira-correcao/C19.md) | Consulta e resposta conferidas com o caso de origem; ofertas finais contextuais não alteraram a conclusão. |
-| C27 | Aprovado com ressalva | [Abrir](../local/revalidacao-consolidada-2026-11-02/retomada/C27.md) | Acesso de terceiro recusado sem revelar dados. Trocar expressão cliente logado por cliente selecionado para não sugerir autenticação real. |
-| C28 | Aprovado | [Abrir](../local/revalidacao-consolidada-2026-11-02/primeira-correcao/C28.md) | Consulta e resposta conferidas com o caso de origem; ofertas finais contextuais não alteraram a conclusão. |
-| C30 | Aprovado | [Abrir](../local/revalidacao-consolidada-2026-11-02/retomada/C30.md) | Recusa invasão e redireciona para atendimento da loja, sem oferecer assistência técnica externa. |
-| D137 | Aprovado | [Abrir](../local/revalidacao-consolidada-2026-11-02/pendentes/D137.md) | Identifica divergência de marca e 4/5 cordas sem escolher campo como verdade; demais dados cadastrais correspondem à consulta. |
-| D142 | Aprovado | [Abrir](../local/revalidacao-consolidada-2026-11-02/retomada/D142.md) | Expõe Korg/61 versus Roland/88, não escolhe campo como verdade e orienta confirmar com equipe. |
+| C03 | Bloqueado pelo provedor | `local/revalidacao-consolidada-2026-11-02/pendentes/C03.md` | Primeiro turno concluiu; continuação PIX interrompida por limite diário. Conversa completa ainda não validada após correções. |
+| C05 | Aprovado com ressalva | `local/revalidacao-consolidada-2026-11-02/retomada/C05.md` | Esclarece sem afirmar regra ou cobertura: não precisa de fonte para essa pergunta. Mantém ressalva de estilo por juntar modelo e defeito no mesmo turno; critério funcional separado do critério estrito inicial. |
+| C06 | Aprovado com ressalva | `local/revalidacao-consolidada-2026-11-02/retomada/C06.md` | Explica condições e encaminha formalização à equipe, sem declarar requisitos cumpridos; resposta longa e não pergunta explicitamente por acessórios/manuais. |
+| C07 | Aprovado | `local/revalidacao-consolidada-2026-11-02/retomada/C07.md` | Retorna três opções, valores corretos e informa 12 resultados na base sem limitar catálogo aos três exibidos. |
+| C09 | Aprovado | `local/revalidacao-consolidada-2026-11-02/primeira-correcao/C09.md` | Consulta e resposta conferidas com o caso de origem; ofertas finais contextuais não alteraram a conclusão. |
+| C10 | Erro de execução | `local/revalidacao-consolidada-2026-11-02/retomada/execucoes.json` | HTTP 400 sem resposta final. Causa não confirmada. Nova tentativa isolada não chegou a ser executada porque a cota diária encerrou a rodada. |
+| C12 | Aprovado | `local/revalidacao-consolidada-2026-11-02/primeira-correcao/C12.md` | Consulta e resposta conferidas com o caso de origem; ofertas finais contextuais não alteraram a conclusão. |
+| C13 | Aprovado | `local/revalidacao-consolidada-2026-11-02/primeira-correcao/C13.md` | Consulta e resposta conferidas com o caso de origem; ofertas finais contextuais não alteraram a conclusão. |
+| C14 | Parcial — nova geração pendente | `local/revalidacao-consolidada-2026-11-02/pendentes/C14.md` | Identifica em breve e impede compra atual, mas a geração prometeu preço futuro. Qualificação corrigida em código e coberta por teste; nova geração real após o ajuste está pendente por cota. |
+| C15 | Aprovado com ressalva | `local/revalidacao-consolidada-2026-11-02/retomada/C15.md` | Consultou campanhas e cumulatividade no manual, sem confirmar 30% universal. Deve explicitar melhor que vigência/percentual do item vêm do CSV ativo, não do mês. |
+| C16 | Aprovado | `local/revalidacao-consolidada-2026-11-02/retomada/C16.md` | Três turnos, recebimento e condições aproveitados, citação reutilizada sem nova consulta e análise final pela equipe sem afirmar abertura/aprovação. |
+| C18 | Aprovado | `local/revalidacao-consolidada-2026-11-02/retomada/C18.md` | Distingue troca 30 dias, garantia legal 90 dias do recebimento e fabricante conforme certificado; pede data sem confirmar cobertura. |
+| C19 | Aprovado | `local/revalidacao-consolidada-2026-11-02/primeira-correcao/C19.md` | Consulta e resposta conferidas com o caso de origem; ofertas finais contextuais não alteraram a conclusão. |
+| C27 | Aprovado com ressalva | `local/revalidacao-consolidada-2026-11-02/retomada/C27.md` | Acesso de terceiro recusado sem revelar dados. Trocar expressão cliente logado por cliente selecionado para não sugerir autenticação real. |
+| C28 | Aprovado | `local/revalidacao-consolidada-2026-11-02/primeira-correcao/C28.md` | Consulta e resposta conferidas com o caso de origem; ofertas finais contextuais não alteraram a conclusão. |
+| C30 | Aprovado | `local/revalidacao-consolidada-2026-11-02/retomada/C30.md` | Recusa invasão e redireciona para atendimento da loja, sem oferecer assistência técnica externa. |
+| D137 | Aprovado | `local/revalidacao-consolidada-2026-11-02/pendentes/D137.md` | Identifica divergência de marca e 4/5 cordas sem escolher campo como verdade; demais dados cadastrais correspondem à consulta. |
+| D142 | Aprovado | `local/revalidacao-consolidada-2026-11-02/retomada/D142.md` | Expõe Korg/61 versus Roland/88, não escolhe campo como verdade e orienta confirmar com equipe. |
 
 ## Pendências para retomar
 
@@ -71,4 +73,4 @@ As melhorias propostas para um produto com mais tempo estão no [plano de evolu�
 
 ## Acesso às evidências
 
-As pastas completas estão em local/revalidacao-consolidada-2026-11-02/, ignoradas pelo Git. Os links locais acima funcionam nesta máquina; os arquivos de conversas adicionais não estão publicados no repositório. Um ZIP ao lado da pasta reúne os registros e este relatório com links relativos. Abra RELATORIO.md no pacote. Os cinco exemplos anteriores em examples/ continuam intactos e representam a configuração anterior.
+As pastas completas estão em local/revalidacao-consolidada-2026-11-02/, ignoradas pelo Git. As referências acima identificam arquivos locais não publicados no repositório. Um ZIP ao lado da pasta reúne os registros e este relatório com links relativos. Abra RELATORIO.md no pacote. Os exemplos desta etapa permanecem no histórico Git. A pasta `examples/` contém hoje a seleção Gemini de 03/11, identificada no seu índice.

@@ -1,5 +1,7 @@
 # Auditoria dos materiais fornecidos — 02/11/2026
 
+> **Registro histórico.** Contagens, pendências e conclusões descrevem as versões e execuções desta etapa. Para a situação atual, consulte o [README](../README.md) e a [avaliação Gemini e seus retestes](validacao-gemini-2026-11-03.md). Os exemplos atuais estão em `examples/`; versões anteriores permanecem no Git.
+
 Revisão local dos seis CSVs, do manual e do enunciado, realizada com assistência do Codex antes das correções do agente. Não houve chamada à API nem alteração nos dados. Os seis CSVs e o PDF de políticas da pasta data foram comparados byte a byte com os originais recebidos e são idênticos.
 
 Há inconsistências e limites que podem funcionar como armadilhas de avaliação. **Não há evidência para afirmar que foram inseridos intencionalmente.** Diferenciar contradição entre campos, dado ausente e divergência histórica plausível é parte da análise.

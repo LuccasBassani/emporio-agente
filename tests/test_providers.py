@@ -65,8 +65,8 @@ class ProviderTests(unittest.TestCase):
         return Settings.from_env({"LLM_PROVIDER": provider, "GROQ_API_KEY": "segredo-de-teste",
                                   "GEMINI_API_KEY": "segredo-de-teste"})
 
-    def test_tool_roundtrip_for_both_providers(self):
-        """Simula decisão -> execução externa -> resposta, conferindo os dois protocolos."""
+    def test_tool_roundtrip_for_all_providers(self):
+        """Simula decisão -> execução -> resposta nos três provedores e dois protocolos."""
         tools = [{"type": "function", "function": {
             "name": "buscar_produtos", "parameters": {"type": "object", "properties": {}},
         }}]

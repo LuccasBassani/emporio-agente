@@ -1,5 +1,7 @@
 # Retomada da avaliação Qwen — 03/11/2026
 
+> **Registro histórico.** Contagens, pendências e conclusões descrevem as versões e execuções desta etapa. Para a situação atual, consulte o [README](../README.md) e a [avaliação Gemini e seus retestes](validacao-gemini-2026-11-03.md). Os exemplos atuais estão em `examples/`; versões anteriores permanecem no Git.
+
 Execução entre 19h18 e 20h31 (São Paulo), por Streamlit AppTest e API real da Groq, com Qwen/Qwen3.8-27b e persona padrão. Código do agente igual a ea85546; HEAD da execução 7cb730d, que só acrescentou documentação. Não é uma rodada manual no navegador. Nenhuma resposta foi simulada ou editada.
 
 ## Resultado

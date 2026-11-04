@@ -1,15 +1,15 @@
 # Roteiro de avaliação do atendimento
 
-Preparado em 02/11/2026 para testar a persona padrão da Lia e as regras do agente completo pela interface. Os resultados esperados abaixo foram conferidos nos CSVs, nas funções de consulta e no manual fornecido. **Isso não significa que as conversas desta lista já foram executadas com o modelo.** Os exemplos anteriores em `examples/` foram gerados antes desta atualização de persona.
+Roteiro preparado em 02/11/2026 e usado nas rodadas de avaliação. O candidato orientou os cenários e os resultados esperados; Codex apoiou sua organização, automação e execução. Os critérios abaixo usam os CSVs, as funções de consulta e o manual fornecido. Definir um critério é separado de executar e aprovar uma conversa. A seleção atual de `examples/` contém cinco conversas Gemini de 03/11/2026.
 
 ## Como executar e registrar
 
 1. Abra uma nova sessão da aplicação e confira Lia, tom Acolhedor e objetivo e instruções preenchidas. Não importe uma configuração antiga para esta rodada.
 2. Comece cada caso em **Nova conversa**, com o cliente indicado. Mensagens numeradas dentro de um caso pertencem à mesma conversa.
-3. Envie uma mensagem e espere a resposta antes da seguinte. Na Groq, se ocorrer limite de uso, aguarde a renovação da cota e tente novamente. Não classifique esse erro como acerto ou falha de conteúdo: marque **Bloqueado por cota**.
+3. Envie uma mensagem e espere a resposta antes da seguinte. Se o provedor limitar o uso, aguarde a renovação da cota antes de tentar novamente. Registre **Bloqueado por cota**, separadamente de acerto ou falha de conteúdo.
 4. Abra **Ver consultas e fontes**. Confira os resultados das ferramentas e o que a resposta efetivamente afirma; uma citação existente, sozinha, não comprova a resposta.
 5. Exporte a conversa com evidências. Guarde as execuções adicionais em `local/avaliacao/`, ignorado pelo Git, mantendo apenas os 3 a 5 exemplos selecionados para entrega em `examples/`.
-6. Registre ID, data, provedor/modelo, cliente, resultado, evidência e observação. Resultados possíveis: **Não executado**, **Aprovado**, **Falhou**, **Bloqueado por cota**. Não substitua a resposta original por uma versão corrigida.
+6. Registre ID, data, provedor/modelo, cliente, resultado, evidência e observação. Resultados possíveis: **Não executado**, **Aprovado**, **Aprovado com ressalva**, **Falhou**, **Bloqueado por cota** ou **Erro de execução**. Não substitua a resposta original por uma versão corrigida.
 
 Para começar, execute C01, C03, C05, C06, C10, C12, C16, C19, C23 e C27. Faça os demais em uma segunda rodada. Não é necessário executar tudo em sequência nem consumir toda a cota da API.
 
@@ -74,7 +74,7 @@ Em todos os casos: observar parágrafos curtos, listas nas comparações, até t
 
 ## Registro das execuções
 
-Primeira rodada tentada pela interface em 02/11/2026, com configuração padrão: consulte o [relatório de avaliação](avaliacao-persona-2026-11-02.md). Resultado: 9 aprovados, 10 aprovados com ressalvas, 12 falhas e 1 bloqueado por cota. A lista acima permanece como roteiro e a tabela abaixo como modelo de registro; os resultados efetivos e as evidências estão no relatório.
+O [relatório inicial de 02/11](avaliacao-persona-2026-11-02.md) registra nove aprovados, dez com ressalvas, 12 falhas e um bloqueado. A [avaliação Gemini de 03/11](validacao-gemini-2026-11-03.md) registra a rodada integral seguinte e os retestes. As tabelas acima são critérios; a tabela abaixo é somente um modelo vazio para novas execuções.
 
 Copie uma linha por caso executado; não marque automaticamente os 32 casos como aprovados por a suíte de código passar. Testes de estilo e interpretação exigem leitura da conversa real. Esta planilha em texto começa sem execuções.
 

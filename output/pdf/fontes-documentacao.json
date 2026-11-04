@@ -1,18 +1,12 @@
 {
   "normalizacao": "UTF-8, finais de linha LF",
   "arquivos": {
-    "README.md": "3a4e3d8ad91aa3e88951d728b39262af195c5cce824a7a65029f476fc207013c",
-    "docs/decisoes.md": "e4ece955a3b11d0f87bc3b4b5d328fa6ec022d85c72c9523e7acb744e7a4fb67",
-    "docs/evolucao-produto.md": "08b7df1a6c6ee1ca218b01f1391914ef8054d08d339594c04c09f9073d6a193d",
-    "docs/auditoria-dados-2026-11-02.md": "a6e6aa75627396da10b7c4ed0e44400445730ca32ded3e2ae7be12cfb347da76",
-    "docs/cenarios-de-teste.md": "9708d07430d8e4d5f4fffb12996cb1c844c25178f8a2c0e07f7c202b3a4e21ed",
-    "docs/validacao-gemini-2026-11-03.md": "dc053be298d39b07d13aefee45c8653e4e906902eb8a038cfc5c891ca3486d3f",
-    "docs/validacao-qwen-retomada-2026-11-03.md": "abe019fb78569861c5f6cabcaf9e4ff2776d57a2e075faeb9607d2c8b07e82a5",
-    "docs/guia-do-projeto.md": "0d312ead4565b9e66518344975ee94f9291c1d61efae440813d469da1015690d",
-    "docs/diario.md": "579830bc784451b0ec7b8673aa45dc7172e577bd5a93b0bc9635dadb43beba1a",
-    "docs/avaliacao-persona-2026-11-02.md": "8d41fbd57b3ffed2352bbe78e99e19e33955b03a471557096fc03f59f5bb1fd9",
-    "docs/revalidacao-correcoes-2026-11-02.md": "8ca00ee8627a3be799c95fc067c3dc32d4b2c770e98c99cf16d81c623aa20b9e",
-    "docs/validacao-32-2026-11-03.md": "4fb044cc4951427d7d138c9e90be51be0ab544ae91d1c701f36550513b5b2898",
-    "docs/validacao-gemini-flash-parcial-2026-11-03.md": "b3c90c6d37ad3b1a1a1e31ea20e8f2d222e64704864e66237f78f89e35428d9d"
+    "README.md": "aae1bb908f467d5b6a941155bf59a63b9b835f641d4c11780a66c012fa972137",
+    "docs/entrega.md": "352fd3e7b988c993b17a0fd3f6c7beb8f1b684341246a10188267c3491fadb88",
+    "examples/catalogo-e-pix.md": "6765ecf5fda55304b7d9a3012f9547b59a90cb989285ad743a97d8c5200c0ecb",
+    "examples/rag-promocao-pix.md": "b3519527c9153751342150df135dae367c7d48c796b44ef4a7dcb2089b42d1de",
+    "examples/rag-parcelamento.md": "a92965720fe95aeb8f16cef9ff31a5bdffe299e7cbe3e024f248d623c7e7eede",
+    "examples/pedido-rastreamento.md": "1e52c7600f855045266acb21d0eaa8001ef8af9191cddd033765aabf6edae7a7",
+    "examples/fora-do-escopo.md": "3d206ae90c909fe6f5b4d58178211f97081b3468a954bc043611939462f3b059"
   }
 }
