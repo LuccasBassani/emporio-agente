@@ -1,14 +1,18 @@
 # Conversa de teste do agente
 
-Provedor: groq. Modelo: qwen/qwen3.8-27b.
+Provedor: gemini. Modelo: gemini-3.5-flash-lite.
 
 ## Turno 1
 
 ### Cliente
-Vocês vendem cabos e palhetas?
+Vocês vendem cabos, palhetas ou amplificadores?
 
 ### Agente
-Trabalhamos exclusivamente com instrumentos musicais, então não vendemos cabos nem palhetas. Posso ajudar a encontrar algum instrumento dentro do nosso catálogo?
+Olá! Na Empório da Música, nós somos especializados em instrumentos musicais, como violões, guitarras, baixos, teclados, baterias e outros instrumentos de cordas, sopro e percussão. 
+
+Cabos, palhetas e amplificadores são acessórios e não fazem parte do nosso catálogo de instrumentos. 
+
+Posso te ajudar a encontrar algum instrumento específico?
 
 ### Consultas executadas
 Nenhuma nova consulta neste turno.

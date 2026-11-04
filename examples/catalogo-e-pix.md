@@ -1,6 +1,6 @@
 # Conversa de teste do agente
 
-Provedor: groq. Modelo: qwen/qwen3.8-27b.
+Provedor: gemini. Modelo: gemini-3.5-flash-lite.
 
 ## Turno 1
 
@@ -8,12 +8,10 @@ Provedor: groq. Modelo: qwen/qwen3.8-27b.
 Quero duas opções de violões disponíveis até R$ 1.000. Mostre nome e preço.
 
 ### Agente
-Aqui estão duas opções de violões disponíveis até R$ 1.000:
+Olá! Temos estas opções de violões disponíveis dentro do seu orçamento:
 
-1. **Tagima Memphis AC-39 Nylon Natural** — R$ 429,90 [D83]
-2. **Rozini RC-104 Nylon Estudante** — R$ 459,90 [D85]
-
-Preços sem frete. Há mais opções nessa faixa, se quiser que eu liste outras.
+* Tagima Memphis AC-39 Nylon Natural – R$ 429,90 sem frete [D83].
+* Rozini RC-104 Nylon Estudante – R$ 459,90 sem frete [D85].
 
 ### Consultas executadas
 
@@ -21,10 +19,10 @@ Preços sem frete. Há mais opções nessa faixa, se quiser que eu liste outras.
 {
   "ferramenta": "buscar_produtos",
   "parametros": {
-    "categoria_id": 5,
     "limite": 2,
+    "somente_disponiveis": true,
     "preco_maximo": 1000,
-    "somente_disponiveis": true
+    "categoria_id": 5
   },
   "resultado": {
     "total_encontrado": 12,
@@ -57,6 +55,11 @@ Preços sem frete. Há mais opções nessa faixa, se quiser que eu liste outras.
           "electronics": "no",
           "color": "Natural"
         },
+        "classificacao_eletrica": {
+          "valor": false,
+          "origem": "products.csv: specs.electronics"
+        },
+        "divergencias_cadastrais": [],
         "fontes": [
           {
             "id": "D83",
@@ -67,7 +70,7 @@ Preços sem frete. Há mais opções nessa faixa, se quiser que eu liste outras.
             "regras_preco": "politicas_da_loja.pdf, seções 3 e 6.2"
           }
         ],
-        "observacao": "Preço sem frete. Indisponibilidade impede oferta de compra mesmo com preço cadastrado."
+        "observacao": "Valor cadastrado atual, sem frete."
       },
       {
         "encontrado": true,
@@ -95,6 +98,11 @@ Preços sem frete. Há mais opções nessa faixa, se quiser que eu liste outras.
           "electronics": "no",
           "color": "Natural"
         },
+        "classificacao_eletrica": {
+          "valor": false,
+          "origem": "products.csv: specs.electronics"
+        },
+        "divergencias_cadastrais": [],
         "fontes": [
           {
             "id": "D85",
@@ -105,11 +113,17 @@ Preços sem frete. Há mais opções nessa faixa, se quiser que eu liste outras.
             "regras_preco": "politicas_da_loja.pdf, seções 3 e 6.2"
           }
         ],
-        "observacao": "Preço sem frete. Indisponibilidade impede oferta de compra mesmo com preço cadastrado."
+        "observacao": "Valor cadastrado atual, sem frete."
       }
     ],
     "criterio_orcamento": "Preço final para o pagamento escolhido, com promoção ativa quando houver, sem frete.",
     "fonte": "CSVs fornecidos; não representa estoque em tempo real."
+  },
+  "parametros_solicitados": {
+    "limite": 3,
+    "somente_disponiveis": true,
+    "preco_maximo": 1000,
+    "categoria_id": 5
   }
 }
 ```
@@ -139,10 +153,10 @@ Preços sem frete. Há mais opções nessa faixa, se quiser que eu liste outras.
 ## Turno 2
 
 ### Cliente
-E o primeiro no PIX, quanto fica?
+E o primeiro no PIX?
 
 ### Agente
-O **Tagima Memphis AC-39 Nylon Natural** no PIX fica por **R$ 408,41** (5% de desconto sobre R$ 429,90) [D83].
+O violão Tagima Memphis AC-39 Nylon Natural sai por R$ 408,41 sem frete no pagamento via PIX [D83].
 
 ### Consultas executadas
 
@@ -150,8 +164,8 @@ O **Tagima Memphis AC-39 Nylon Natural** no PIX fica por **R$ 408,41** (5% de de
 {
   "ferramenta": "consultar_produto",
   "parametros": {
-    "pagamento": "pix",
-    "produto_id": 83
+    "produto_id": 83,
+    "pagamento": "pix"
   },
   "resultado": {
     "encontrado": true,
@@ -179,6 +193,11 @@ O **Tagima Memphis AC-39 Nylon Natural** no PIX fica por **R$ 408,41** (5% de de
       "electronics": "no",
       "color": "Natural"
     },
+    "classificacao_eletrica": {
+      "valor": false,
+      "origem": "products.csv: specs.electronics"
+    },
+    "divergencias_cadastrais": [],
     "fontes": [
       {
         "id": "D83",
@@ -189,7 +208,7 @@ O **Tagima Memphis AC-39 Nylon Natural** no PIX fica por **R$ 408,41** (5% de de
         "regras_preco": "politicas_da_loja.pdf, seções 3 e 6.2"
       }
     ],
-    "observacao": "Preço sem frete. Indisponibilidade impede oferta de compra mesmo com preço cadastrado."
+    "observacao": "Valor cadastrado atual, sem frete."
   }
 }
 ```

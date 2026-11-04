@@ -4,8 +4,7 @@ Protótipo do desafio técnico de AI Engineer da Artefact.
 
 ## Situação atual
 
-Desenvolvimento iniciado em 31/10/2026. Protótipo local com interface de configuração e chat, RAG sobre políticas, catálogo/preços, pedidos por cliente de teste, fontes e exportações implementados. A revisão final de entrega e a validação do modelo local Ollama continuam pendentes.
-Entrega informada pelo candidato: terça-feira, 03/11/2026 às 23h59. Planejamento em America/Sao_Paulo, sujeito ao fuso indicado no e-mail.
+Desenvolvimento iniciado em 31/10/2026. Protótipo local com interface de configuração e chat, RAG sobre políticas, catálogo/preços, pedidos por cliente de teste, fontes e exportações implementados. A demonstração atual usa Gemini Flash-Lite; Groq e Ollama continuam configuráveis. Ollama permanece sem validação com modelo instalado.
 
 ## Funcionalidades da primeira versão
 
@@ -37,7 +36,7 @@ Filtros, cálculos de preço e validação dos parâmetros ficam no código Pyth
 ```mermaid
 flowchart LR
     UI[Interface ou terminal] --> AG[Agente Python]
-    AG <--> LLM[Groq ou Ollama]
+    AG <--> LLM[Groq, Gemini ou Ollama]
     AG --> CAT[Consultas estruturadas nos CSVs]
     AG --> RAG[Recuperação BM25 no PDF]
     CAT --> AG
@@ -45,11 +44,11 @@ flowchart LR
     AG --> OUT[Resposta com fontes e exportação]
 ```
 
-Groq e Ollama são os provedores escolhidos. A seleção é explícita em `LLM_PROVIDER`, sem troca automática entre processamento local e externo.
-Groq depende de chave e das cotas disponíveis na conta. Ollama depende do servidor local e do modelo baixado.
-A chave fica em variável de ambiente ou `.env` local, fora do Git. Os modelos são configuráveis. A Groq passou nos diagnósticos reais de saudação e chamada/retorno de ferramenta e em dois cenários de RAG sobre o manual, revisados manualmente. Ollama ainda não foi validado com modelo em execução.
+Groq, Gemini e Ollama são os provedores suportados. A seleção é explícita em `LLM_PROVIDER`, sem troca automática entre processamento local e externo.
+Groq e Gemini dependem de chaves próprias e das cotas disponíveis em cada conta. Ollama depende do servidor local e do modelo baixado.
+As chaves ficam em variáveis de ambiente ou `.env` local, fora do Git. Variáveis já definidas no ambiente têm prioridade sobre o arquivo; a seleção aplicada na interface controla o provedor/modelo das novas conversas. Os modelos são configuráveis. A Groq passou nos diagnósticos reais de saudação e chamada/retorno de ferramenta e em dois cenários de RAG sobre o manual, revisados manualmente. Ollama ainda não foi validado com modelo em execução.
 
-O modelo Groq foi mantido como configuração inicial disponível na conta e validada nos cenários registrados; não foi escolhido por um benchmark comparativo de modelos. O nome do modelo é configurável para permitir essa comparação. A configuração Ollama é uma alternativa local preparada, cuja qualidade de atendimento ainda precisa de validação real.
+A configuração atual de demonstração usa Gemini Flash-Lite 3.5, com suporte a ferramentas e capacidade gratuita observada na avaliação. Qwen na Groq permanece como alternativa compatível. A escolha não representa um benchmark controlado de superioridade: as execuções e revisões estão identificadas nos relatórios. Ollama é a opção local preparada, cuja qualidade ainda precisa de validação com um modelo instalado.
 
 ## Preparar e executar
 
@@ -73,7 +72,7 @@ Copie o exemplo apenas na primeira configuração; preserve o `.env` se ele já 
 
 Abra http://127.0.0.1:8501 no navegador. O servidor usa somente a interface local do computador. Para encerrar, pressione Ctrl+C no terminal.
 
-1. Escolha nome, tom e instruções adicionais; selecione Groq ou Ollama e confira o modelo.
+1. Escolha nome, tom e instruções adicionais; selecione Groq, Gemini ou Ollama e confira o modelo.
 2. Clique em **Aplicar e iniciar nova conversa**. Alterações em rascunho não mudam uma conversa em andamento.
 3. Para testar pedidos, selecione o cliente fictício. **Cliente #2** tem o **pedido 8**; o **Cliente #6** tem o **pedido 9**, sem código de rastreamento.
 4. Envie mensagens. Em **Ver consultas e fontes**, confira os argumentos, resultados e trechos usados.
@@ -95,6 +94,20 @@ GROQ_MODEL=qwen/qwen3.8-27b
 ```
 
 Crie sua chave na [conta Groq](https://console.groq.com/keys) e confira as cotas do plano gratuito antes dos testes. A disponibilidade do modelo também depende da conta. Não coloque a chave em mensagens, commits ou capturas de tela.
+
+### Usar Gemini Flash
+
+```dotenv
+LLM_PROVIDER=gemini
+GEMINI_API_KEY=sua_chave_local
+GEMINI_MODEL=gemini-3.5-flash-lite
+```
+
+Crie a chave no [Google AI Studio](https://aistudio.google.com/apikey) e confira o nível gratuito e as cotas do projeto. O conector usa o endpoint compatível de chat e preserva as assinaturas opacas das chamadas de ferramentas. A chave é exclusiva deste provedor: uma chave da Groq ou a variável genérica `GOOGLE_API_KEY` não são reaproveitadas.
+
+Flash 3.6 passou nos diagnósticos e foi avaliado parcialmente, mas apresentou limite diário de 20 requisições no nível gratuito. Flash 3.8 retornou alta demanda nas sondagens. Flash-Lite passou em chamada/retorno de ferramenta e permitiu concluir a rodada dos 32. A escolha prioriza capacidade gratuita observada e integração simples; os resultados não constituem benchmark comparativo entre modelos.
+
+No nível gratuito, a [política do Google](https://aistudio.google.com/docs/pricing) informa uso do conteúdo para melhoria de produtos. Use apenas dados autorizados. Os testes do desafio usam trechos de políticas e catálogo fictícios e somente campos operacionais de pedidos, sem dados pessoais de clientes. Não há troca automática de provedor.
 
 ### Usar Ollama local
 
@@ -121,7 +134,7 @@ Essa opção não exige chave Groq. A configuração acima usa o modelo no compu
 .\.venv\Scripts\python.exe -m emporio --test-tools
 ```
 
-`--check` faz uma chamada real de saudação. `--test-tools` verifica se o modelo solicita uma ferramenta de diagnóstico e usa seu resultado na resposta. Esse comando não testa catálogo ou políticas. Cada execução na Groq consome a cota da API.
+`--check` faz uma chamada real de saudação. `--test-tools` verifica se o modelo solicita uma ferramenta de diagnóstico e usa seu resultado na resposta. Esse comando não testa catálogo ou políticas. Cada execução em um provedor externo consome a cota da API selecionada.
 
 Variáveis já definidas no processo têm prioridade sobre o `.env`. Rodar sem opções mostra a ajuda e não chama nenhum modelo.
 
@@ -136,7 +149,7 @@ Os testes usam respostas HTTP simuladas para verificar os dois protocolos, retor
 ## Organização atual
 
 - `emporio/config.py`: leitura e validação das configurações.
-- `emporio/llm.py`: requisições Groq/Ollama e normalização de texto e ferramentas.
+- `emporio/llm.py`: requisições Groq/Gemini/Ollama e normalização de texto e ferramentas.
 - `emporio/catalog.py`: consultas e cálculos de preço em Python.
 - `emporio/tools.py`: ferramentas permitidas e validação de argumentos.
 - `emporio/agent.py`: escolha de ferramentas pelo modelo, histórico e exportação.
@@ -210,12 +223,12 @@ No terminal, o mesmo contexto pode ser selecionado explicitamente:
 
 A [avaliação inicial da persona em 02/11](docs/avaliacao-persona-2026-11-02.md) tentou os 32 cenários pela interface: 9 aprovados, 10 aprovados com ressalvas, 12 falhas e 1 bloqueado por cota. Foram exportadas 29 conversas completas. Essa rodada orientou as correções, mantendo as evidências originais.
 
-A [revalidação das correções](docs/revalidacao-correcoes-2026-11-02.md), por código com chamadas reais à Groq, tentou 18 cenários priorizados: 15 atenderam ao objetivo principal, quatro deles com ressalvas; três permanecem pendentes (C14 após ajuste de preço futuro, continuação de C03 e repetição de C10). O diagnóstico do último HTTP 429 confirmou limite diário do provedor; novas chamadas foram encerradas. O HTTP 400 anterior de C10 tem causa não confirmada. A rodada integral dos 32 com o código final e uma nova conferência de moeda no navegador não foram concluídas. Testes locais não devem ser interpretados como aprovação geral do atendimento; evidências completas estão guardadas localmente, fora do Git.
+As [revalidações de 02/11](docs/revalidacao-correcoes-2026-11-02.md) e a [retomada Qwen de 03/11](docs/validacao-qwen-retomada-2026-11-03.md) preservam o histórico de correções. Na retomada Qwen, 24 cenários foram concluídos: 14 aprovados, 9 com ressalvas e 1 falha em campanha. C25 foi interrompido por cota diária e C26–C32 não começaram. Os casos de continuidade/PIX, promoção sem acumulação e preço de indisponível foram concluídos nessa retomada. A descrição da campanha recebeu depois uma guarda de validação com teste de regressão.
 
-Na [tentativa integral de 03/11](docs/validacao-32-2026-11-03.md), pela interface via AppTest com API real, C14 passou após a correção de qualificação de preço. C03 foi interrompido na continuação por cota diária e os demais 30 casos não foram iniciados. A nova geração resolve a pendência específica de C14; a rodada completa continua pendente. Nenhum modelo foi trocado automaticamente.
+A [avaliação completa com Gemini Flash-Lite](docs/validacao-gemini-2026-11-03.md) tentou os 32 cenários com API real e Streamlit AppTest: 12 aprovados, 15 com ressalvas e 5 falhas. Após ajustes pequenos, nove casos foram repetidos e houve uma conferência adicional de pedido. Os cinco problemas iniciais tiveram o objetivo principal atendido nos retestes; permanecem ressalvas de linguagem, condições de preço e condução de atendimento. O relatório mantém as falhas iniciais, as revisões de código e os limites da revalidação, sem declarar uma nova rodada integral na última revisão.
 
-- 54 testes automatizados de preços, disponibilidade, acesso a pedidos, recuperação, observações de auditoria, qualificações comerciais, correção de referências e aberturas de triagem, protocolos de IA, espaçamento opcional e fluxo da interface via Streamlit AppTest. As chamadas nesses testes são simuladas e não consomem API. A instalação em um segundo ambiente limpo foi conferida anteriormente com a suíte de 42 testes; as dependências não mudaram nesta correção.
-- Exemplos reais em [examples/](examples/README.md), com catálogo/continuação, políticas, pedido e atendimento fora do escopo. A consulta real de pedido foi executada pela interface via AppTest com Groq. Envio de mensagem, importação da configuração e downloads Markdown/TXT/JSON também foram conferidos no navegador.
+- 61 testes automatizados de preços, disponibilidade, acesso a pedidos, recuperação, observações de auditoria, qualificações comerciais, correção de referências e aberturas de triagem, protocolos de IA, espaçamento opcional e fluxo da interface via Streamlit AppTest. As chamadas nesses testes são simuladas e não consomem API. A instalação em um segundo ambiente limpo foi conferida anteriormente com a suíte de 42 testes; as dependências não mudaram nesta correção.
+- Exemplos reais em [examples/](examples/README.md), com catálogo/continuação, políticas, pedido e atendimento fora do escopo. A seleção atual foi executada com Gemini Flash-Lite pela interface via AppTest; modelos e revisões constam do índice dos exemplos. Envio de mensagem, importação da configuração e downloads Markdown/TXT/JSON também foram conferidos no navegador.
 - RAG lexical pode falhar em reformulações ou recuperar trechos incompletos; citações válidas não garantem fidelidade de todas as afirmações. O comportamento de triagem de devolução ainda depende do modelo.
 - Instruções de estilo são subordinadas às regras fixas no prompt e às validações do código. Isso não é uma garantia absoluta contra prompt injection.
 - Histórico em memória da sessão, com dois turnos anteriores no contexto. Sem gravação automática de conversas nem credenciais exportadas. Recarregar ou encerrar a sessão pode perder o histórico; use o download.
@@ -224,13 +237,13 @@ Na [tentativa integral de 03/11](docs/validacao-32-2026-11-03.md), pela interfac
 
 ### Condições de execução do provedor
 
-A demonstração foi validada com o plano gratuito da Groq, sujeito às cotas do provedor. Interrupções por cota são registradas separadamente da avaliação de conteúdo. Capacidade e disponibilidade dependem do modelo e do plano utilizados; alterar o provedor/modelo exige nova validação. A cota externa não é um defeito da lógica do agente. O programa informa o erro, mantém a pergunta e oferece nova tentativa explícita, sem retry HTTP ou fallback automático.
+As execuções externas usam os provedores selecionados e ficam sujeitas às cotas e à disponibilidade de cada conta/modelo. Interrupções por cota são registradas separadamente da avaliação de conteúdo. Capacidade e disponibilidade dependem do modelo e do plano utilizados; alterar o provedor/modelo exige nova validação. A cota externa não é um defeito da lógica do agente. O programa informa o erro, mantém a pergunta e oferece nova tentativa explícita, sem retry HTTP ou fallback automático.
 
 `LLM_MIN_INTERVAL_SECONDS` permite espaçar chamadas na mesma sessão, inclusive chamadas internas de ferramentas. O padrão é 0 (desativado); por exemplo, 65 aplica 65 segundos entre os inícios das requisições. Reinicie a aplicação após alterar o `.env`. É uma opção de execução conforme a conta utilizada, sem garantia de evitar limites de tamanho, minuto ou dia, e não coordena cotas entre várias sessões.
 
 ### Com mais tempo de desenvolvimento
 
-Priorizaríamos corrigir dados na origem e versionar políticas; implementar identificação/autorização reais; ampliar avaliação com paráfrases e conversas longas; estruturar a triagem de devoluções; integrar estoque, frete e atendimento humano; e persistir histórico com observabilidade e retenção definida. Compararíamos outros modelos e recuperação semântica somente mediante ganho medido sobre BM25. O [plano de evolução do produto](docs/evolucao-produto.md) explica prioridades e critérios de aceitação. Essas propostas não são apresentadas como funcionalidades existentes.
+Priorizaríamos guardrails de resposta e recuperação de erros; correção dos dados na origem e políticas versionadas; identificação/autorização reais; avaliação contínua; triagem estruturada e contexto de atendimentos anteriores com retenção e controle de acesso. Integrações de estoque, frete e atendimento humano viriam conforme necessidade. Fine-tuning seria avaliado depois, com conversas revisadas e teste independente, para comportamento e tom; preços e disponibilidade continuariam consultados nas fontes. Compararíamos outros modelos e recuperação semântica somente mediante ganho medido sobre BM25. O [plano de evolução do produto](docs/evolucao-produto.md) explica prioridades e critérios de aceitação. Essas propostas não são apresentadas como funcionalidades existentes.
 
 ## RAG sobre políticas
 
@@ -250,7 +263,7 @@ Para gerar uma resposta real e exportar a evidência:
 .\.venv\Scripts\python.exe -m emporio --ask "Comprei online e quero devolver. Como funciona?" --show-sources --export local/teste-rag.md
 ```
 
-`--ask` envia os trechos recuperados ao provedor selecionado. Com Groq, isso transmite conteúdo do manual ao serviço externo; use apenas com autorização sobre esse conteúdo. Com o endereço local padrão do Ollama e modelo local, a geração é feita no computador.
+`--ask` envia os trechos recuperados ao provedor selecionado. Com Groq ou Gemini, isso transmite conteúdo do manual ao serviço externo selecionado; use apenas com autorização sobre esse conteúdo. Com o endereço local padrão do Ollama e modelo local, a geração é feita no computador.
 
 A exportação inclui pergunta, resposta, modelo/provedor e os trechos recuperados com seção e página. Citações `[P1]`, `[P2]`, etc., identificam esses trechos. O programa rejeita uma resposta sem citação ou com ID inexistente; isso verifica a referência, mas não prova que cada afirmação foi corretamente interpretada. A revisão de fidelidade continua sendo parte dos testes.
 
@@ -270,11 +283,13 @@ Dois cenários reais de geração, sobre promoção/PIX e devolução, estão re
 
 ## Uso de IA até o momento
 
-Codex foi usado para ler o enunciado, examinar os dados, consultar documentação oficial, analisar a referência de interface, implementar o protótipo e seus testes e preparar a documentação. As escolhas de escopo e provedores foram discutidas durante o desenvolvimento. O fluxo de trabalho foi incremental: implementar, executar testes locais e reais, revisar falhas, registrar decisões e salvar commits. Um exemplo foi a correção da triagem de devolução após uma resposta que confirmou elegibilidade antes de perguntar a data de recebimento. Evidências e limitações estão registradas no diário.
+Codex foi usado para ler o enunciado, examinar os dados, consultar documentação oficial, analisar a referência de interface, implementar o protótipo e seus testes, executar avaliações assistidas via AppTest e preparar documentação e exportação em PDF. As escolhas de escopo e provedores foram discutidas durante o desenvolvimento. O fluxo de trabalho foi incremental: implementar, executar testes locais e reais, revisar falhas, registrar decisões e salvar commits. Um exemplo foi a correção da triagem de devolução após uma resposta que confirmou elegibilidade antes de perguntar a data de recebimento. Evidências e limitações estão registradas no diário.
 
 ## Documentação
 
 - [Auditoria dos dados e ambiguidades do material fornecido](docs/auditoria-dados-2026-11-02.md)
+- [Avaliação Gemini e retestes](docs/validacao-gemini-2026-11-03.md)
+- [Evolução proposta: guardrails, contexto e fine-tuning](docs/evolucao-produto.md)
 - [Guia para acompanhar as etapas](docs/guia-do-projeto.md)
 - [Decisões e questões em aberto](docs/decisoes.md)
 - [Diário do desenvolvimento](docs/diario.md)
@@ -288,3 +303,16 @@ Codex foi usado para ler o enunciado, examinar os dados, consultar documentaçã
 - https://console.groq.com/docs/rate-limits
 - https://docs.ollama.com/api/chat
 - https://docs.ollama.com/capabilities/tool-calling
+
+## Exportar a documentação em PDF
+
+O exportador reúne este README e os arquivos Markdown de `docs/`, com sumário, links, paginação e manifesto SHA-256 das fontes Markdown normalizadas em UTF-8/LF. Registros datados permanecem como histórico; a situação atual é apresentada neste README e na avaliação mais recente.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-docs.txt
+.\.venv\Scripts\python.exe scripts/exportar_documentacao.py
+```
+
+Saída: `output/pdf/emporio-agente-readme-documentacao.pdf`. O script usa as fontes Arial e Consolas disponíveis no Windows; essa dependência é apenas do exportador, não do atendimento. O PDF não incorpora `.env`, credenciais nem conversas locais não selecionadas.
+
+Referências do conector Gemini: [compatibilidade de chat](https://aistudio.google.com/docs/openai), [assinaturas de ferramentas](https://ai.google.dev/gemini-api/docs/generate-content/thought-signatures) e [modelos](https://aistudio.google.com/docs/models).

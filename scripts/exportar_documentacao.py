@@ -13,10 +13,11 @@ from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
+from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import (BaseDocTemplate, Frame, PageTemplate, Paragraph,
-                               Spacer, PageBreak, LongTable, TableStyle, Preformatted)
+                               Spacer, PageBreak, LongTable, TableStyle, Preformatted, Image, KeepTogether)
 from reportlab.platypus.tableofcontents import TableOfContents
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -116,6 +117,16 @@ def build():
         while i < len(lines):
             line = lines[i].strip()
             if not line:
+                i += 1
+                continue
+            figure = re.fullmatch(r"!\[([^\]]*)\]\(([^)]+)\)", line)
+            if figure:
+                picture = (source.parent / figure[2]).resolve()
+                if picture.is_relative_to(ROOT) and picture.is_file() and picture.suffix.lower() in {".png", ".jpg", ".jpeg"}:
+                    width, height = ImageReader(str(picture)).getSize()
+                    scale = min(doc.width / width, 165*mm / height)
+                    story.append(KeepTogether([Image(str(picture),width*scale,height*scale),
+                                               Paragraph(inline(figure[1],source),tiny),Spacer(1,9)]))
                 i += 1
                 continue
             if line.startswith("```"):

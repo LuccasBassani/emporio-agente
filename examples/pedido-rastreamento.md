@@ -1,20 +1,14 @@
 # Conversa de teste do agente
 
-Provedor: groq. Modelo: qwen/qwen3.8-27b.
+Provedor: gemini. Modelo: gemini-3.5-flash-lite.
 
 ## Turno 1
 
 ### Cliente
-Qual o status do pedido 8 e o código de rastreamento?
+Qual o status, total e rastreamento do meu pedido 8?
 
 ### Agente
-O pedido 8 está com status **shipped** (enviado) [O8].
-
-- **Rastreamento:** BRJL5544332BR
-- **Item:** Kala KA-C Concert Mogno (1 unid.)
-- **Total histórico:** R$ 349,90
-
-Observação: esses são os dados cadastrados, sem rastreamento ao vivo; a data real de recebimento não está informada.
+O seu pedido 8 está com o status de enviado (shipped) e o código de rastreamento é BRJL5544332BR [O8]. O valor total histórico é de R$ 349,90 [O8].
 
 ### Consultas executadas
 

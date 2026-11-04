@@ -1,19 +1,15 @@
-# Exemplos executados
+# Exemplos reais selecionados
 
-Os arquivos desta pasta registram chamadas reais ao modelo, sem editar manualmente as respostas exportadas. Cada arquivo contém pergunta, resposta, provedor/modelo e os trechos recuperados do manual.
+Cinco conversas executadas em 03/11/2026 com Google Gemini, modelo `gemini-3.5-flash-lite`, pela interface via Streamlit AppTest e API real. As perguntas e respostas foram copiadas das exportações sem edição manual; consultas e fontes estão preservadas em cada arquivo.
 
-| Arquivo | Cenário | Verificação manual |
-| --- | --- | --- |
-| [rag-promocao-pix.md](rag-promocao-pix.md) | Combinação de promoção com desconto PIX | A resposta segue a regra recuperada e cita o trecho pertinente |
-| [rag-devolucao.md](rag-devolucao.md) | Arrependimento em compra online sem data de recebimento | Explica as condições de forma condicional e pergunta quando houve recebimento |
-| [catalogo-e-pix.md](catalogo-e-pix.md) | Duas opções de violões por orçamento e continuação sobre PIX | Consulta os CSVs, mantém a referência ao primeiro produto e usa o preço calculado em Python |
-| [pedido-rastreamento.md](pedido-rastreamento.md) | Status, item e rastreamento do pedido 8 | Executado pela interface via AppTest com cliente de teste #2; dados conferidos contra os CSVs |
-| [fora-do-escopo.md](fora-do-escopo.md) | Pedido de cabos e palhetas | Executado no navegador; explica o escopo fixo do atendimento sem inventar parceiros |
+| Conversa | Comportamento demonstrado | Contexto | Código da execução |
+| --- | --- | --- | --- |
+| [catalogo-e-pix.md](catalogo-e-pix.md) | Catálogo e continuidade no PIX | Sem identificação | `13b2227` |
+| [rag-promocao-pix.md](rag-promocao-pix.md) | Promoção e PIX não cumulativos | Sem identificação | `13b2227` |
+| [rag-parcelamento.md](rag-parcelamento.md) | Parcelamento específico do manual | Sem identificação | `163ef3c` |
+| [pedido-rastreamento.md](pedido-rastreamento.md) | Status, total histórico e rastreamento | Cliente #2 | `861c929` |
+| [fora-do-escopo.md](fora-do-escopo.md) | Escopo de instrumentos e acessórios | Sem identificação | `163ef3c` |
 
-Executados em 31/10/2026 com Groq, modelo `qwen/qwen3.8-27b`, após autorização para enviar os trechos das políticas da loja fictícia.
+O parcelamento demonstra recuperação da seção 3.1 e aplicação da condição específica de parcela mínima, diante da tabela geral do manual. O catálogo mostra continuidade entre dois turnos e preço calculado em Python; o exemplo promocional combina consulta de produto e política. O pedido usa apenas campos operacionais autorizados. O exemplo de acessórios usa o escopo fixo do atendimento, sem recuperação naquela conversa.
 
-No primeiro teste de devolução, o modelo começou confirmando a possibilidade de devolução sem perguntar a data de recebimento. A instrução de triagem foi ajustada e o cenário foi executado novamente. O arquivo de devolução contém a nova resposta, que foi revisada. O problema e a correção estão registrados no diário.
-
-O teste de catálogo foi executado depois, em dois turnos. Uma primeira tentativa atingiu a cota gratuita na continuação. A evidência salva é a nova sessão concluída com intervalo entre as mensagens, sem editar as respostas.
-
-São cinco exemplos: quatro testes de um turno e uma conversa de dois turnos. O teste de pedido foi autorizado com envio somente dos campos operacionais dos pedidos fictícios, sem nomes ou contatos. O exemplo fora do escopo usa a regra fixa de atendimento no prompt e não executou recuperação; isso está explícito no arquivo exportado. Os identificadores de citação permitem conferir a origem; a revisão manual avalia se a afirmação corresponde ao trecho citado. Ainda é necessário revisar essa seleção antes da entrega final.
+Resultados dos 32 cenários e as ressalvas dos exemplos estão no [relatório completo](../docs/validacao-gemini-2026-11-03.md). A seleção inclui pequenas ressalvas de apresentação, como termo inglês no pedido e condição sem frete omitida no texto promocional. As execuções anteriores permanecem no histórico Git e nos arquivos locais de evidência.

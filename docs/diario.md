@@ -233,6 +233,16 @@ Os testes da interface não demonstram todas as combinações de perguntas. Olla
 - Consultada a lista de modelos pela API, sem inferência adicional ou envio do desafio. Preparada configuração alternativa GPT-OSS 20B com mesma persona/provedor, sem aplicá-la. Solicitada escolha explícita entre avaliar outro modelo gratuito e aguardar o Qwen, mantendo a seleção de destino transparente.
 - Documentação e registros em docs/validacao-32-2026-11-03.md e local/validacao-32-2026-11-03/. Nenhum plano contratado, chave exposta ou dado original alterado.
 
+## 03/11/2026 - Avaliação integral com Gemini e consolidação
+
+- Retomada Qwen concluiu 24 cenários, com 14 aprovados, nove ressalvas e uma falha de campanha; a cota diária interrompeu C25.
+- Conector Gemini implementado com chave própria, assinaturas de ferramenta preservadas e importação compatível com configurações antigas. Flash 3.8 apresentou alta demanda; Flash 3.6 gerou respostas, mas sua rodada foi parcial com recusa diária de 20 requisições.
+- Flash-Lite 3.5 concluiu a tentativa dos 32: 12 aprovados, 15 com ressalvas e cinco falhas, em 86 requisições HTTP 200. Evidências originais preservadas.
+- Tratados estados normais de pedido sem identificação/não localizado, mantendo retorno indistinguível para pedido ausente e de terceiro. Instruções esclarecidas para as demais falhas. Nove casos reexecutados; uma regressão de condição de frete em total histórico recebeu guarda conservadora e novo teste unitário.
+- Conferência real final de C25 entregou status, total e rastreamento corretos, sem qualificar frete. Suíte final: 61 testes locais passando. Não houve nova rodada integral após o último ajuste; versões e ressalvas foram mantidas no relatório.
+- Selecionadas cinco conversas reais sem editar respostas. Exportador do README e Markdown de documentação criado com sumário, links, paginação, imagem da interface e manifesto das fontes. Fontes originais do desafio conferidas como byte-idênticas.
+- Plano de evolução ampliado com guardrails, contexto de atendimento e avaliação de fine-tuning baseada em conversas revisadas e conjunto independente.
+
 ## Como registrar as próximas etapas
 
 Para cada etapa, anotar: problema, solução escolhida e motivo, alternativa considerada, teste executado, resultado e limitação restante.

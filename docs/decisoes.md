@@ -109,3 +109,23 @@ Além das conversas, testar funções críticas de preço, filtros e acesso a pe
 - Groq configurada e testada; validar Ollama com modelo instalado e respeitar as cotas disponíveis.
 - Revisar as cinco conversas e ampliar testes com variações, ambiguidades e tentativa de induzir respostas sem fontes.
 - Revisão final da entrega e mudança do repositório para público permanecem pendentes; não publicar a aplicação nem enviar e-mail automaticamente.
+
+## 03/11/2026 - Provedor alternativo e vigência de campanhas
+
+Após a interrupção da rodada Qwen por cota diária, foi escolhido explicitamente Gemini Flash como alternativa externa. O conector mantém o mesmo agente, as mesmas cinco ferramentas, a recuperação lexical e os dados originais. Cada provedor tem sua credencial e endpoint fixos, sem reaproveitar chaves nem selecionar outro destino automaticamente.
+
+A listagem da API confirmou modelos Flash disponíveis. O Flash 3.8 apresentou indisponibilidade por alta demanda; o Flash 3.6 respondeu à geração curta e concluiu chamada/retorno de ferramenta. Por isso, o modelo preparado para a avaliação Gemini é `gemini-3.6-flash`. A API compatível exige devolver as assinaturas opacas das chamadas de ferramentas, preservadas pelo adaptador. Não são raciocínio exposto ao cliente.
+
+O importador aceita configurações antigas sem o campo Gemini, acrescentando somente o modelo padrão, sem mudar o provedor escolhido. Campos extras e credenciais continuam rejeitados. A suíte chegou a 57 testes passando, incluindo contratos de três provedores e regressão da campanha.
+
+Uma resposta real Qwen citou a campanha do manual sem qualificar a vigência operacional. Foi incluída guarda conservadora que solicita uma revisão quando uma campanha recuperada é mencionada sem ressalva sobre ativação/cadastro. Não é um classificador completo de promoções nem uma regra específica para o texto do cenário. O cadastro de ofertas ativas permanece a fonte de preço. A rodada Gemini usa um novo código fixado e não demonstra isoladamente que a troca do modelo causou melhora.
+
+## 03/11/2026 - Consolidação da avaliação e estados de pedido
+
+A rodada integral foi executada em Flash-Lite 3.5, após o limite diário observado no Flash 3.6. As 32 perguntas foram preservadas e os resultados separados por versão/modelo. Os cinco problemas iniciais motivaram retestes dirigidos; as respostas antigas permaneceram nas evidências.
+
+Pedido sem identificação ou não localizado é um estado normal da ferramenta, não um fato que precise de citação inventada. Para uma chamada única de consulta/listagem nesses estados, o programa apresenta orientação determinística a partir do resultado. Pedido ausente e de terceiro continuam com a mesma resposta. Pedidos autorizados seguem a geração com os dados minimizados e o total histórico.
+
+Foram esclarecidas as instruções sobre canal online já informado, status descontinuado com estoque positivo, escopo de instrumentos e qualificação de preços. Uma regressão de texto atribuiu sem frete ao total histórico; incluímos validação conservadora e teste reproduzível para impedir essa afirmação não documentada. A suíte final passou em 61 testes. Os retestes e suas ressalvas estão em validacao-gemini-2026-11-03.md.
+
+A entrega seleciona cinco exportações reais por variedade e demonstração dos fluxos. O relatório completo preserva as falhas e o histórico de revisão. Guardrails mais amplos, contexto de atendimentos anteriores e eventual fine-tuning são evolução proposta, com critérios de avaliação, não funcionalidades anunciadas como prontas.
